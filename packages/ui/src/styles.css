@@ -1,0 +1,13 @@
+/* Component-level styles for the UI package */
+@import "tailwindcss" prefix(ui);
+@import "@repo/tailwind-config";
+
+@source "./";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}";

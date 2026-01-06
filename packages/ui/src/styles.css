@@ -4,8 +4,6 @@
 
 @source "./";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;

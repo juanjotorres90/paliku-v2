@@ -2,6 +2,8 @@ import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { ThemeScript } from "@repo/ui/theme-script";
+import { ThemeToggle } from "@repo/ui/theme-toggle";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,27 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (prefersDark) {
-                  document.documentElement.classList.add('dark');
-                }
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                  if (e.matches) {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                });
-              })();
-            `,
-          }}
-        />
+        <ThemeScript />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+        <ThemeToggle className="ui:fixed ui:top-4 ui:right-4 ui:z-50" />
         {children}
       </body>
     </html>

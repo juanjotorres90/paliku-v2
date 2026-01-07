@@ -4,8 +4,15 @@
 
 @source "./";
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
+/* Image switching based on theme class */
+.imgDark {
+  display: none;
+}
+
+.dark .imgLight {
+  display: none;
+}
+
+.dark .imgDark {
+  display: block;
 }

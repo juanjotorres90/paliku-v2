@@ -154,11 +154,11 @@ export function ThemeToggle({
   if (!mounted) {
     return (
       <button
-        className={`ui:inline-flex ui:items-center ui:justify-center ui:size-10 ui:rounded-full ui:transition-all ui:duration-300 ui:bg-gray-100 ui:text-gray-600 ui:dark:bg-gray-800 ui:dark:text-gray-400 ui:shadow-lg ui:backdrop-blur-sm ${className ?? ""}`}
+        className={`inline-flex items-center justify-center size-10 rounded-full transition-all duration-300 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 shadow-lg backdrop-blur-sm ${className ?? ""}`}
         aria-label="Toggle theme"
         disabled
       >
-        <span className="ui:size-5" />
+        <span className="size-5" />
       </button>
     );
   }
@@ -169,16 +169,16 @@ export function ThemeToggle({
     <button
       type="button"
       onClick={cycleTheme}
-      className={`ui:group ui:inline-flex ui:items-center ui:justify-center ui:size-10 ui:rounded-full ui:transition-all ui:duration-300 ui:ease-out ui:bg-white/80 ui:dark:bg-gray-900/80 ui:backdrop-blur-md ui:text-gray-700 ui:dark:text-gray-200 ui:shadow-lg ui:shadow-gray-200/50 ui:dark:shadow-black/30 ui:ring-1 ui:ring-gray-200/50 ui:dark:ring-gray-700/50 ui:hover:scale-110 ui:hover:shadow-xl ui:hover:ring-2 ui:hover:ring-purple-500/50 ui:dark:hover:ring-purple-400/50 ui:active:scale-95 ui:cursor-pointer ${className ?? ""}`}
+      className={`group inline-flex items-center justify-center size-10 rounded-full transition-all duration-300 ease-out bg-white/80 dark:bg-gray-900/80 backdrop-blur-md text-gray-700 dark:text-gray-200 shadow-lg shadow-gray-200/50 dark:shadow-black/30 ring-1 ring-gray-200/50 dark:ring-gray-700/50 hover:scale-110 hover:shadow-xl hover:ring-2 hover:ring-purple-500/50 dark:hover:ring-purple-400/50 active:scale-95 cursor-pointer ${className ?? ""}`}
       aria-label={label}
       title={label}
     >
       {theme === "system" ? (
-        <SystemIcon className="ui:size-5 ui:transition-transform ui:duration-300 ui:group-hover:rotate-12" />
+        <SystemIcon className="size-5 transition-transform duration-300 group-hover:rotate-12" />
       ) : theme === "light" ? (
-        <SunIcon className="ui:size-5 ui:transition-transform ui:duration-300 ui:group-hover:rotate-90" />
+        <SunIcon className="size-5 transition-transform duration-300 group-hover:rotate-90" />
       ) : (
-        <MoonIcon className="ui:size-5 ui:transition-transform ui:duration-300 ui:group-hover:-rotate-12" />
+        <MoonIcon className="size-5 transition-transform duration-300 group-hover:-rotate-12" />
       )}
     </button>
   );

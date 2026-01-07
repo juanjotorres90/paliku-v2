@@ -1,8 +1,7 @@
-import "@repo/ui/styles.css";
-import "./globals.css";
+import "@repo/ui/globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { ThemeScript } from "@repo/ui/theme-script";
+import { ThemeProvider } from "./providers";
 import { ThemeToggle } from "@repo/ui/theme-toggle";
 
 const geistSans = localFont({
@@ -26,12 +25,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <ThemeScript />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
-        <ThemeToggle className="ui:fixed ui:top-4 ui:right-4 ui:z-50" />
-        {children}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable}`}
+        suppressHydrationWarning
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          enableColorScheme
+        >
+          <ThemeToggle className="fixed top-4 right-4 z-50" />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

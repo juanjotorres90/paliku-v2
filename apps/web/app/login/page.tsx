@@ -14,6 +14,14 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const getSafeRedirect = (value: string | null) => {
+    if (!value) return "/";
+    if (value.startsWith("/") && !value.startsWith("//") && !value.startsWith("/\\")) {
+      return value;
+    }
+    return "/";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -32,7 +40,7 @@ export default function LoginPage() {
         return;
       }
 
-      const redirectTo = searchParams.get("redirect") ?? "/";
+      const redirectTo = getSafeRedirect(searchParams.get("redirect"));
       router.replace(redirectTo);
       router.refresh();
     } catch {

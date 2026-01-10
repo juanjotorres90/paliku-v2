@@ -8,30 +8,60 @@ if (!supabaseUrl) {
   throw new Error("Missing SUPABASE_URL environment variable");
 }
 
-const jwksUrl = `${supabaseUrl}/auth/v1/.well-known/jwks.json`;
-const JWKS = jose.createRemoteJWKSet(new URL(jwksUrl));
+const supabaseOrigin = new URL(supabaseUrl).origin;
+const issuer = `${supabaseOrigin}/auth/v1`;
+const audience = process.env.SUPABASE_JWT_AUD ?? "authenticated";
+const jwtSecret = process.env.SUPABASE_JWT_SECRET;
+const jwtAlgs = (process.env.SUPABASE_JWT_ALGS ?? "")
+  .split(",")
+  .map((alg) => alg.trim())
+  .filter(Boolean);
+const algorithms =
+  jwtAlgs.length > 0 ? jwtAlgs : jwtSecret ? ["HS256"] : ["RS256", "ES256"];
+
+const JWKS = jose.createRemoteJWKSet(
+  new URL("/auth/v1/.well-known/jwks.json", supabaseOrigin)
+);
 
 const corsOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
-const allowedOrigins = corsOrigin.split(",").map((o) => o.trim());
+const allowedOrigins = corsOrigin
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
 
-// Custom JWT middleware using jose for ES256 verification
+// Custom JWT middleware
 const jwtAuth = createMiddleware(async (c, next) => {
+  if (c.req.method === "OPTIONS") {
+    return new Response(null, { status: 204 });
+  }
+
   const authHeader = c.req.header("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return c.json({ error: "Missing or invalid Authorization header" }, 401);
   }
 
-  const token = authHeader.slice(7);
+  const token = authHeader.slice(7).trim();
+  if (!token) {
+    return c.json({ error: "Missing or invalid Authorization header" }, 401);
+  }
 
   try {
-    const { payload } = await jose.jwtVerify(token, JWKS, {
-      issuer: `${supabaseUrl}/auth/v1`,
-      audience: "authenticated",
-    });
+    const verifyOptions = {
+      issuer,
+      audience,
+      algorithms,
+      clockTolerance: "5s",
+    };
+    const { payload } = jwtSecret
+      ? await jose.jwtVerify(token, new TextEncoder().encode(jwtSecret), verifyOptions)
+      : await jose.jwtVerify(token, JWKS, verifyOptions);
+    if (!payload.sub) {
+      return c.json({ error: "Invalid token" }, 401);
+    }
     c.set("jwtPayload", payload);
     await next();
   } catch (err) {
-    console.error("JWT verification failed:", err);
+    console.error("JWT verification failed");
     return c.json({ error: "Invalid token" }, 401);
   }
 });

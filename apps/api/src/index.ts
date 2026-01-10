@@ -58,7 +58,6 @@ app.use("/me", jwtAuth);
 
 app.get("/me", (c) => {
   const payload = c.get("jwtPayload");
-  console.log("🚀 ~ payload:", payload)
   return c.json({
     userId: payload.sub,
     aud: payload.aud,

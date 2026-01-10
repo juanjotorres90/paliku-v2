@@ -7,11 +7,17 @@ import { Input } from "@repo/ui/components/input";
 import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 import { TurborepoLogo } from "@repo/ui/components/turborepo-logo";
+import { MeWidget } from "./me-widget";
 
 export default function Home() {
   return (
     <main className="min-h-screen p-8 flex flex-col items-center justify-center gap-8">
       <h1 className="text-3xl font-bold">Web App</h1>
+
+      <section className="flex flex-col gap-4 items-center w-full max-w-md">
+        <h2 className="text-xl font-semibold">Authentication Status</h2>
+        <MeWidget />
+      </section>
 
       <section className="flex flex-col gap-4 items-center">
         <h2 className="text-xl font-semibold">Turborepo Logo</h2>

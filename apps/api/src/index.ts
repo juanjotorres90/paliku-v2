@@ -1,16 +1,42 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { jwt } from "hono/jwt";
+import { createMiddleware } from "hono/factory";
+import * as jose from "jose";
 
-const jwtSecret = process.env.SUPABASE_JWT_SECRET;
-if (!jwtSecret) {
-  throw new Error("Missing SUPABASE_JWT_SECRET environment variable");
+const supabaseUrl = process.env.SUPABASE_URL;
+if (!supabaseUrl) {
+  throw new Error("Missing SUPABASE_URL environment variable");
 }
+
+const jwksUrl = `${supabaseUrl}/auth/v1/.well-known/jwks.json`;
+const JWKS = jose.createRemoteJWKSet(new URL(jwksUrl));
 
 const corsOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
 const allowedOrigins = corsOrigin.split(",").map((o) => o.trim());
 
-const app = new Hono();
+// Custom JWT middleware using jose for ES256 verification
+const jwtAuth = createMiddleware(async (c, next) => {
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return c.json({ error: "Missing or invalid Authorization header" }, 401);
+  }
+
+  const token = authHeader.slice(7);
+
+  try {
+    const { payload } = await jose.jwtVerify(token, JWKS, {
+      issuer: `${supabaseUrl}/auth/v1`,
+      audience: "authenticated",
+    });
+    c.set("jwtPayload", payload);
+    await next();
+  } catch (err) {
+    console.error("JWT verification failed:", err);
+    return c.json({ error: "Invalid token" }, 401);
+  }
+});
+
+const app = new Hono<{ Variables: { jwtPayload: jose.JWTPayload } }>();
 
 // CORS middleware
 app.use(
@@ -28,10 +54,11 @@ app.get("/", (c) => {
 });
 
 // Protected /me endpoint
-app.use("/me", jwt({ secret: jwtSecret }));
+app.use("/me", jwtAuth);
 
 app.get("/me", (c) => {
   const payload = c.get("jwtPayload");
+  console.log("🚀 ~ payload:", payload)
   return c.json({
     userId: payload.sub,
     aud: payload.aud,

@@ -23,6 +23,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@repo/validators':
+        specifier: workspace:*
+        version: link:../../packages/validators
       hono:
         specifier: ^4.11.3
         version: 4.11.3
@@ -91,6 +94,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@repo/validators':
+        specifier: workspace:*
+        version: link:../../packages/validators
       '@supabase/ssr':
         specifier: ^0.6.1
         version: 0.6.1(@supabase/supabase-js@2.90.1)
@@ -143,6 +149,8 @@ importers:
       typescript:
         specifier: 5.9.3
         version: 5.9.3
+
+  packages/db: {}
 
   packages/eslint-config:
     devDependencies:
@@ -251,6 +259,25 @@ importers:
       tailwindcss:
         specifier: ^4.1.5
         version: 4.1.18
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
+  packages/validators:
+    dependencies:
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -2151,6 +2178,9 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
 snapshots:
 
@@ -4111,3 +4141,5 @@ snapshots:
   ws@8.19.0: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@3.25.76: {}

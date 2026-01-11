@@ -16,6 +16,14 @@ pnpm -C apps/api dev
 
 Server runs on `http://localhost:3002`.
 
+## Build
+
+```sh
+pnpm -C apps/api build
+```
+
+Build output goes to `apps/api/dist`.
+
 ## Env
 
 - `SUPABASE_URL`

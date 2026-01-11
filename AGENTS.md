@@ -4,22 +4,25 @@
 
 - `apps/web`: Next.js App Router app (dev on `:3000`).
 - `apps/docs`: Next.js App Router app (dev on `:3001`).
+- `apps/api`: Bun + Hono API (dev on `:3002`).
 - `packages/ui`: shared React component library.
   - Source: `packages/ui/src/*.tsx`
   - Built output (generated): `packages/ui/dist/**`
   - Shared styles entrypoint: `@repo/ui/styles.css`
+- `packages/validators`: shared Zod schemas.
+- `packages/db`: Supabase/Postgres SQL artifacts.
 - `packages/tailwind-config`: shared Tailwind v4 CSS tokens + PostCSS config (`@repo/tailwind-config/postcss`).
 - `packages/eslint-config`, `packages/typescript-config`: shared tooling configs.
 - Monorepo tooling: `pnpm-workspace.yaml` + `turbo.json`.
 
 ## Build, Test, and Development Commands
 
-Requirements: Node `>=24` and `pnpm@10.24.0` (see root `package.json`).
+Requirements: Node `>=24`, `pnpm@10.24.0`, and Bun (for `apps/api`).
 
 From repo root:
 
 - `pnpm install`: install workspace deps.
-- `pnpm dev`: run dev tasks via Turbo (starts both apps).
+- `pnpm dev`: run dev tasks via Turbo (starts web/docs/api).
 - `pnpm build`: build all apps/packages.
 - `pnpm lint`: run ESLint across the repo.
 - `pnpm check-types`: run type checks (Next typegen + `tsc`).
@@ -29,6 +32,7 @@ Targeted runs:
 
 - `turbo dev --filter=web` / `turbo dev --filter=docs`
 - `turbo build --filter=@repo/ui`
+- `pnpm -C apps/api dev` / `pnpm -C apps/api build`
 - `pnpm -C packages/ui dev:styles`: rebuild UI CSS in watch mode.
 
 ## Coding Style & Naming Conventions

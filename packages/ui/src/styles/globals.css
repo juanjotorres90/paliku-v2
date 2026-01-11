@@ -1,7 +1,6 @@
 @import "tailwindcss";
+@import "@repo/tailwind-config";
 @import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
 
 :root {
   --background: 0 0% 100%;
@@ -102,5 +101,3 @@
 
 /* Scan all source files for Tailwind classes */
 @source "../**/*.{ts,tsx}";
-@source "../../../apps/**/*.{ts,tsx}";
-@source "../../../packages/**/*.{ts,tsx}";

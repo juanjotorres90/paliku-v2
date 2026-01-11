@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Avatar } from "@repo/ui/components/avatar";
+import { ProfileUpsertSchema } from "@repo/validators/profile";
 
 type IntentValue = "practice" | "friends" | "date";
 
@@ -96,6 +97,13 @@ function ProfileSettingsPageContent() {
     setSaving(true);
 
     try {
+      const parsed = ProfileUpsertSchema.safeParse(formData);
+      if (!parsed.success) {
+        setError(parsed.error.issues[0]?.message ?? "Invalid profile");
+        setSaving(false);
+        return;
+      }
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
       const response = await fetch(`${apiUrl}/profile/me`, {
         method: "POST",
@@ -103,7 +111,7 @@ function ProfileSettingsPageContent() {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(parsed.data),
       });
 
       if (!response.ok) {

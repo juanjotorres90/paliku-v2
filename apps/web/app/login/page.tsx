@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
+import { LoginRequestSchema } from "@repo/validators/auth";
 
 function LoginPageContent() {
   const router = useRouter();
@@ -36,6 +37,13 @@ function LoginPageContent() {
     setLoading(true);
 
     try {
+      const parsed = LoginRequestSchema.safeParse({ email, password });
+      if (!parsed.success) {
+        setError(parsed.error.issues[0]?.message ?? "Invalid form");
+        setLoading(false);
+        return;
+      }
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
       const response = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
@@ -43,7 +51,7 @@ function LoginPageContent() {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(parsed.data),
       });
 
       const text = await response.text();

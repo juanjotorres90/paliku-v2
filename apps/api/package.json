@@ -3,6 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --env-file=../../.env.local --hot src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
     "lint": "eslint .",
     "check-types": "tsc --noEmit",
     "test": "vitest run",

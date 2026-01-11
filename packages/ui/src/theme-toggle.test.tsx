@@ -1,5 +1,5 @@
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { describe, expect, it, afterEach, beforeEach, vi } from "vitest";
+import { describe, expect, it, afterEach, beforeEach } from "vitest";
 import { ThemeToggle } from "./theme-toggle";
 
 describe("ThemeToggle", () => {

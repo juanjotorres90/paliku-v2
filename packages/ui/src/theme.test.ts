@@ -118,7 +118,7 @@ describe("theme utilities", () => {
       setTheme("dark");
 
       expect(listener).toHaveBeenCalled();
-      const event = listener.mock.calls[0][0] as StorageEvent;
+      const event = listener.mock.calls[0]![0] as StorageEvent;
       expect(event.key).toBe(STORAGE_KEY);
       expect(event.newValue).toBe("dark");
 
@@ -132,7 +132,7 @@ describe("theme utilities", () => {
       setTheme("system");
 
       expect(listener).toHaveBeenCalled();
-      const event = listener.mock.calls[0][0] as StorageEvent;
+      const event = listener.mock.calls[0]![0] as StorageEvent;
       expect(event.newValue).toBeNull();
 
       window.removeEventListener("storage", listener);

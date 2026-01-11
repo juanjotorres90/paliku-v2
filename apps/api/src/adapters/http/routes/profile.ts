@@ -12,16 +12,14 @@ export function createProfileRoutes(
   router.use("/me", jwtAuth);
 
   router.get("/me", async (c) => {
-    const payload = c.get("jwtPayload");
-    const accessToken = c.get("accessToken");
-
-    if (!payload?.sub || !accessToken) {
-      return c.json({ error: "Invalid token" }, 401);
-    }
+    // jwtAuth middleware guarantees these are set and payload.sub exists
+    const payload = c.get("jwtPayload")!;
+    const accessToken = c.get("accessToken")!;
+    const userId = payload.sub as string;
 
     try {
       const result = await useCases.getProfileMe(
-        { accessToken, userId: payload.sub },
+        { accessToken, userId },
         {
           supabaseAuth,
           supabaseUrl: config.supabase.url,
@@ -42,12 +40,10 @@ export function createProfileRoutes(
   });
 
   router.post("/me", async (c) => {
-    const payload = c.get("jwtPayload");
-    const accessToken = c.get("accessToken");
-
-    if (!payload?.sub || !accessToken) {
-      return c.json({ error: "Invalid token" }, 401);
-    }
+    // jwtAuth middleware guarantees these are set and payload.sub exists
+    const payload = c.get("jwtPayload")!;
+    const accessToken = c.get("accessToken")!;
+    const userId = payload.sub as string;
 
     const body = await parseJsonBody(c);
     if (!body.ok) {
@@ -65,7 +61,7 @@ export function createProfileRoutes(
 
     try {
       const profileResult = await useCases.updateProfileMe(
-        { accessToken, userId: payload.sub, data: parsed.data },
+        { accessToken, userId, data: parsed.data },
         {
           supabaseAuth,
           supabaseUrl: config.supabase.url,
@@ -89,12 +85,10 @@ export function createProfileRoutes(
   router.use("/avatar", jwtAuth);
 
   router.post("/avatar", async (c) => {
-    const payload = c.get("jwtPayload");
-    const accessToken = c.get("accessToken");
-
-    if (!payload?.sub || !accessToken) {
-      return c.json({ error: "Invalid token" }, 401);
-    }
+    // jwtAuth middleware guarantees these are set and payload.sub exists
+    const payload = c.get("jwtPayload")!;
+    const accessToken = c.get("accessToken")!;
+    const userId = payload.sub as string;
 
     const formData = await c.req.formData();
     const file = formData.get("file");
@@ -109,7 +103,7 @@ export function createProfileRoutes(
 
     try {
       const profileResult = await useCases.uploadAvatar(
-        { accessToken, userId: payload.sub, file },
+        { accessToken, userId, file },
         {
           supabaseAuth,
           storageClient,

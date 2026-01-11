@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { createSupabaseBrowserClient } from "../../lib/supabase/browser";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -16,11 +16,19 @@ export default function LoginPage() {
 
   const getSafeRedirect = (value: string | null) => {
     if (!value) return "/";
-    if (value.startsWith("/") && !value.startsWith("//") && !value.startsWith("/\\")) {
+    if (
+      value.startsWith("/") &&
+      !value.startsWith("//") &&
+      !value.startsWith("/\\")
+    ) {
       return value;
     }
     return "/";
   };
+
+  function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,14 +36,32 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const supabase = createSupabaseBrowserClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
+      const response = await fetch(`${apiUrl}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
       });
 
-      if (signInError) {
-        setError(signInError.message);
+      const text = await response.text();
+
+      if (!response.ok) {
+        let message = "Failed to sign in";
+        if (text) {
+          try {
+            const json: unknown = JSON.parse(text);
+            if (isRecord(json) && typeof json.error === "string") {
+              message = json.error;
+            }
+          } catch {
+            // JSON parse failed, use default message
+          }
+        }
+
+        setError(message);
         setLoading(false);
         return;
       }
@@ -49,6 +75,11 @@ export default function LoginPage() {
     }
   };
 
+  const redirectParam = searchParams.get("redirect");
+  const registerHref = redirectParam
+    ? `/register?redirect=${encodeURIComponent(redirectParam)}`
+    : "/register";
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm space-y-6">
@@ -56,6 +87,12 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold">Sign In</h1>
           <p className="text-muted-foreground mt-2">
             Enter your email and password to continue
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            New here?{" "}
+            <Link href={registerHref} className="underline underline-offset-4">
+              Create an account
+            </Link>
           </p>
         </div>
 
@@ -102,5 +139,13 @@ export default function LoginPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

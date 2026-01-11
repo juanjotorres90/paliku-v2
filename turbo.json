@@ -1,7 +1,17 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalEnv": ["SUPABASE_URL", "SUPABASE_ANON_KEY"],
+  "globalEnv": [
+    "SUPABASE_URL",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_JWT_AUD",
+    "SUPABASE_JWT_SECRET",
+    "SUPABASE_JWT_ALGS",
+    "API_URL",
+    "NEXT_PUBLIC_API_URL",
+    "CORS_ORIGIN",
+    "COOKIE_DOMAIN"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

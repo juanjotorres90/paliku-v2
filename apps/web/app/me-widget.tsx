@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/components/button";
-import { createSupabaseBrowserClient } from "../lib/supabase/browser";
 
 interface MeResponse {
   userId: string;
@@ -21,23 +20,17 @@ export function MeWidget() {
   useEffect(() => {
     async function fetchMe() {
       try {
-        const supabase = createSupabaseBrowserClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
+        const response = await fetch(`${apiUrl}/me`, {
+          credentials: "include",
+        });
 
-        if (!session) {
+        if (response.status === 401) {
           setError("Not authenticated");
           setLoading(false);
           return;
         }
-
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
-        const response = await fetch(`${apiUrl}/me`, {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        });
 
         if (!response.ok) {
           const text = await response.text();
@@ -61,8 +54,11 @@ export function MeWidget() {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
-      const supabase = createSupabaseBrowserClient();
-      await supabase.auth.signOut();
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
+      await fetch(`${apiUrl}/auth/signout`, {
+        method: "POST",
+        credentials: "include",
+      });
       router.replace("/login");
       router.refresh();
     } catch {
@@ -82,7 +78,12 @@ export function MeWidget() {
     return (
       <div className="p-4 border rounded-md bg-destructive/10 space-y-3">
         <p className="text-sm text-destructive">{error}</p>
-        <Button variant="outline" size="sm" onClick={handleLogout} disabled={loggingOut}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleLogout}
+          disabled={loggingOut}
+        >
           {loggingOut ? "Logging out..." : "Logout"}
         </Button>
       </div>
@@ -97,7 +98,12 @@ export function MeWidget() {
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
-      <Button variant="outline" size="sm" onClick={handleLogout} disabled={loggingOut}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleLogout}
+        disabled={loggingOut}
+      >
         {loggingOut ? "Logging out..." : "Logout"}
       </Button>
     </div>

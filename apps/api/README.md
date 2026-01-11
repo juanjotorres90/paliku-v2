@@ -1,11 +1,25 @@
-To install dependencies:
+# `api` (Hono + Bun)
+
+## Dev
+
+From repo root:
+
 ```sh
-bun install
+pnpm dev
 ```
 
-To run:
+Or just this app:
+
 ```sh
-bun run dev
+pnpm -C apps/api dev
 ```
 
-open http://localhost:3000
+Server runs on `http://localhost:3002`.
+
+## Env
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `API_URL` (public API origin, e.g. `http://localhost:3002`)
+- `CORS_ORIGIN` (default `http://localhost:3000`)
+- `COOKIE_DOMAIN` (optional, for sharing auth cookies across subdomains)

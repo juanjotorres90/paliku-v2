@@ -1,99 +1,85 @@
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import { createMiddleware } from "hono/factory";
-import * as jose from "jose";
+import type {
+  AppConfig,
+  SupabaseConfig,
+  CorsConfig,
+  CookieConfig,
+} from "./domain/config";
+import { getCookieDomainForSharing } from "./domain/cookie";
+import { createPKCEHelpers } from "./adapters/crypto";
+import { createFetchHttpClient } from "./adapters/http-client";
+import { createSupabaseAuthAdapter } from "./adapters/supabase-auth";
+import { createJWTVerifier } from "./adapters/jwt-verifier";
+import { createRoutes } from "./adapters/routes";
+import * as useCases from "./application/index";
 
-const supabaseUrl = process.env.SUPABASE_URL;
-if (!supabaseUrl) {
-  throw new Error("Missing SUPABASE_URL environment variable");
+function buildConfig(): AppConfig {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error("Missing SUPABASE_URL environment variable");
+  }
+
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+  if (!supabaseAnonKey) {
+    throw new Error("Missing SUPABASE_ANON_KEY environment variable");
+  }
+
+  const supabaseOrigin = new URL(supabaseUrl);
+  const projectRef = supabaseOrigin.hostname.split(".")[0] || "default";
+
+  const supabaseConfig: SupabaseConfig = {
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
+    audience: process.env.SUPABASE_JWT_AUD ?? "authenticated",
+    jwtSecret: process.env.SUPABASE_JWT_SECRET,
+    jwtAlgs: (process.env.SUPABASE_JWT_ALGS ?? "")
+      .split(",")
+      .map((alg) => alg.trim())
+      .filter(Boolean),
+  };
+
+  const corsOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
+  const allowedOrigins = corsOrigin
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+
+  const corsConfig: CorsConfig = {
+    allowedOrigins,
+  };
+
+  const cookieDomain =
+    process.env.COOKIE_DOMAIN ??
+    getCookieDomainForSharing(
+      allowedOrigins[0] ? new URL(allowedOrigins[0]).hostname : "localhost",
+    );
+
+  const cookieConfig: CookieConfig = {
+    domain: cookieDomain,
+    projectRef,
+  };
+
+  return {
+    supabase: supabaseConfig,
+    cors: corsConfig,
+    cookie: cookieConfig,
+  };
 }
 
-const supabaseOrigin = new URL(supabaseUrl).origin;
-const issuer = `${supabaseOrigin}/auth/v1`;
-const audience = process.env.SUPABASE_JWT_AUD ?? "authenticated";
-const jwtSecret = process.env.SUPABASE_JWT_SECRET;
-const jwtAlgs = (process.env.SUPABASE_JWT_ALGS ?? "")
-  .split(",")
-  .map((alg) => alg.trim())
-  .filter(Boolean);
-const algorithms =
-  jwtAlgs.length > 0 ? jwtAlgs : jwtSecret ? ["HS256"] : ["RS256", "ES256"];
+const config = buildConfig();
+const pkceHelpers = createPKCEHelpers();
+const httpClient = createFetchHttpClient();
+const supabaseAuth = createSupabaseAuthAdapter(config.supabase, httpClient);
+const jwtVerifier = createJWTVerifier(config.supabase);
 
-const JWKS = jose.createRemoteJWKSet(
-  new URL("/auth/v1/.well-known/jwks.json", supabaseOrigin)
-);
+const routeCtx = {
+  config,
+  jwtVerifier,
+  useCases,
+  pkceHelpers,
+  supabaseAuth,
+};
 
-const corsOrigin = process.env.CORS_ORIGIN ?? "http://localhost:3000";
-const allowedOrigins = corsOrigin
-  .split(",")
-  .map((o) => o.trim())
-  .filter(Boolean);
-
-// Custom JWT middleware
-const jwtAuth = createMiddleware(async (c, next) => {
-  if (c.req.method === "OPTIONS") {
-    return new Response(null, { status: 204 });
-  }
-
-  const authHeader = c.req.header("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return c.json({ error: "Missing or invalid Authorization header" }, 401);
-  }
-
-  const token = authHeader.slice(7).trim();
-  if (!token) {
-    return c.json({ error: "Missing or invalid Authorization header" }, 401);
-  }
-
-  try {
-    const verifyOptions = {
-      issuer,
-      audience,
-      algorithms,
-      clockTolerance: "5s",
-    };
-    const { payload } = jwtSecret
-      ? await jose.jwtVerify(token, new TextEncoder().encode(jwtSecret), verifyOptions)
-      : await jose.jwtVerify(token, JWKS, verifyOptions);
-    if (!payload.sub) {
-      return c.json({ error: "Invalid token" }, 401);
-    }
-    c.set("jwtPayload", payload);
-    await next();
-  } catch (err) {
-    console.error("JWT verification failed");
-    return c.json({ error: "Invalid token" }, 401);
-  }
-});
-
-const app = new Hono<{ Variables: { jwtPayload: jose.JWTPayload } }>();
-
-// CORS middleware
-app.use(
-  "*",
-  cors({
-    origin: allowedOrigins,
-    allowHeaders: ["Authorization", "Content-Type"],
-    allowMethods: ["GET", "POST", "OPTIONS"],
-  })
-);
-
-// Health check (public)
-app.get("/", (c) => {
-  return c.text("ok");
-});
-
-// Protected /me endpoint
-app.use("/me", jwtAuth);
-
-app.get("/me", (c) => {
-  const payload = c.get("jwtPayload");
-  return c.json({
-    userId: payload.sub,
-    aud: payload.aud,
-    role: payload.role,
-  });
-});
+const app = createRoutes(routeCtx);
 
 export default {
   port: 3002,

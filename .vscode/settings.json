@@ -3,5 +3,9 @@
     {
       "mode": "auto"
     }
+  ],
+  "conventionalCommits.scopes": [
+    "api",
+    "web"
   ]
 }

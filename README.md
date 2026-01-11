@@ -34,6 +34,8 @@ pnpm build
 pnpm lint
 pnpm check-types
 pnpm format
+pnpm test
+pnpm test:watch
 ```
 
 Targeted runs:

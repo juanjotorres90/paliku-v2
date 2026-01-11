@@ -9,7 +9,7 @@ import { createPKCEHelpers } from "./adapters/crypto";
 import { createFetchHttpClient } from "./adapters/http-client";
 import { createSupabaseAuthAdapter } from "./adapters/supabase-auth";
 import { createJWTVerifier } from "./adapters/jwt-verifier";
-import { createRoutes } from "./adapters/routes";
+import { createHttpApp } from "./adapters/http/app";
 import { createStorageClient } from "./adapters/storage-client";
 import * as useCases from "./application/index";
 
@@ -86,7 +86,7 @@ const routeCtx = {
   storageClient,
 };
 
-const app = createRoutes(routeCtx);
+const app = createHttpApp(routeCtx);
 
 export default {
   port: 3002,

@@ -51,6 +51,7 @@ describe("createProfileRoutes", () => {
       supabaseAuth: {
         signup: vi.fn(),
         login: vi.fn(),
+        refreshSession: vi.fn(),
         exchangeAuthCodeForTokens: vi.fn(),
         getUser: vi.fn().mockResolvedValue({ email: "test@example.com" }),
       } as unknown as SupabaseAuthPort,

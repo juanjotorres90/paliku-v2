@@ -13,6 +13,7 @@ describe("callback", () => {
       exchangeAuthCodeForTokens: vi.fn().mockResolvedValue(mockTokens),
       signup: vi.fn(),
       login: vi.fn(),
+      refreshSession: vi.fn(),
       getUser: vi.fn(),
     };
 
@@ -44,6 +45,7 @@ describe("callback", () => {
       exchangeAuthCodeForTokens: vi.fn().mockResolvedValue(mockTokens),
       signup: vi.fn(),
       login: vi.fn(),
+      refreshSession: vi.fn(),
       getUser: vi.fn(),
     };
 
@@ -66,6 +68,7 @@ describe("callback", () => {
         .mockRejectedValue(new Error("Invalid auth code")),
       signup: vi.fn(),
       login: vi.fn(),
+      refreshSession: vi.fn(),
       getUser: vi.fn(),
     };
 

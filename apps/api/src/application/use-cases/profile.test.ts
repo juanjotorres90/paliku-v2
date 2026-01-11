@@ -9,6 +9,7 @@ describe("getProfileMe", () => {
     getUser: vi.fn().mockResolvedValue({ email: "test@example.com" }),
     signup: vi.fn(),
     login: vi.fn(),
+    refreshSession: vi.fn(),
     exchangeAuthCodeForTokens: vi.fn(),
   };
 
@@ -204,6 +205,7 @@ describe("updateProfileMe", () => {
     getUser: vi.fn().mockResolvedValue({ email: "test@example.com" }),
     signup: vi.fn(),
     login: vi.fn(),
+    refreshSession: vi.fn(),
     exchangeAuthCodeForTokens: vi.fn(),
   };
 
@@ -364,6 +366,7 @@ describe("uploadAvatar", () => {
     getUser: vi.fn().mockResolvedValue({ email: "test@example.com" }),
     signup: vi.fn(),
     login: vi.fn(),
+    refreshSession: vi.fn(),
     exchangeAuthCodeForTokens: vi.fn(),
   };
 

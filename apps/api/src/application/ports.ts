@@ -11,6 +11,8 @@ export interface SupabaseAuthPort {
 
   login(email: string, password: string): Promise<AuthTokens>;
 
+  refreshSession(refreshToken: string): Promise<AuthTokens>;
+
   exchangeAuthCodeForTokens(
     authCode: string,
     codeVerifier: string,

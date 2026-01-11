@@ -195,6 +195,68 @@ describe("createSupabaseAuthAdapter", () => {
     });
   });
 
+  describe("refreshSession", () => {
+    it("should refresh session successfully", async () => {
+      (mockHttpClient.post as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi
+          .fn()
+          .mockResolvedValue(
+            '{"access_token":"access-123","refresh_token":"refresh-456"}',
+          ),
+      });
+
+      const adapter = createSupabaseAuthAdapter(config, mockHttpClient);
+      const result = await adapter.refreshSession("refresh-000");
+
+      expect(result.accessToken).toBe("access-123");
+      expect(result.refreshToken).toBe("refresh-456");
+    });
+
+    it("should keep existing refresh token when response does not include one", async () => {
+      (mockHttpClient.post as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue('{"access_token":"access-123"}'),
+      });
+
+      const adapter = createSupabaseAuthAdapter(config, mockHttpClient);
+      const result = await adapter.refreshSession("refresh-000");
+
+      expect(result.accessToken).toBe("access-123");
+      expect(result.refreshToken).toBe("refresh-000");
+    });
+
+    it("should throw error when access token is missing", async () => {
+      (mockHttpClient.post as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: vi.fn().mockResolvedValue('{"refresh_token":"refresh-456"}'),
+      });
+
+      const adapter = createSupabaseAuthAdapter(config, mockHttpClient);
+
+      await expect(adapter.refreshSession("refresh-000")).rejects.toThrow(
+        "Refresh failed: missing access token",
+      );
+    });
+
+    it("should throw error on refresh failure", async () => {
+      (mockHttpClient.post as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: false,
+        status: 401,
+        text: vi.fn().mockResolvedValue('{"error":"Invalid refresh token"}'),
+      });
+
+      const adapter = createSupabaseAuthAdapter(config, mockHttpClient);
+
+      await expect(adapter.refreshSession("refresh-000")).rejects.toThrow(
+        "Invalid refresh token",
+      );
+    });
+  });
+
   describe("exchangeAuthCodeForTokens", () => {
     it("should exchange code for tokens successfully", async () => {
       (mockHttpClient.post as ReturnType<typeof vi.fn>).mockResolvedValue({

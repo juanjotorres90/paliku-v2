@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { LoginRequestSchema } from "@repo/validators/auth";
+import { apiFetch } from "../lib/api";
 
 function LoginPageContent() {
   const router = useRouter();
@@ -44,13 +45,11 @@ function LoginPageContent() {
         return;
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
-      const response = await fetch(`${apiUrl}/auth/login`, {
+      const response = await apiFetch("/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify(parsed.data),
       });
 

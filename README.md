@@ -57,3 +57,8 @@ scans that app, while `@repo/ui` declares sources for shared components.
 ## API
 
 See `apps/api/README.md` for environment variables and local dev details.
+
+## Docs
+
+- `docs/ARCHITECTURE.md`
+- `docs/PRODUCTION_READINESS.md`

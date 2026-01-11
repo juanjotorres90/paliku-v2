@@ -128,6 +128,56 @@ export function createAuthRoutes(ctx: RouteContext) {
     }
   });
 
+  router.post("/refresh", async (c) => {
+    const webOrigin = resolveWebOrigin([c.req.header("Origin")], corsConfig);
+
+    const cookieOptions = getCookieOptions(
+      cookieConfig,
+      webOrigin.startsWith("https://"),
+    );
+    const refreshTokenOptions = {
+      ...cookieOptions,
+      maxAge: 60 * 60 * 24 * 30,
+    };
+
+    const accessTokenCookieName = getCookieName(cookieConfig, "access-token");
+    const refreshTokenCookieName = getCookieName(cookieConfig, "refresh-token");
+
+    const refreshToken = getCookie(c, refreshTokenCookieName);
+    if (!refreshToken) {
+      return c.json({ error: "Missing refresh token" }, 401);
+    }
+
+    try {
+      const result = await useCases.refresh({ refreshToken }, { supabaseAuth });
+
+      setCookie(
+        c,
+        accessTokenCookieName,
+        result.tokens.accessToken,
+        cookieOptions,
+      );
+      if (result.tokens.refreshToken) {
+        setCookie(
+          c,
+          refreshTokenCookieName,
+          result.tokens.refreshToken,
+          refreshTokenOptions,
+        );
+      }
+
+      return c.json({ ok: true });
+    } catch (err) {
+      deleteCookie(c, accessTokenCookieName, cookieOptions);
+      deleteCookie(c, refreshTokenCookieName, cookieOptions);
+
+      return c.json(
+        { error: err instanceof Error ? err.message : "Refresh failed" },
+        401,
+      );
+    }
+  });
+
   router.post("/signout", async (c) => {
     const webOrigin = resolveWebOrigin([c.req.header("Origin")], corsConfig);
 

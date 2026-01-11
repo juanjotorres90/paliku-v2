@@ -6,6 +6,7 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Avatar } from "@repo/ui/components/avatar";
 import { ProfileUpsertSchema } from "@repo/validators/profile";
+import { apiFetchWithRefresh } from "../../lib/api";
 
 type IntentValue = "practice" | "friends" | "date";
 
@@ -48,11 +49,7 @@ function ProfileSettingsPageContent() {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
-        const response = await fetch(`${apiUrl}/profile/me`, {
-          credentials: "include",
-        });
+        const response = await apiFetchWithRefresh("/profile/me");
 
         if (response.status === 401) {
           router.replace(
@@ -104,13 +101,11 @@ function ProfileSettingsPageContent() {
         return;
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
-      const response = await fetch(`${apiUrl}/profile/me`, {
+      const response = await apiFetchWithRefresh("/profile/me", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify(parsed.data),
       });
 
@@ -140,13 +135,11 @@ function ProfileSettingsPageContent() {
     setUploading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(`${apiUrl}/profile/avatar`, {
+      const response = await apiFetchWithRefresh("/profile/avatar", {
         method: "POST",
-        credentials: "include",
         body: formData,
       });
 

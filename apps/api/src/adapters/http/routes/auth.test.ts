@@ -45,6 +45,7 @@ describe("createAuthRoutes", () => {
       supabaseAuth: {
         signup: vi.fn(),
         login: vi.fn(),
+        refreshSession: vi.fn(),
         exchangeAuthCodeForTokens: vi.fn(),
         getUser: vi.fn(),
       } as unknown as SupabaseAuthPort,
@@ -246,6 +247,77 @@ describe("createAuthRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
+    });
+  });
+
+  describe("POST /refresh", () => {
+    it("should return 401 when refresh token cookie is missing", async () => {
+      const app = new Hono<RouteEnv>();
+      app.route("/auth", createAuthRoutes(mockContext));
+
+      const res = await app.request("/auth/refresh", {
+        method: "POST",
+        headers: {
+          Origin: "http://localhost:3000",
+        },
+      });
+
+      expect(res.status).toBe(401);
+      const data = await res.json();
+      expect(data).toHaveProperty("error");
+    });
+
+    it("should refresh successfully and set new cookies", async () => {
+      (
+        mockContext.supabaseAuth.refreshSession as ReturnType<typeof vi.fn>
+      ).mockResolvedValue({
+        accessToken: "new-access-token",
+        refreshToken: "new-refresh-token",
+      });
+
+      const app = new Hono<RouteEnv>();
+      app.route("/auth", createAuthRoutes(mockContext));
+
+      const res = await app.request("/auth/refresh", {
+        method: "POST",
+        headers: {
+          Origin: "http://localhost:3000",
+          Cookie: "sb-test-project-refresh-token=refresh-token",
+        },
+      });
+
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data).toEqual({ ok: true });
+
+      const cookies = res.headers.get("set-cookie");
+      expect(cookies).toContain("sb-test-project-access-token");
+      expect(cookies).toContain("sb-test-project-refresh-token");
+    });
+
+    it("should clear cookies and return 401 when refresh fails", async () => {
+      (
+        mockContext.supabaseAuth.refreshSession as ReturnType<typeof vi.fn>
+      ).mockRejectedValue(new Error("Invalid refresh token"));
+
+      const app = new Hono<RouteEnv>();
+      app.route("/auth", createAuthRoutes(mockContext));
+
+      const res = await app.request("/auth/refresh", {
+        method: "POST",
+        headers: {
+          Origin: "http://localhost:3000",
+          Cookie: "sb-test-project-refresh-token=refresh-token",
+        },
+      });
+
+      expect(res.status).toBe(401);
+      const data = await res.json();
+      expect(data.error).toBe("Invalid refresh token");
+
+      const cookies = res.headers.get("set-cookie");
+      expect(cookies).toContain("sb-test-project-access-token=");
+      expect(cookies).toContain("sb-test-project-refresh-token=");
     });
   });
 

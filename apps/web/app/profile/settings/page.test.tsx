@@ -87,6 +87,7 @@ describe("ProfileSettingsPage", () => {
   it("redirects to login when user is not authenticated (401)", async () => {
     globalThis.fetch = createFetchMock([
       { type: "resolve", value: { status: 401, ok: false } },
+      { type: "resolve", value: { status: 401, ok: false } },
     ]);
     render(<ProfileSettingsPage />);
     await waitFor(() => {

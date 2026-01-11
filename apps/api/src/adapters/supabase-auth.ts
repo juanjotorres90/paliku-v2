@@ -130,6 +130,36 @@ export function createSupabaseAuthAdapter(
       return { accessToken, refreshToken };
     },
 
+    async refreshSession(refreshToken: string): Promise<AuthTokens> {
+      const refreshUrl = new URL(
+        "/auth/v1/token?grant_type=refresh_token",
+        supabaseOrigin,
+      );
+      const response = await httpClient.post(
+        refreshUrl.toString(),
+        { refresh_token: refreshToken },
+        {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+          "Content-Type": "application/json",
+          "X-Supabase-Api-Version": "2024-01-01",
+        },
+      );
+
+      const result = await parseResponse<{
+        access_token?: string;
+        refresh_token?: string;
+      }>(response);
+      const accessToken = result?.access_token;
+      const nextRefreshToken = result?.refresh_token;
+
+      if (!accessToken) {
+        throw new Error("Refresh failed: missing access token");
+      }
+
+      return { accessToken, refreshToken: nextRefreshToken ?? refreshToken };
+    },
+
     async exchangeAuthCodeForTokens(
       authCode: string,
       codeVerifier: string,

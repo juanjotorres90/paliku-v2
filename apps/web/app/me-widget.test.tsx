@@ -40,10 +40,15 @@ describe("MeWidget", () => {
   });
 
   it("shows error state when user is not authenticated (401)", async () => {
-    mockFetch.mockResolvedValueOnce({
-      status: 401,
-      ok: false,
-    });
+    mockFetch
+      .mockResolvedValueOnce({
+        status: 401,
+        ok: false,
+      })
+      .mockResolvedValueOnce({
+        status: 401,
+        ok: false,
+      });
 
     render(<MeWidget />);
 
@@ -152,6 +157,10 @@ describe("MeWidget", () => {
 
   it("handles logout from error state", async () => {
     mockFetch
+      .mockResolvedValueOnce({
+        status: 401,
+        ok: false,
+      })
       .mockResolvedValueOnce({
         status: 401,
         ok: false,

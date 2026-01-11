@@ -39,6 +39,7 @@ describe("createHttpApp", () => {
     supabaseAuth: {
       signup: vi.fn(),
       login: vi.fn(),
+      refreshSession: vi.fn(),
       exchangeAuthCodeForTokens: vi.fn(),
       getUser: vi.fn(),
     } as unknown as SupabaseAuthPort,

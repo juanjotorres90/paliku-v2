@@ -16,6 +16,7 @@ describe("register", () => {
     const mockSupabaseAuth: SupabaseAuthPort = {
       signup: vi.fn().mockResolvedValue({ needsEmailConfirmation: true }),
       login: vi.fn(),
+      refreshSession: vi.fn(),
       exchangeAuthCodeForTokens: vi.fn(),
       getUser: vi.fn(),
     };
@@ -43,6 +44,7 @@ describe("register", () => {
     const mockSupabaseAuth: SupabaseAuthPort = {
       signup: vi.fn().mockResolvedValue({ needsEmailConfirmation: false }),
       login: vi.fn(),
+      refreshSession: vi.fn(),
       exchangeAuthCodeForTokens: vi.fn(),
       getUser: vi.fn(),
     };
@@ -73,6 +75,7 @@ describe("register", () => {
     const mockSupabaseAuth: SupabaseAuthPort = {
       signup: vi.fn().mockRejectedValue(new Error("Email already registered")),
       login: vi.fn(),
+      refreshSession: vi.fn(),
       exchangeAuthCodeForTokens: vi.fn(),
       getUser: vi.fn(),
     };

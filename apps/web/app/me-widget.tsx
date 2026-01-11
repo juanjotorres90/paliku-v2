@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@repo/ui/components/button";
+import { apiFetch, apiFetchWithRefresh } from "./lib/api";
 
 interface MeResponse {
   userId: string;
@@ -21,11 +22,7 @@ export function MeWidget() {
   useEffect(() => {
     async function fetchMe() {
       try {
-        const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
-        const response = await fetch(`${apiUrl}/me`, {
-          credentials: "include",
-        });
+        const response = await apiFetchWithRefresh("/me");
 
         if (response.status === 401) {
           setError("Not authenticated");
@@ -55,11 +52,7 @@ export function MeWidget() {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
-      await fetch(`${apiUrl}/auth/signout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await apiFetch("/auth/signout", { method: "POST" });
       router.replace("/login");
       router.refresh();
     } catch {

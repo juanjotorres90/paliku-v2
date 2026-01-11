@@ -6,6 +6,7 @@ import { useState, Suspense } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { RegisterRequestSchema } from "@repo/validators/auth";
+import { apiFetch } from "../lib/api";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -64,13 +65,11 @@ function RegisterPageContent() {
     }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
-      const response = await fetch(`${apiUrl}/auth/register`, {
+      const response = await apiFetch("/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify(parsed.data),
       });
 
@@ -104,12 +103,11 @@ function RegisterPageContent() {
         return;
       }
 
-      const loginResponse = await fetch(`${apiUrl}/auth/login`, {
+      const loginResponse = await apiFetch("/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           email: parsed.data.email,
           password: parsed.data.password,

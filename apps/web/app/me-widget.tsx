@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@repo/ui/components/button";
 
 interface MeResponse {
@@ -98,14 +99,21 @@ export function MeWidget() {
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleLogout}
-        disabled={loggingOut}
-      >
-        {loggingOut ? "Logging out..." : "Logout"}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleLogout}
+          disabled={loggingOut}
+        >
+          {loggingOut ? "Logging out..." : "Logout"}
+        </Button>
+        <Link href="/profile/settings">
+          <Button variant="outline" size="sm">
+            Profile Settings
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

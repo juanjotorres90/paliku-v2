@@ -18,6 +18,13 @@ export const ProfileUpsertSchema = z
       .default(""),
     intents: z.array(IntentSchema).min(1).max(3),
     isPublic: z.boolean().optional().default(true),
+    avatarUrl: z
+      .string()
+      .trim()
+      .url("Invalid avatar URL")
+      .max(2048, "Avatar URL too long")
+      .optional()
+      .nullable(),
   })
   .strict();
 
@@ -32,9 +39,18 @@ export const ProfilePublicSchema = z
     location: z.string(),
     intents: z.array(IntentSchema),
     isPublic: z.boolean(),
+    avatarUrl: z.string().url().nullable().optional(),
     updatedAt: z.string().datetime(),
   })
   .strict();
 
 export type ProfilePublic = z.infer<typeof ProfilePublicSchema>;
 
+export const ProfileMeResponseSchema = z
+  .object({
+    email: z.string().email(),
+    profile: ProfilePublicSchema,
+  })
+  .strict();
+
+export type ProfileMeResponse = z.infer<typeof ProfileMeResponseSchema>;

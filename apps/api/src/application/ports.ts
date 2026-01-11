@@ -15,6 +15,8 @@ export interface SupabaseAuthPort {
     authCode: string,
     codeVerifier: string,
   ): Promise<AuthTokens>;
+
+  getUser(accessToken: string): Promise<{ email: string }>;
 }
 
 export interface JWTVerifierPort {

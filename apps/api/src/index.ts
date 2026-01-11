@@ -10,6 +10,7 @@ import { createFetchHttpClient } from "./adapters/http-client";
 import { createSupabaseAuthAdapter } from "./adapters/supabase-auth";
 import { createJWTVerifier } from "./adapters/jwt-verifier";
 import { createRoutes } from "./adapters/routes";
+import { createStorageClient } from "./adapters/storage-client";
 import * as useCases from "./application/index";
 
 function buildConfig(): AppConfig {
@@ -70,6 +71,10 @@ const pkceHelpers = createPKCEHelpers();
 const httpClient = createFetchHttpClient();
 const supabaseAuth = createSupabaseAuthAdapter(config.supabase, httpClient);
 const jwtVerifier = createJWTVerifier(config.supabase);
+const storageClient = createStorageClient(
+  config.supabase.url,
+  config.supabase.anonKey,
+);
 
 const routeCtx = {
   config,
@@ -77,6 +82,8 @@ const routeCtx = {
   useCases,
   pkceHelpers,
   supabaseAuth,
+  httpClient,
+  storageClient,
 };
 
 const app = createRoutes(routeCtx);

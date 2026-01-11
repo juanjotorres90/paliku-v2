@@ -12,6 +12,14 @@ export interface HttpClient {
     status: number;
     text: () => Promise<string>;
   }>;
+  get(
+    url: string,
+    headers: Record<string, string>,
+  ): Promise<{
+    ok: boolean;
+    status: number;
+    text: () => Promise<string>;
+  }>;
 }
 
 export function createSupabaseAuthAdapter(
@@ -152,6 +160,27 @@ export function createSupabaseAuthAdapter(
       }
 
       return { accessToken, refreshToken };
+    },
+
+    async getUser(accessToken: string): Promise<{ email: string }> {
+      const userUrl = new URL("/auth/v1/user", supabaseOrigin);
+      const response = await httpClient.get(userUrl.toString(), {
+        apikey: anonKey,
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "X-Supabase-Api-Version": "2024-01-01",
+      });
+
+      const result = await parseResponse<{
+        email?: string;
+      }>(response);
+      const email = result?.email;
+
+      if (!email) {
+        throw new Error("Failed to get user: missing email");
+      }
+
+      return { email };
     },
   };
 }

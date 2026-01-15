@@ -5,6 +5,7 @@ import { parseJsonBody } from "../utils/parse-json";
 import { getCookieName, getCookieOptions } from "../utils/cookies";
 import { resolveWebOrigin } from "../utils/origin";
 import type { LoginInput, RegisterInput } from "../../../application";
+import { mapErrorToStatus, formatError } from "../utils/error-mapper";
 
 export function createAuthRoutes(ctx: RouteContext) {
   const { config, useCases, pkceHelpers, supabaseAuth } = ctx;
@@ -60,10 +61,9 @@ export function createAuthRoutes(ctx: RouteContext) {
       });
     } catch (err) {
       deleteCookie(c, codeVerifierCookieName, cookieOptions);
-      return c.json(
-        { error: err instanceof Error ? err.message : "Signup failed" },
-        500,
-      );
+      const status = mapErrorToStatus(err);
+      const body = formatError(err);
+      return c.json(body, status as 400 | 401 | 403 | 404 | 409 | 413 | 500);
     }
   });
 
@@ -121,10 +121,9 @@ export function createAuthRoutes(ctx: RouteContext) {
 
       return c.json({ ok: true });
     } catch (err) {
-      return c.json(
-        { error: err instanceof Error ? err.message : "Login failed" },
-        500,
-      );
+      const status = mapErrorToStatus(err);
+      const body = formatError(err);
+      return c.json(body, status as 400 | 401 | 403 | 404 | 409 | 413 | 500);
     }
   });
 

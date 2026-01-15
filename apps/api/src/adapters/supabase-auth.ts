@@ -1,6 +1,12 @@
 import type { SupabaseAuthPort } from "../application/ports";
 import type { SupabaseConfig } from "../domain/config";
 import type { AuthTokens } from "../domain/types";
+import {
+  ValidationError,
+  AuthenticationError,
+  ForbiddenError,
+  ConflictError,
+} from "../domain/errors";
 
 export interface HttpClient {
   post(
@@ -62,7 +68,20 @@ export function createSupabaseAuthAdapter(
                 typeof json.error === "string"
               ? json.error
               : "Request failed";
-      throw new Error(message);
+
+      // Map HTTP status codes to typed errors
+      switch (response.status) {
+        case 400:
+          throw new ValidationError(message);
+        case 401:
+          throw new AuthenticationError(message);
+        case 403:
+          throw new ForbiddenError(message);
+        case 409:
+          throw new ConflictError(message);
+        default:
+          throw new Error(message);
+      }
     }
 
     return json as T;
@@ -124,7 +143,7 @@ export function createSupabaseAuthAdapter(
       const refreshToken = result?.refresh_token;
 
       if (!accessToken) {
-        throw new Error("Login failed: missing access token");
+        throw new AuthenticationError("Login failed: missing access token");
       }
 
       return { accessToken, refreshToken };
@@ -154,7 +173,7 @@ export function createSupabaseAuthAdapter(
       const nextRefreshToken = result?.refresh_token;
 
       if (!accessToken) {
-        throw new Error("Refresh failed: missing access token");
+        throw new AuthenticationError("Refresh failed: missing access token");
       }
 
       return { accessToken, refreshToken: nextRefreshToken ?? refreshToken };
@@ -186,7 +205,9 @@ export function createSupabaseAuthAdapter(
       const refreshToken = result?.refresh_token;
 
       if (!accessToken) {
-        throw new Error("Token exchange failed: missing access token");
+        throw new AuthenticationError(
+          "Token exchange failed: missing access token",
+        );
       }
 
       return { accessToken, refreshToken };
@@ -207,7 +228,7 @@ export function createSupabaseAuthAdapter(
       const email = result?.email;
 
       if (!email) {
-        throw new Error("Failed to get user: missing email");
+        throw new AuthenticationError("Failed to get user: missing email");
       }
 
       return { email };

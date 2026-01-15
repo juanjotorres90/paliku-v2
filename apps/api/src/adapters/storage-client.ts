@@ -1,3 +1,10 @@
+import {
+  ValidationError,
+  AuthenticationError,
+  ForbiddenError,
+  PayloadTooLargeError,
+} from "../domain/errors";
+
 export interface StorageClient {
   upload(
     bucket: string,
@@ -36,7 +43,21 @@ export function createStorageClient(
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(`Upload failed: ${response.status} - ${text}`);
+      const message = `Upload failed: ${response.status} - ${text}`;
+
+      // Map HTTP status codes to typed errors
+      switch (response.status) {
+        case 400:
+          throw new ValidationError(message);
+        case 401:
+          throw new AuthenticationError(message);
+        case 403:
+          throw new ForbiddenError(message);
+        case 413:
+          throw new PayloadTooLargeError(message);
+        default:
+          throw new Error(message);
+      }
     }
 
     const publicUrl = new URL(

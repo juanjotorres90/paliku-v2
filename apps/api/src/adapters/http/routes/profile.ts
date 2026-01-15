@@ -1,6 +1,7 @@
 import { Hono, type MiddlewareHandler } from "hono";
 import type { RouteContext, RouteEnv } from "../context";
 import { parseJsonBody } from "../utils/parse-json";
+import { mapErrorToStatus, formatError } from "../utils/error-mapper";
 
 export function createProfileRoutes(
   ctx: RouteContext,
@@ -30,12 +31,9 @@ export function createProfileRoutes(
 
       return c.json(result);
     } catch (err) {
-      return c.json(
-        {
-          error: err instanceof Error ? err.message : "Failed to fetch profile",
-        },
-        500,
-      );
+      const status = mapErrorToStatus(err);
+      const body = formatError(err);
+      return c.json(body, status as 400 | 401 | 403 | 404 | 409 | 413 | 500);
     }
   });
 
@@ -72,13 +70,9 @@ export function createProfileRoutes(
 
       return c.json(profileResult);
     } catch (err) {
-      return c.json(
-        {
-          error:
-            err instanceof Error ? err.message : "Failed to update profile",
-        },
-        500,
-      );
+      const status = mapErrorToStatus(err);
+      const body = formatError(err);
+      return c.json(body, status as 400 | 401 | 403 | 404 | 409 | 413 | 500);
     }
   });
 
@@ -115,12 +109,9 @@ export function createProfileRoutes(
 
       return c.json(profileResult);
     } catch (err) {
-      return c.json(
-        {
-          error: err instanceof Error ? err.message : "Failed to upload avatar",
-        },
-        500,
-      );
+      const status = mapErrorToStatus(err);
+      const body = formatError(err);
+      return c.json(body, status as 400 | 401 | 403 | 404 | 409 | 413 | 500);
     }
   });
 

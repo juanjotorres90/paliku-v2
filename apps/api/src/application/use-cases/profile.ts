@@ -3,6 +3,13 @@ import type { HttpClient } from "../../adapters/http-client";
 import type { ProfileMeResult, Profile } from "../../domain/types";
 import type { ProfileUpsert } from "@repo/validators";
 import type { StorageClient } from "../../adapters/storage-client";
+import {
+  NotFoundError,
+  ValidationError,
+  PayloadTooLargeError,
+  ForbiddenError,
+  AuthenticationError,
+} from "../../domain/errors";
 
 export interface GetProfileMeInput {
   accessToken: string;
@@ -38,7 +45,18 @@ export async function getProfileMe(
   });
 
   if (!profileResponse.ok) {
-    throw new Error("Failed to fetch profile");
+    const status = profileResponse.status;
+    const text = await profileResponse.text();
+
+    // Map HTTP status codes to typed errors
+    switch (status) {
+      case 401:
+        throw new AuthenticationError(`Failed to fetch profile: ${text}`);
+      case 403:
+        throw new ForbiddenError(`Failed to fetch profile: ${text}`);
+      default:
+        throw new Error(`Failed to fetch profile: ${text}`);
+    }
   }
 
   const profileText = await profileResponse.text();
@@ -55,7 +73,7 @@ export async function getProfileMe(
   const profileRow = profiles[0] as unknown;
 
   if (!profileRow || typeof profileRow !== "object") {
-    throw new Error("Profile not found");
+    throw new NotFoundError("Profile not found");
   }
 
   const profile: Profile = {
@@ -125,7 +143,18 @@ export async function updateProfileMe(
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update profile");
+    const status = response.status;
+    const text = await response.text();
+
+    // Map HTTP status codes to typed errors
+    switch (status) {
+      case 401:
+        throw new AuthenticationError(`Failed to update profile: ${text}`);
+      case 403:
+        throw new ForbiddenError(`Failed to update profile: ${text}`);
+      default:
+        throw new Error(`Failed to update profile: ${text}`);
+    }
   }
 
   const text = await response.text();
@@ -201,12 +230,12 @@ export async function uploadAvatar(
   const { email } = await supabaseAuth.getUser(accessToken);
 
   if (!file.type.startsWith("image/")) {
-    throw new Error("File must be an image");
+    throw new ValidationError("File must be an image");
   }
 
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    throw new Error("File too large (max 5MB)");
+    throw new PayloadTooLargeError("File too large (max 5MB)");
   }
 
   const ext = file.name.split(".").pop() || "jpg";
@@ -234,7 +263,22 @@ export async function uploadAvatar(
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update profile with avatar");
+    const status = response.status;
+    const text = await response.text();
+
+    // Map HTTP status codes to typed errors
+    switch (status) {
+      case 401:
+        throw new AuthenticationError(
+          `Failed to update profile with avatar: ${text}`,
+        );
+      case 403:
+        throw new ForbiddenError(
+          `Failed to update profile with avatar: ${text}`,
+        );
+      default:
+        throw new Error(`Failed to update profile with avatar: ${text}`);
+    }
   }
 
   const text = await response.text();

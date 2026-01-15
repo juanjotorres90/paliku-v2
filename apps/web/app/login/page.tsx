@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { LoginRequestSchema } from "@repo/validators/auth";
+import { getSafeRedirect } from "../../lib/redirect";
 import { apiFetch } from "../lib/api";
 
 function LoginPageContent() {
@@ -15,18 +16,6 @@ function LoginPageContent() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const getSafeRedirect = (value: string | null) => {
-    if (!value) return "/";
-    if (
-      value.startsWith("/") &&
-      !value.startsWith("//") &&
-      !value.startsWith("/\\")
-    ) {
-      return value;
-    }
-    return "/";
-  };
 
   function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null;
@@ -82,10 +71,11 @@ function LoginPageContent() {
     }
   };
 
-  const redirectParam = searchParams.get("redirect");
-  const registerHref = redirectParam
-    ? `/register?redirect=${encodeURIComponent(redirectParam)}`
-    : "/register";
+  const redirectParam = getSafeRedirect(searchParams.get("redirect"));
+  const registerHref =
+    redirectParam === "/"
+      ? "/register"
+      : `/register?redirect=${encodeURIComponent(redirectParam)}`;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">

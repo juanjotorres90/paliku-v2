@@ -6,6 +6,7 @@ import { useState, Suspense } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { RegisterRequestSchema } from "@repo/validators/auth";
+import { getSafeRedirect } from "../../lib/redirect";
 import { apiFetch } from "../lib/api";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -24,18 +25,6 @@ function RegisterPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const getSafeRedirect = (value: string | null) => {
-    if (!value) return "/";
-    if (
-      value.startsWith("/") &&
-      !value.startsWith("//") &&
-      !value.startsWith("/\\")
-    ) {
-      return value;
-    }
-    return "/";
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,10 +117,11 @@ function RegisterPageContent() {
     }
   };
 
-  const redirectParam = searchParams.get("redirect");
-  const loginHref = redirectParam
-    ? `/login?redirect=${encodeURIComponent(redirectParam)}`
-    : "/login";
+  const redirectParam = getSafeRedirect(searchParams.get("redirect"));
+  const loginHref =
+    redirectParam === "/"
+      ? "/login"
+      : `/login?redirect=${encodeURIComponent(redirectParam)}`;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">

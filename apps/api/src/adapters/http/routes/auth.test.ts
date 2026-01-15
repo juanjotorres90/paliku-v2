@@ -70,6 +70,7 @@ describe("createAuthRoutes", () => {
         headers: {
           "Content-Type": "application/json",
           Origin: "http://localhost:3000",
+          "X-Forwarded-For": "192.168.1.1",
         },
         body: "invalid json",
       });
@@ -88,6 +89,7 @@ describe("createAuthRoutes", () => {
         headers: {
           "Content-Type": "application/json",
           Origin: "http://localhost:3000",
+          "X-Forwarded-For": "192.168.1.2",
         },
         body: JSON.stringify({ invalid: "data" }),
       });
@@ -112,6 +114,7 @@ describe("createAuthRoutes", () => {
         headers: {
           "Content-Type": "application/json",
           Origin: "http://localhost:3000",
+          "X-Forwarded-For": "192.168.1.3",
         },
         body: JSON.stringify({
           email: "test@example.com",
@@ -141,6 +144,7 @@ describe("createAuthRoutes", () => {
         headers: {
           "Content-Type": "application/json",
           Origin: "http://localhost:3000",
+          "X-Forwarded-For": "192.168.1.4",
         },
         body: JSON.stringify({
           email: "test@example.com",

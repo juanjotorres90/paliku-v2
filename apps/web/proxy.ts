@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { getSafeRedirect } from "./lib/redirect";
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -12,7 +14,10 @@ export async function proxy(request: NextRequest) {
   if (!accessToken && pathname !== "/login" && pathname !== "/register") {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
+    const safeRedirect = getSafeRedirect(
+      `${pathname}${request.nextUrl.search}`,
+    );
+    url.searchParams.set("redirect", safeRedirect);
     return NextResponse.redirect(url);
   }
 

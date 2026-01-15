@@ -6,6 +6,7 @@ import { getCookieName, getCookieOptions } from "../utils/cookies";
 import { resolveWebOrigin } from "../utils/origin";
 import type { LoginInput, RegisterInput } from "../../../application";
 import { mapErrorToStatus, formatError } from "../utils/error-mapper";
+import { createRateLimiter } from "../middleware/rate-limiter";
 
 export function createAuthRoutes(ctx: RouteContext) {
   const { config, useCases, pkceHelpers, supabaseAuth } = ctx;
@@ -14,7 +15,22 @@ export function createAuthRoutes(ctx: RouteContext) {
 
   const router = new Hono<RouteEnv>();
 
-  router.post("/register", async (c) => {
+  const registerRateLimiter = createRateLimiter({
+    limit: 3,
+    windowMs: 60 * 1000,
+  });
+
+  const loginRateLimiter = createRateLimiter({
+    limit: 5,
+    windowMs: 60 * 1000,
+  });
+
+  const refreshRateLimiter = createRateLimiter({
+    limit: 10,
+    windowMs: 60 * 1000,
+  });
+
+  router.post("/register", registerRateLimiter, async (c) => {
     const body = await parseJsonBody(c);
     if (!body.ok) {
       return c.json({ error: "Invalid JSON body" }, 400);
@@ -67,7 +83,7 @@ export function createAuthRoutes(ctx: RouteContext) {
     }
   });
 
-  router.post("/login", async (c) => {
+  router.post("/login", loginRateLimiter, async (c) => {
     const body = await parseJsonBody(c);
     if (!body.ok) {
       return c.json({ error: "Invalid JSON body" }, 400);
@@ -127,7 +143,7 @@ export function createAuthRoutes(ctx: RouteContext) {
     }
   });
 
-  router.post("/refresh", async (c) => {
+  router.post("/refresh", refreshRateLimiter, async (c) => {
     const webOrigin = resolveWebOrigin([c.req.header("Origin")], corsConfig);
 
     const cookieOptions = getCookieOptions(

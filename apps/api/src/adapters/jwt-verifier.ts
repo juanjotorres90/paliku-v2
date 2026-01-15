@@ -46,25 +46,34 @@ export function createJWTVerifier(config: SupabaseConfig): JWTVerifierPort {
       new URL("/auth/v1/oidc/.well-known/openid-configuration", supabaseOrigin),
     ];
 
-    for (const discoveryUrl of discoveryUrls) {
-      try {
-        const response = await fetch(discoveryUrl.toString(), {
-          headers: { Accept: "application/json" },
-        });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
 
-        if (!response.ok) continue;
+    try {
+      for (const discoveryUrl of discoveryUrls) {
+        try {
+          const response = await fetch(discoveryUrl.toString(), {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+          });
 
-        const json: unknown = await response.json();
-        const jwksUri =
-          isRecord(json) && typeof json.jwks_uri === "string"
-            ? json.jwks_uri
-            : undefined;
-        if (!jwksUri) continue;
+          if (!response.ok) continue;
 
-        return new URL(jwksUri, supabaseOrigin);
-      } catch {
-        continue;
+          const json: unknown = await response.json();
+          const jwksUri =
+            isRecord(json) && typeof json.jwks_uri === "string"
+              ? json.jwks_uri
+              : undefined;
+          if (!jwksUri) continue;
+
+          clearTimeout(timeout);
+          return new URL(jwksUri, supabaseOrigin);
+        } catch {
+          continue;
+        }
       }
+    } finally {
+      clearTimeout(timeout);
     }
 
     return undefined;

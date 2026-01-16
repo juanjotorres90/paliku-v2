@@ -42,6 +42,36 @@ Targeted runs:
 - Tailwind v4: UI utilities are prefixed (`ui:*`). Variant order must follow the prefix (e.g. `ui:dark:*`, `ui:hover:*`, `ui:group-hover:*`).
 - Formatting/linting: rely on `pnpm format` + `pnpm lint` (don’t hand-format).
 
+## React & Next.js Best Practices
+
+Follow the comprehensive React performance optimization guidelines from the `react-best-practices` skill. Key priorities:
+
+### Critical (Apply Always)
+
+- **Eliminate Waterfalls**: Use `Promise.all()` for independent async ops; defer `await` until needed.
+- **Bundle Size**: Avoid barrel imports (e.g. import directly: `lucide-react/dist/esm/icons/check` not `lucide-react`).
+- **Dynamic Imports**: Lazy-load heavy components with `next/dynamic`.
+- **Strategic Suspense**: Stream content while showing layout shell.
+
+### High Priority
+
+- **Server-Side**: Use React.cache() for per-request deduplication; parallelize data fetching via component composition.
+- **Client-Side**: Use SWR for automatic deduplication and caching.
+
+### Medium Priority
+
+- **Re-renders**: Extract to memoized components; defer state reads to usage point; narrow effect deps.
+- **Rendering**: Use CSS `content-visibility` for long lists; hoist static JSX outside render.
+
+### Implementation Checklist
+
+1. Profile with React DevTools Profiler before optimizing.
+2. Focus on critical paths: waterfalls → bundle size → re-renders.
+3. Measure impact with LCP, TTI, FID metrics.
+4. Test thoroughly after applying optimizations.
+
+For the complete 40+ rule guide with code examples, load the `REACT_BEST_PRACTICES.md` skill.
+
 ## Testing Guidelines
 
 No test framework is configured yet (no `test` scripts, no coverage gates). If you add tests, colocate them (`*.test.ts(x)`) and wire a package-level test script; Vitest is the preferred default.

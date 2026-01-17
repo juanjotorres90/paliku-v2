@@ -29,6 +29,18 @@ export default function AppLayout({
               >
                 Home
               </Link>
+              <Link
+                href="/people"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                People
+              </Link>
+              <Link
+                href="/chats"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Chats
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">

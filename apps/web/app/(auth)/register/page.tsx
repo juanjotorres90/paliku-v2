@@ -6,8 +6,8 @@ import { useState, Suspense } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { RegisterRequestSchema } from "@repo/validators/auth";
-import { getSafeRedirect } from "../../lib/redirect";
-import { apiFetch } from "../lib/api";
+import { getSafeRedirect } from "../../../lib/redirect";
+import { apiFetch } from "../../lib/api";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -82,7 +82,12 @@ function RegisterPageContent() {
         return;
       }
 
-      const json: unknown = JSON.parse(text);
+      let json: unknown = {};
+      try {
+        json = text ? (JSON.parse(text) as unknown) : {};
+      } catch {
+        json = {};
+      }
 
       if (isRecord(json) && json.needsEmailConfirmation === true) {
         setSuccess(

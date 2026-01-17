@@ -6,7 +6,7 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Avatar } from "@repo/ui/components/avatar";
 import { ProfileUpsertSchema } from "@repo/validators/profile";
-import { apiFetchWithRefresh } from "../../lib/api";
+import { apiFetchWithRefresh } from "../../../lib/api";
 
 type IntentValue = "practice" | "friends" | "date";
 
@@ -75,7 +75,8 @@ function ProfileSettingsPageContent() {
           intents: json.profile.intents,
           isPublic: json.profile.isPublic,
         });
-        setAvatarPreview(json.profile.avatarUrl);
+        // Treat empty string as null for avatar preview
+        setAvatarPreview(json.profile.avatarUrl || null);
         setLoading(false);
       } catch (err) {
         setError(
@@ -109,6 +110,14 @@ function ProfileSettingsPageContent() {
         body: JSON.stringify(parsed.data),
       });
 
+      if (response.status === 401) {
+        router.replace(
+          `/login?redirect=${encodeURIComponent("/profile/settings")}`,
+        );
+        router.refresh();
+        return;
+      }
+
       if (!response.ok) {
         const text = await response.text();
         throw new Error(`Failed to save profile: ${response.status} - ${text}`);
@@ -116,6 +125,13 @@ function ProfileSettingsPageContent() {
 
       const updatedProfile = await response.json();
       setProfile(updatedProfile);
+      setFormData({
+        displayName: updatedProfile.profile.displayName,
+        bio: updatedProfile.profile.bio,
+        location: updatedProfile.profile.location,
+        intents: updatedProfile.profile.intents,
+        isPublic: updatedProfile.profile.isPublic,
+      });
       setAvatarPreview(updatedProfile.profile.avatarUrl);
       setSaving(false);
     } catch (err) {
@@ -135,13 +151,21 @@ function ProfileSettingsPageContent() {
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const payload = new FormData();
+      payload.append("file", file);
 
       const response = await apiFetchWithRefresh("/profile/avatar", {
         method: "POST",
-        body: formData,
+        body: payload,
       });
+
+      if (response.status === 401) {
+        router.replace(
+          `/login?redirect=${encodeURIComponent("/profile/settings")}`,
+        );
+        router.refresh();
+        return;
+      }
 
       if (!response.ok) {
         const text = await response.text();
@@ -152,6 +176,13 @@ function ProfileSettingsPageContent() {
 
       const updatedProfile = await response.json();
       setProfile(updatedProfile);
+      setFormData({
+        displayName: updatedProfile.profile.displayName,
+        bio: updatedProfile.profile.bio,
+        location: updatedProfile.profile.location,
+        intents: updatedProfile.profile.intents,
+        isPublic: updatedProfile.profile.isPublic,
+      });
       setAvatarPreview(updatedProfile.profile.avatarUrl);
       setUploading(false);
     } catch (err) {

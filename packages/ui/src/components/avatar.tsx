@@ -21,42 +21,57 @@ export function Avatar({
   alt,
   ...props
 }: AvatarProps) {
+  const imgRef = React.useRef<HTMLImageElement>(null);
   const [imgError, setImgError] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+
+  // Treat empty strings as no src
+  const validSrc = src && src.trim() !== "" ? src : undefined;
 
   React.useEffect(() => {
     setImgError(false);
     setLoaded(false);
-  }, [src]);
+  }, [validSrc]);
 
-  if (imgError || !src) {
-    return (
-      <div
-        className={cn(
-          "inline-flex items-center justify-center rounded-full bg-muted text-muted-foreground overflow-hidden",
-          sizeClasses[size],
-          className,
-        )}
-      >
-        {fallback}
-      </div>
-    );
-  }
+  // Handle images that load from browser cache (onLoad may not fire)
+  React.useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth > 0) {
+      setLoaded(true);
+    }
+  }, [validSrc]);
 
+  const showFallback = imgError || !validSrc;
+
+  // Always render the fallback container, show/hide based on image state
+  // This prevents layout shift and ensures something is always visible
   return (
-    <img
-      src={src}
-      alt={alt ?? "Avatar"}
+    <div
       className={cn(
-        "inline-flex items-center justify-center rounded-full object-cover",
+        "relative inline-flex items-center justify-center rounded-full bg-muted text-muted-foreground overflow-hidden",
         sizeClasses[size],
-        "transition-opacity",
-        loaded ? "opacity-100" : "opacity-0",
         className,
       )}
-      onError={() => setImgError(true)}
-      onLoad={() => setLoaded(true)}
-      {...props}
-    />
+    >
+      {/* Fallback - visible when no image or image failed/loading */}
+      {(showFallback || !loaded) && fallback}
+
+      {/* Image - only render if we have a valid src */}
+      {validSrc && !imgError && (
+        <img
+          ref={imgRef}
+          src={validSrc}
+          alt={alt ?? "Avatar"}
+          className={cn(
+            "absolute inset-0 h-full w-full rounded-full object-cover",
+            "transition-opacity duration-200",
+            loaded ? "opacity-100" : "opacity-0",
+          )}
+          onError={() => setImgError(true)}
+          onLoad={() => setLoaded(true)}
+          {...props}
+        />
+      )}
+    </div>
   );
 }

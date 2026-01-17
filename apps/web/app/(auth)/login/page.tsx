@@ -6,8 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { LoginRequestSchema } from "@repo/validators/auth";
-import { getSafeRedirect } from "../../lib/redirect";
-import { apiFetch } from "../lib/api";
+import { getSafeRedirect } from "../../../lib/redirect";
+import { apiFetch } from "../../lib/api";
 
 function LoginPageContent() {
   const router = useRouter();

@@ -2,7 +2,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { ThemeProvider } from "./providers";
-import { ThemeToggle } from "@repo/ui/theme-toggle";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,7 +35,6 @@ export default function RootLayout({
           disableTransitionOnChange
           enableColorScheme
         >
-          <ThemeToggle className="fixed top-4 right-4 z-50" />
           {children}
         </ThemeProvider>
       </body>

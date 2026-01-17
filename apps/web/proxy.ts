@@ -5,6 +5,11 @@ import { getSafeRedirect } from "./lib/redirect";
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Skip auth check for API routes - they handle their own auth
+  if (pathname.startsWith("/api")) {
+    return NextResponse.next({ request });
+  }
+
   const accessToken = request.cookies.get(
     request.cookies.getAll().find((c) => c.name.endsWith("-access-token"))
       ?.name ?? "",

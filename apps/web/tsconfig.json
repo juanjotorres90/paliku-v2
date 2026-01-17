@@ -8,7 +8,8 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@repo/ui/*": ["../../packages/ui/src/*"]
+      "@repo/ui/*": ["../../packages/ui/src/*"],
+      "@api/*": ["../../apps/api/src/*"]
     }
   },
   "include": [
@@ -18,7 +19,5 @@
     "next.config.js",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

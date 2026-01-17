@@ -543,18 +543,15 @@ describe("ProfileSettingsPage", () => {
   });
 
   // Environment Config Tests
-  it("uses environment variable for API URL", async () => {
-    const originalEnv = process.env.NEXT_PUBLIC_API_URL;
-    process.env.NEXT_PUBLIC_API_URL = "http://test-api:4000";
+  it("calls same-origin /api endpoint", async () => {
     const mockFetch = createFetchMock([profileLoadResponse()]);
     globalThis.fetch = mockFetch;
     render(<ProfileSettingsPage />);
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        "http://test-api:4000/profile/me",
+        "/api/profile/me",
         expect.any(Object),
       );
     });
-    process.env.NEXT_PUBLIC_API_URL = originalEnv;
   });
 });

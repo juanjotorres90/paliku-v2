@@ -5,7 +5,8 @@ function normalizePath(path: string): string {
 }
 
 function getApiUrl(): string {
-  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3002";
+  // API is mounted at /api in the Next.js app (same-origin)
+  return "/api";
 }
 
 function withCredentials(init: RequestInit | undefined): RequestInit {

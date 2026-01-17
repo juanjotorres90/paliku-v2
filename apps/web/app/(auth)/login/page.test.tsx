@@ -357,10 +357,7 @@ describe("LoginPage", () => {
     });
   });
 
-  it("uses environment variable for API URL", async () => {
-    const originalEnv = process.env.NEXT_PUBLIC_API_URL;
-    process.env.NEXT_PUBLIC_API_URL = "http://test-api:4000";
-
+  it("calls same-origin /api endpoint", async () => {
     mockFetch.mockResolvedValueOnce({
       status: 200,
       ok: true,
@@ -380,12 +377,10 @@ describe("LoginPage", () => {
 
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        "http://test-api:4000/auth/login",
+        "/api/auth/login",
         expect.any(Object),
       );
     });
-
-    process.env.NEXT_PUBLIC_API_URL = originalEnv;
   });
 
   it("handles JSON response with non-object value", async () => {

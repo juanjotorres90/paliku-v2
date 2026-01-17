@@ -8,7 +8,7 @@ import { Skeleton } from "@repo/ui/components/skeleton";
 import { Textarea } from "@repo/ui/components/textarea";
 import { TurborepoLogo } from "@repo/ui/components/turborepo-logo";
 
-export default function Home() {
+export default function Home(): React.ReactElement {
   return (
     <main className="min-h-screen p-8 flex flex-col items-center justify-center gap-8">
       <h1 className="text-3xl font-bold">Docs App</h1>
@@ -72,13 +72,19 @@ export default function Home() {
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox id="checked" defaultChecked />
-            <label htmlFor="checked" className="text-sm font-medium leading-none">
+            <label
+              htmlFor="checked"
+              className="text-sm font-medium leading-none"
+            >
               Checked by default
             </label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox id="disabled" disabled />
-            <label htmlFor="disabled" className="text-sm font-medium leading-none opacity-50">
+            <label
+              htmlFor="disabled"
+              className="text-sm font-medium leading-none opacity-50"
+            >
               Disabled checkbox
             </label>
           </div>

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { Hono } from "hono";
 import { createMeRoutes } from "./me";
 import type { RouteEnv } from "../context";

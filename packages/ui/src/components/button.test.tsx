@@ -7,7 +7,7 @@ describe("Button", () => {
     render(<Button>Save changes</Button>);
 
     expect(
-      screen.getByRole("button", { name: "Save changes" })
+      screen.getByRole("button", { name: "Save changes" }),
     ).toBeInTheDocument();
   });
 
@@ -15,7 +15,7 @@ describe("Button", () => {
     render(<Button>Default</Button>);
 
     expect(screen.getByRole("button", { name: "Default" })).toHaveClass(
-      "bg-primary"
+      "bg-primary",
     );
   });
 });

@@ -1,4 +1,4 @@
-export const TurborepoLogo = () => {
+export const TurborepoLogo = (): React.ReactElement => {
   return (
     <svg
       aria-label="Turbo logomark"

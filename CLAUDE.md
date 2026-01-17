@@ -41,6 +41,7 @@ cd packages/ui && pnpm generate:component
 ## Monorepo Architecture
 
 ### Structure
+
 ```
 apps/
 ├── web/          # Main web app (port 3000)

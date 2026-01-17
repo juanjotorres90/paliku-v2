@@ -54,6 +54,7 @@ shared packages.
 Components use shadcn/ui patterns with Radix UI primitives and `class-variance-authority` for variants.
 
 Import patterns:
+
 - `@repo/ui/components/button` → `packages/ui/src/components/button.tsx`
 - `@repo/ui/lib/utils` → `packages/ui/src/lib/utils.ts`
 - `@repo/ui/hooks/*` → `packages/ui/src/hooks/*.ts`
@@ -65,6 +66,7 @@ Generate new components: `pnpm -C packages/ui generate:component`
 ### Styling
 
 Tailwind v4 with CSS-first configuration. Design tokens defined in:
+
 - `packages/tailwind-config/shared-styles.css` - shared theme tokens
 - `packages/ui/src/styles/globals.css` - component library styles with CSS variables for theming
 

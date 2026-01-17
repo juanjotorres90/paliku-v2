@@ -7,7 +7,7 @@ describe("Home", () => {
     render(<Home />);
 
     expect(
-      screen.getByRole("heading", { name: "Docs App" })
+      screen.getByRole("heading", { name: "Docs App" }),
     ).toBeInTheDocument();
   });
 });

@@ -133,9 +133,17 @@ export function createAuthRoutes(ctx: RouteContext) {
           result.tokens.refreshToken,
           refreshTokenOptions,
         );
+      } else {
+        deleteCookie(c, refreshTokenCookieName, cookieOptions);
       }
 
-      return c.json({ ok: true });
+      return c.json({
+        ok: true,
+        tokens: {
+          accessToken: result.tokens.accessToken,
+          refreshToken: result.tokens.refreshToken ?? null,
+        },
+      });
     } catch (err) {
       const status = mapErrorToStatus(err);
       const body = formatError(err);
@@ -158,7 +166,23 @@ export function createAuthRoutes(ctx: RouteContext) {
     const accessTokenCookieName = getCookieName(cookieConfig, "access-token");
     const refreshTokenCookieName = getCookieName(cookieConfig, "refresh-token");
 
-    const refreshToken = getCookie(c, refreshTokenCookieName);
+    // Support both cookie-based (web) and body-based (mobile) refresh tokens
+    let refreshToken = getCookie(c, refreshTokenCookieName);
+
+    if (!refreshToken) {
+      // Try to get refresh token from request body (for mobile clients)
+      const body = await parseJsonBody(c);
+      if (
+        body.ok &&
+        typeof body.value === "object" &&
+        body.value !== null &&
+        "refreshToken" in body.value &&
+        typeof body.value.refreshToken === "string"
+      ) {
+        refreshToken = body.value.refreshToken;
+      }
+    }
+
     if (!refreshToken) {
       return c.json({ error: "Missing refresh token" }, 401);
     }
@@ -166,6 +190,7 @@ export function createAuthRoutes(ctx: RouteContext) {
     try {
       const result = await useCases.refresh({ refreshToken }, { supabaseAuth });
 
+      // Set cookies for web clients
       setCookie(
         c,
         accessTokenCookieName,
@@ -179,9 +204,18 @@ export function createAuthRoutes(ctx: RouteContext) {
           result.tokens.refreshToken,
           refreshTokenOptions,
         );
+      } else {
+        deleteCookie(c, refreshTokenCookieName, cookieOptions);
       }
 
-      return c.json({ ok: true });
+      // Return tokens in body for mobile clients
+      return c.json({
+        ok: true,
+        tokens: {
+          accessToken: result.tokens.accessToken,
+          refreshToken: result.tokens.refreshToken ?? null,
+        },
+      });
     } catch (err) {
       deleteCookie(c, accessTokenCookieName, cookieOptions);
       deleteCookie(c, refreshTokenCookieName, cookieOptions);
@@ -262,6 +296,8 @@ export function createAuthRoutes(ctx: RouteContext) {
           tokens.refreshToken,
           refreshTokenOptions,
         );
+      } else {
+        deleteCookie(c, refreshTokenCookieName, cookieOptions);
       }
 
       return c.redirect(`${webOrigin}${next}`);

@@ -71,10 +71,5 @@ export function ThemeScript({
 })();
 `.trim();
 
-  return (
-    <script
-      nonce={nonce}
-      dangerouslySetInnerHTML={{ __html: script }}
-    />
-  );
+  return <script nonce={nonce} dangerouslySetInnerHTML={{ __html: script }} />;
 }

@@ -6,7 +6,7 @@ export function Gradient({
   small?: boolean;
   conic?: boolean;
   className?: string;
-}) {
+}): React.ReactElement {
   return (
     <span
       className={`absolute mix-blend-normal will-change-[filter] rounded-[100%] ${

@@ -10,7 +10,9 @@
     "API_URL",
     "NEXT_PUBLIC_API_URL",
     "CORS_ORIGIN",
-    "COOKIE_DOMAIN"
+    "COOKIE_DOMAIN",
+    "NODE_ENV",
+    "PORT"
   ],
   "tasks": {
     "build": {

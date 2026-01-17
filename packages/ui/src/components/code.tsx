@@ -6,9 +6,11 @@ export function Code({
 }: {
   children: ReactNode;
   className?: string;
-  }): JSX.Element {
+}): JSX.Element {
   return (
-    <code className={`font-mono bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded font-semibold text-gray-800 dark:text-gray-200 ${className}`}>
+    <code
+      className={`font-mono bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded font-semibold text-gray-800 dark:text-gray-200 ${className}`}
+    >
       {children}
     </code>
   );

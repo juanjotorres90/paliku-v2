@@ -59,6 +59,6 @@ export function setTheme(theme: Theme, storageKey = STORAGE_KEY): void {
     new StorageEvent("storage", {
       key: storageKey,
       newValue: theme === "system" ? null : theme,
-    })
+    }),
   );
 }

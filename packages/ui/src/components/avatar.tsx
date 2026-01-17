@@ -26,7 +26,8 @@ export function Avatar({
   const [loaded, setLoaded] = React.useState(false);
 
   // Treat empty strings as no src
-  const validSrc = src && src.trim() !== "" ? src : undefined;
+  const validSrc =
+    src && typeof src === "string" && src.trim() !== "" ? src : undefined;
 
   React.useEffect(() => {
     setImgError(false);

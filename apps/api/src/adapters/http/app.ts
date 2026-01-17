@@ -11,6 +11,42 @@ export function createHttpApp(ctx: RouteContext) {
 
   const app = new Hono<RouteEnv>();
 
+  app.use("*", async (c, next) => {
+    const start = Date.now();
+    const requestId =
+      c.req.header("x-request-id") ??
+      `req_${start.toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+    let error: unknown;
+
+    try {
+      await next();
+    } catch (err) {
+      error = err;
+      throw err;
+    } finally {
+      const durationMs = Date.now() - start;
+      const status = c.res?.status ?? (error ? 500 : 200);
+      const userId = c.get("jwtPayload")?.sub;
+      const base = {
+        message: error ? "request.failed" : "request.completed",
+        requestId,
+        method: c.req.method,
+        path: c.req.path,
+        status,
+        durationMs,
+        userId,
+      };
+
+      if (error instanceof Error) {
+        console.error({ ...base, error: error.message });
+      } else if (error) {
+        console.error({ ...base, error: "unknown_error" });
+      } else {
+        console.info(base);
+      }
+    }
+  });
+
   // CORS must be applied first, before any routes
   // Use a function to dynamically determine the origin
   // This allows both web (with specific origins) and mobile (without Origin header)

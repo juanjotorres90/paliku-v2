@@ -5,4 +5,7 @@ module.exports = {
   // rules: {
   //   'scope-enum': [2, 'always', ['web', 'docs', 'api', 'ui', 'db', 'validators', 'deps']],
   // },
+  rules: {
+    'header-max-length': [0, 'always', 300],
+  },
 };

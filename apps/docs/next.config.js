@@ -1,4 +1,5 @@
 import nextEnv from "@next/env";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = fileURLToPath(new URL("../../", import.meta.url));

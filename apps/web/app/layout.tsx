@@ -2,7 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ThemeProvider } from "./providers";
+import { Providers } from "./providers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,15 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable}`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          enableColorScheme
-        >
-          {children}
-        </ThemeProvider>
+        <Providers>{children}</Providers>
         <Analytics />
       </body>
     </html>

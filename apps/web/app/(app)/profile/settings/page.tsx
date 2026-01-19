@@ -4,25 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { Avatar } from "@repo/ui/components/avatar";
+import { AvatarUpload } from "@repo/ui/components/avatar-upload";
 import { ProfileUpsertSchema } from "@repo/validators/profile";
 import { apiFetchWithRefresh } from "../../../lib/api";
+import { useUser } from "../../../user-context";
 
 type IntentValue = "practice" | "friends" | "date";
-
-interface ProfileMeResponse {
-  email: string;
-  profile: {
-    id: string;
-    displayName: string;
-    bio: string;
-    location: string;
-    intents: string[];
-    isPublic: boolean;
-    avatarUrl: string | null;
-    updatedAt: string;
-  };
-}
 
 const INTENT_OPTIONS = [
   { value: "practice" as IntentValue, label: "Practice" },
@@ -32,12 +19,16 @@ const INTENT_OPTIONS = [
 
 function ProfileSettingsPageContent() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const {
+    user,
+    loading: userLoading,
+    error: userError,
+    refreshUser,
+  } = useUser();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [profile, setProfile] = useState<ProfileMeResponse | null>(null);
   const [formData, setFormData] = useState({
     displayName: "",
     bio: "",
@@ -47,47 +38,24 @@ function ProfileSettingsPageContent() {
   });
 
   useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const response = await apiFetchWithRefresh("/profile/me");
+    if (userLoading) return;
 
-        if (response.status === 401) {
-          router.replace(
-            `/login?redirect=${encodeURIComponent("/profile/settings")}`,
-          );
-          router.refresh();
-          return;
-        }
-
-        if (!response.ok) {
-          const text = await response.text();
-          setError(`API error: ${response.status} - ${text}`);
-          setLoading(false);
-          return;
-        }
-
-        const json = await response.json();
-        setProfile(json);
-        setFormData({
-          displayName: json.profile.displayName,
-          bio: json.profile.bio,
-          location: json.profile.location,
-          intents: json.profile.intents,
-          isPublic: json.profile.isPublic,
-        });
-        // Treat empty string as null for avatar preview
-        setAvatarPreview(json.profile.avatarUrl || null);
-        setLoading(false);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch profile",
-        );
-        setLoading(false);
-      }
+    if (userError) {
+      setError("Failed to fetch profile");
+      return;
     }
 
-    fetchProfile();
-  }, [router]);
+    if (user) {
+      setFormData({
+        displayName: user.profile.displayName,
+        bio: user.profile.bio,
+        location: user.profile.location,
+        intents: user.profile.intents as IntentValue[],
+        isPublic: user.profile.isPublic,
+      });
+      setAvatarPreview(user.profile.avatarUrl || null);
+    }
+  }, [user, userLoading, userError]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,7 +92,7 @@ function ProfileSettingsPageContent() {
       }
 
       const updatedProfile = await response.json();
-      setProfile(updatedProfile);
+      await refreshUser();
       setFormData({
         displayName: updatedProfile.profile.displayName,
         bio: updatedProfile.profile.bio,
@@ -140,8 +108,7 @@ function ProfileSettingsPageContent() {
     }
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleAvatarUpload = async (file: File) => {
     if (!file) {
       setError(null);
       return;
@@ -175,7 +142,7 @@ function ProfileSettingsPageContent() {
       }
 
       const updatedProfile = await response.json();
-      setProfile(updatedProfile);
+      await refreshUser();
       setFormData({
         displayName: updatedProfile.profile.displayName,
         bio: updatedProfile.profile.bio,
@@ -188,6 +155,48 @@ function ProfileSettingsPageContent() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload avatar");
       setUploading(false);
+    }
+  };
+
+  const handleAvatarDelete = async () => {
+    setError(null);
+
+    try {
+      const response = await apiFetchWithRefresh("/profile/me", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          displayName: formData.displayName,
+          bio: formData.bio,
+          location: formData.location,
+          intents: formData.intents,
+          isPublic: formData.isPublic,
+          avatarUrl: null,
+        }),
+      });
+
+      if (response.status === 401) {
+        router.replace(
+          `/login?redirect=${encodeURIComponent("/profile/settings")}`,
+        );
+        router.refresh();
+        return;
+      }
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(
+          `Failed to delete avatar: ${response.status} - ${text}`,
+        );
+      }
+
+      const updatedProfile = await response.json();
+      await refreshUser();
+      setAvatarPreview(updatedProfile.profile.avatarUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete avatar");
     }
   };
 
@@ -204,7 +213,7 @@ function ProfileSettingsPageContent() {
     });
   };
 
-  if (loading) {
+  if (userLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
         <div className="text-center text-muted-foreground">
@@ -235,30 +244,19 @@ function ProfileSettingsPageContent() {
             <label htmlFor="avatar" className="text-sm font-medium">
               Avatar
             </label>
-            <div className="flex items-center gap-4">
-              <Avatar
-                src={avatarPreview ?? undefined}
-                size="xl"
-                fallback={
-                  <span className="font-semibold">
-                    {formData.displayName?.[0]?.toUpperCase() ?? "?"}
-                  </span>
-                }
-              />
-              <div className="space-y-2">
-                <input
-                  id="avatar"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  disabled={uploading}
-                  className="text-sm"
-                />
-                {uploading && (
-                  <p className="text-sm text-muted-foreground">Uploading...</p>
-                )}
-              </div>
-            </div>
+            <AvatarUpload
+              src={avatarPreview ?? undefined}
+              fallback={
+                <span className="font-semibold">
+                  {formData.displayName?.[0]?.toUpperCase() ?? "?"}
+                </span>
+              }
+              size="xl"
+              onChange={handleAvatarUpload}
+              onDelete={handleAvatarDelete}
+              uploading={uploading}
+              maxSizeMB={5}
+            />
           </div>
 
           <div className="space-y-2">
@@ -268,7 +266,7 @@ function ProfileSettingsPageContent() {
             <Input
               id="email"
               type="email"
-              value={profile?.email ?? ""}
+              value={user?.email ?? ""}
               disabled
               className="bg-muted"
             />

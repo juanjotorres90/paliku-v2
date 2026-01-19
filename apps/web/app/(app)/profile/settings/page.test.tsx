@@ -34,168 +34,97 @@ const mockProfileData = {
   },
 };
 
-// Helper to create fetch mock with sequential responses
-function createFetchMock(
-  responses: Array<
-    | { type: "resolve"; value: Partial<Response> }
-    | { type: "reject"; error: unknown }
-  >,
-) {
-  let callIndex = 0;
-  return vi.fn().mockImplementation(() => {
-    const response = responses[callIndex];
-    callIndex++;
-    if (!response) {
-      return Promise.reject(new Error("No more mock responses configured"));
-    }
-    if (response.type === "reject") {
-      return Promise.reject(response.error);
-    }
-    return Promise.resolve(response.value as Response);
-  });
-}
+// Mock API functions
+const mockApiFetchWithRefresh = vi.fn();
+const mockApiFetch = vi.fn();
 
-// Create a success profile load response
-const profileLoadResponse = () => ({
-  type: "resolve" as const,
-  value: {
-    status: 200,
-    ok: true,
-    json: () => Promise.resolve(mockProfileData),
-  },
+// Create a mock module that can be updated
+const createMockUserContext = (overrides = {}) => ({
+  user: null,
+  loading: false,
+  error: false,
+  refreshUser: vi.fn().mockResolvedValue(undefined),
+  ...overrides,
 });
+
+let currentUserContext = createMockUserContext();
+
+vi.mock("../../../lib/api", () => ({
+  apiFetchWithRefresh: () => mockApiFetchWithRefresh(),
+  apiFetch: () => mockApiFetch(),
+}));
+
+vi.mock("../../../user-context", () => ({
+  useUser: () => currentUserContext,
+}));
 
 describe("ProfileSettingsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.restoreAllMocks();
+    currentUserContext = createMockUserContext();
+    mockApiFetchWithRefresh.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockProfileData,
+    });
   });
 
   afterEach(async () => {
     cleanup();
-    vi.restoreAllMocks();
     await new Promise((r) => setTimeout(r, 0));
   });
 
   // Initial Load Tests
   it("shows loading state initially", () => {
-    globalThis.fetch = vi.fn().mockImplementation(() => new Promise(() => {}));
+    currentUserContext = createMockUserContext({ loading: true });
     render(<ProfileSettingsPage />);
     expect(screen.getByText("Loading profile...")).toBeInTheDocument();
   });
 
-  it("redirects to login when user is not authenticated (401)", async () => {
-    globalThis.fetch = createFetchMock([
-      { type: "resolve", value: { status: 401, ok: false } },
-      { type: "resolve", value: { status: 401, ok: false } },
-    ]);
+  it("shows error when user context has error", () => {
+    currentUserContext = createMockUserContext({ error: true });
     render(<ProfileSettingsPage />);
-    await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith(
-        "/login?redirect=%2Fprofile%2Fsettings",
-      );
-    });
-  });
-
-  it("shows error when API returns non-ok response", async () => {
-    globalThis.fetch = createFetchMock([
-      {
-        type: "resolve",
-        value: {
-          status: 500,
-          ok: false,
-          text: () => Promise.resolve("Server error"),
-        },
-      },
-    ]);
-    render(<ProfileSettingsPage />);
-    await waitFor(() => {
-      expect(
-        screen.getByText("API error: 500 - Server error"),
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("shows error when fetch throws an Error", async () => {
-    globalThis.fetch = createFetchMock([
-      { type: "reject", error: new Error("Network failure") },
-    ]);
-    render(<ProfileSettingsPage />);
-    await waitFor(() => {
-      expect(screen.getByText("Network failure")).toBeInTheDocument();
-    });
-  });
-
-  it("shows error when fetch throws a non-Error", async () => {
-    globalThis.fetch = createFetchMock([
-      { type: "reject", error: "unknown error" },
-    ]);
-    render(<ProfileSettingsPage />);
-    await waitFor(() => {
-      expect(screen.getByText("Failed to fetch profile")).toBeInTheDocument();
-    });
+    expect(screen.getByText("Failed to fetch profile")).toBeInTheDocument();
   });
 
   // Form Rendering Tests
-  it("renders profile form when authenticated", async () => {
-    globalThis.fetch = createFetchMock([profileLoadResponse()]);
+  it("renders profile form when authenticated", () => {
+    currentUserContext = createMockUserContext({ user: mockProfileData });
     render(<ProfileSettingsPage />);
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "Profile Settings" }),
-      ).toBeInTheDocument();
-    });
+    expect(
+      screen.getByRole("heading", { name: "Profile Settings" }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toHaveValue("test@example.com");
     expect(screen.getByLabelText("Display name")).toHaveValue("Test User");
   });
 
-  it("shows avatar fallback when no avatar URL", async () => {
-    globalThis.fetch = createFetchMock([profileLoadResponse()]);
+  it("shows avatar fallback when no avatar URL", () => {
+    currentUserContext = createMockUserContext({ user: mockProfileData });
     render(<ProfileSettingsPage />);
-    await waitFor(() => expect(screen.getByText("T")).toBeInTheDocument());
+    expect(screen.getByText("T")).toBeInTheDocument();
   });
 
-  it("shows question mark fallback when displayName is empty", async () => {
+  it("shows question mark fallback when displayName is empty", () => {
     const profileWithEmptyName = {
       ...mockProfileData,
       profile: { ...mockProfileData.profile, displayName: "" },
     };
-    globalThis.fetch = createFetchMock([
-      {
-        type: "resolve",
-        value: {
-          status: 200,
-          ok: true,
-          json: () => Promise.resolve(profileWithEmptyName),
-        },
-      },
-    ]);
+    currentUserContext = createMockUserContext({ user: profileWithEmptyName });
     render(<ProfileSettingsPage />);
-    await waitFor(() => expect(screen.getByText("?")).toBeInTheDocument());
+    expect(screen.getByText("?")).toBeInTheDocument();
   });
 
-  it("shows character count for bio", async () => {
+  it("shows character count for bio", () => {
     const profileWithBio = {
       ...mockProfileData,
       profile: { ...mockProfileData.profile, bio: "Hello" },
     };
-    globalThis.fetch = createFetchMock([
-      {
-        type: "resolve",
-        value: {
-          status: 200,
-          ok: true,
-          json: () => Promise.resolve(profileWithBio),
-        },
-      },
-    ]);
+    currentUserContext = createMockUserContext({ user: profileWithBio });
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByText("5/500 characters")).toBeInTheDocument(),
-    );
+    expect(screen.getByText("5/500 characters")).toBeInTheDocument();
   });
 
-  it("shows profile with avatar URL", async () => {
+  it("shows profile with avatar URL", () => {
     const profileWithAvatar = {
       ...mockProfileData,
       profile: {
@@ -203,102 +132,80 @@ describe("ProfileSettingsPage", () => {
         avatarUrl: "https://example.com/avatar.jpg",
       },
     };
-    globalThis.fetch = createFetchMock([
-      {
-        type: "resolve",
-        value: {
-          status: 200,
-          ok: true,
-          json: () => Promise.resolve(profileWithAvatar),
-        },
-      },
-    ]);
+    currentUserContext = createMockUserContext({ user: profileWithAvatar });
     render(<ProfileSettingsPage />);
-    await waitFor(() => {
-      expect(screen.getByRole("img")).toHaveAttribute(
-        "src",
-        "https://example.com/avatar.jpg",
-      );
-    });
+    expect(screen.getByRole("img")).toHaveAttribute(
+      "src",
+      "https://example.com/avatar.jpg",
+    );
   });
 
   // Form Interaction Tests
-  it("updates bio field", async () => {
-    globalThis.fetch = createFetchMock([profileLoadResponse()]);
+  it("updates display name field", () => {
+    currentUserContext = createMockUserContext({ user: mockProfileData });
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Bio")).toBeInTheDocument(),
-    );
+    fireEvent.change(screen.getByLabelText("Display name"), {
+      target: { value: "Updated Name" },
+    });
+    expect(screen.getByLabelText("Display name")).toHaveValue("Updated Name");
+  });
+
+  it("updates bio field", () => {
+    currentUserContext = createMockUserContext({ user: mockProfileData });
+    render(<ProfileSettingsPage />);
     fireEvent.change(screen.getByLabelText("Bio"), {
       target: { value: "New bio text" },
     });
     expect(screen.getByLabelText("Bio")).toHaveValue("New bio text");
   });
 
-  it("updates location field", async () => {
-    globalThis.fetch = createFetchMock([profileLoadResponse()]);
+  it("updates location field", () => {
+    currentUserContext = createMockUserContext({ user: mockProfileData });
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Location")).toBeInTheDocument(),
-    );
     fireEvent.change(screen.getByLabelText("Location"), {
       target: { value: "San Francisco" },
     });
     expect(screen.getByLabelText("Location")).toHaveValue("San Francisco");
   });
 
-  it("toggles public profile checkbox", async () => {
-    globalThis.fetch = createFetchMock([profileLoadResponse()]);
+  it("toggles public profile checkbox", () => {
+    currentUserContext = createMockUserContext({ user: mockProfileData });
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Public profile")).toBeInTheDocument(),
-    );
     const checkbox = screen.getByLabelText("Public profile");
     expect(checkbox).toBeChecked();
     fireEvent.click(checkbox);
     expect(checkbox).not.toBeChecked();
   });
 
-  it("toggles intent selection - add intent", async () => {
-    globalThis.fetch = createFetchMock([profileLoadResponse()]);
+  it("toggles intent selection - add intent", () => {
+    currentUserContext = createMockUserContext({ user: mockProfileData });
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Friends" }),
-      ).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Friends" }));
-    expect(screen.getByRole("button", { name: "Friends" })).toBeInTheDocument();
+    const friendsButton = screen.getByRole("button", { name: "Friends" });
+    // Check that button is outline (default is outline when not selected)
+    expect(friendsButton.className).not.toContain("bg-primary");
+    fireEvent.click(friendsButton);
+    // Check that button is now selected (has bg-primary class)
+    expect(friendsButton.className).toContain("bg-primary");
   });
 
-  it("toggles intent selection - remove intent", async () => {
+  it("toggles intent selection - remove intent", () => {
     const profileWithMultipleIntents = {
       ...mockProfileData,
       profile: { ...mockProfileData.profile, intents: ["practice", "friends"] },
     };
-    globalThis.fetch = createFetchMock([
-      {
-        type: "resolve",
-        value: {
-          status: 200,
-          ok: true,
-          json: () => Promise.resolve(profileWithMultipleIntents),
-        },
-      },
-    ]);
+    currentUserContext = createMockUserContext({
+      user: profileWithMultipleIntents,
+    });
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Practice" }),
-      ).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Practice" }));
-    expect(
-      screen.getByRole("button", { name: "Practice" }),
-    ).toBeInTheDocument();
+    const practiceButton = screen.getByRole("button", { name: "Practice" });
+    // Check that button is selected (has bg-primary class)
+    expect(practiceButton.className).toContain("bg-primary");
+    fireEvent.click(practiceButton);
+    // Check that button is now outline (no bg-primary class)
+    expect(practiceButton.className).not.toContain("bg-primary");
   });
 
-  it("limits intent selection to maximum 3", async () => {
+  it("limits intent selection to maximum 3", () => {
     const profileWithAllIntents = {
       ...mockProfileData,
       profile: {
@@ -306,69 +213,76 @@ describe("ProfileSettingsPage", () => {
         intents: ["practice", "friends", "date"],
       },
     };
-    globalThis.fetch = createFetchMock([
-      {
-        type: "resolve",
-        value: {
-          status: 200,
-          ok: true,
-          json: () => Promise.resolve(profileWithAllIntents),
-        },
-      },
-    ]);
+    currentUserContext = createMockUserContext({ user: profileWithAllIntents });
     render(<ProfileSettingsPage />);
-    await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Practice" }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: "Friends" }),
-      ).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Date" })).toBeInTheDocument();
-    });
+    expect(
+      screen.getByRole("button", { name: "Practice" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Friends" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Date" })).toBeInTheDocument();
   });
 
   // Save Operation Tests
   it("handles profile save successfully", async () => {
-    globalThis.fetch = createFetchMock([
-      profileLoadResponse(),
-      {
-        type: "resolve",
-        value: {
-          status: 200,
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              ...mockProfileData,
-              profile: { ...mockProfileData.profile, displayName: "Updated" },
-            }),
-        },
-      },
-    ]);
+    const updatedProfile = {
+      ...mockProfileData,
+      profile: { ...mockProfileData.profile, displayName: "Updated" },
+    };
+
+    currentUserContext = createMockUserContext({
+      user: mockProfileData,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    });
+
+    mockApiFetchWithRefresh.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => updatedProfile,
+    });
+
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Display name")).toBeInTheDocument(),
-    );
     fireEvent.change(screen.getByLabelText("Display name"), {
       target: { value: "Updated" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
-    await waitFor(() =>
-      expect(screen.getByText("Saving...")).toBeInTheDocument(),
-    );
-    await waitFor(() =>
+
+    await waitFor(() => {
+      expect(screen.getByText("Saving...")).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
       expect(
         screen.getByRole("button", { name: "Save changes" }),
-      ).toBeInTheDocument(),
-    );
+      ).toBeInTheDocument();
+    });
+
+    expect(currentUserContext.refreshUser).toHaveBeenCalled();
   });
 
-  it("shows validation error when profile schema is invalid", async () => {
-    globalThis.fetch = createFetchMock([profileLoadResponse()]);
+  it("handles profile save with 401 redirect", async () => {
+    currentUserContext = createMockUserContext({
+      user: mockProfileData,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    });
+
+    mockApiFetchWithRefresh.mockResolvedValue({
+      ok: false,
+      status: 401,
+    });
+
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Display name")).toBeInTheDocument(),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith(
+        "/login?redirect=%2Fprofile%2Fsettings",
+      );
+    });
+  });
+
+  it("shows validation error when profile schema is invalid", () => {
+    currentUserContext = createMockUserContext({ user: mockProfileData });
+    render(<ProfileSettingsPage />);
 
     // Set display name to just 1 char - too short for min(2)
     fireEvent.change(screen.getByLabelText("Display name"), {
@@ -376,61 +290,44 @@ describe("ProfileSettingsPage", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
 
-    await waitFor(() =>
-      expect(screen.getByText(/Display name too short/i)).toBeInTheDocument(),
-    );
+    // Zod validation error message
+    expect(screen.getByText(/Display name too short/i)).toBeInTheDocument();
   });
 
   it("handles profile save error", async () => {
-    globalThis.fetch = createFetchMock([
-      profileLoadResponse(),
-      {
-        type: "resolve",
-        value: {
-          status: 500,
-          ok: false,
-          text: () => Promise.resolve("Save failed"),
-        },
-      },
-    ]);
+    currentUserContext = createMockUserContext({
+      user: mockProfileData,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    });
+
+    mockApiFetchWithRefresh.mockResolvedValue({
+      ok: false,
+      status: 500,
+      text: async () => "Save failed",
+    });
+
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Display name")).toBeInTheDocument(),
-    );
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
-    await waitFor(() =>
-      expect(screen.getByText(/Failed to save profile/)).toBeInTheDocument(),
-    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to save profile/)).toBeInTheDocument();
+    });
   });
 
   it("handles profile save network error", async () => {
-    globalThis.fetch = createFetchMock([
-      profileLoadResponse(),
-      { type: "reject", error: new Error("Network error") },
-    ]);
-    render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Display name")).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
-    await waitFor(() =>
-      expect(screen.getByText("Network error")).toBeInTheDocument(),
-    );
-  });
+    currentUserContext = createMockUserContext({
+      user: mockProfileData,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    });
 
-  it("handles profile save with non-Error throw", async () => {
-    globalThis.fetch = createFetchMock([
-      profileLoadResponse(),
-      { type: "reject", error: "unknown error" },
-    ]);
+    mockApiFetchWithRefresh.mockRejectedValue(new Error("Network error"));
+
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Display name")).toBeInTheDocument(),
-    );
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
-    await waitFor(() =>
-      expect(screen.getByText("Failed to save profile")).toBeInTheDocument(),
-    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Network error")).toBeInTheDocument();
+    });
   });
 
   // Avatar Upload Tests
@@ -442,116 +339,142 @@ describe("ProfileSettingsPage", () => {
         avatarUrl: "https://example.com/new-avatar.jpg",
       },
     };
-    globalThis.fetch = createFetchMock([
-      profileLoadResponse(),
-      {
-        type: "resolve",
-        value: {
-          status: 200,
-          ok: true,
-          json: () => Promise.resolve(updatedProfile),
-        },
-      },
-    ]);
-    render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Avatar")).toBeInTheDocument(),
-    );
-    const file = new File(["test"], "avatar.png", { type: "image/png" });
-    fireEvent.change(screen.getByLabelText("Avatar"), {
-      target: { files: [file] },
-    });
-    await waitFor(() =>
-      expect(screen.getByText("Uploading...")).toBeInTheDocument(),
-    );
-    await waitFor(() =>
-      expect(screen.queryByText("Uploading...")).not.toBeInTheDocument(),
-    );
-  });
 
-  it("handles avatar upload with no file selected", async () => {
-    globalThis.fetch = createFetchMock([profileLoadResponse()]);
-    render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Avatar")).toBeInTheDocument(),
-    );
-    fireEvent.change(screen.getByLabelText("Avatar"), {
-      target: { files: [] },
+    currentUserContext = createMockUserContext({
+      user: mockProfileData,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
     });
-    expect(screen.queryByText("Uploading...")).not.toBeInTheDocument();
+
+    mockApiFetchWithRefresh.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => updatedProfile,
+    });
+
+    render(<ProfileSettingsPage />);
+    const file = new File(["test"], "avatar.png", { type: "image/png" });
+
+    // Trigger file upload
+    const input = screen.getByLabelText("Avatar");
+    fireEvent.change(input, { target: { files: [file] } });
+
+    // Wait for the upload to complete and refresh to be called
+    await waitFor(() => {
+      expect(currentUserContext.refreshUser).toHaveBeenCalled();
+    });
   });
 
   it("handles avatar upload error", async () => {
-    globalThis.fetch = createFetchMock([
-      profileLoadResponse(),
-      {
-        type: "resolve",
-        value: {
-          status: 500,
-          ok: false,
-          text: () => Promise.resolve("Upload failed"),
+    currentUserContext = createMockUserContext({
+      user: mockProfileData,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    });
+
+    mockApiFetchWithRefresh.mockResolvedValue({
+      ok: false,
+      status: 500,
+      text: async () => "Upload failed",
+    });
+
+    render(<ProfileSettingsPage />);
+    const file = new File(["test"], "avatar.png", { type: "image/png" });
+    fireEvent.change(screen.getByLabelText("Avatar"), {
+      target: { files: [file] },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to upload avatar/)).toBeInTheDocument();
+    });
+  });
+
+  it("handles avatar delete successfully", async () => {
+    const updatedProfile = {
+      ...mockProfileData,
+      profile: {
+        ...mockProfileData.profile,
+        avatarUrl: null,
+      },
+    };
+
+    currentUserContext = createMockUserContext({
+      user: {
+        ...mockProfileData,
+        profile: {
+          ...mockProfileData.profile,
+          avatarUrl: "https://example.com/avatar.jpg",
         },
       },
-    ]);
-    render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Avatar")).toBeInTheDocument(),
-    );
-    const file = new File(["test"], "avatar.png", { type: "image/png" });
-    fireEvent.change(screen.getByLabelText("Avatar"), {
-      target: { files: [file] },
+      refreshUser: vi.fn().mockResolvedValue(undefined),
     });
-    await waitFor(() =>
-      expect(screen.getByText(/Failed to upload avatar/)).toBeInTheDocument(),
-    );
-  });
 
-  it("handles avatar upload network error", async () => {
-    globalThis.fetch = createFetchMock([
-      profileLoadResponse(),
-      { type: "reject", error: new Error("Network error") },
-    ]);
-    render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Avatar")).toBeInTheDocument(),
-    );
-    const file = new File(["test"], "avatar.png", { type: "image/png" });
-    fireEvent.change(screen.getByLabelText("Avatar"), {
-      target: { files: [file] },
+    mockApiFetchWithRefresh.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => updatedProfile,
     });
-    await waitFor(() =>
-      expect(screen.getByText("Network error")).toBeInTheDocument(),
-    );
-  });
 
-  it("handles avatar upload with non-Error throw", async () => {
-    globalThis.fetch = createFetchMock([
-      profileLoadResponse(),
-      { type: "reject", error: "unknown error" },
-    ]);
     render(<ProfileSettingsPage />);
-    await waitFor(() =>
-      expect(screen.getByLabelText("Avatar")).toBeInTheDocument(),
-    );
-    const file = new File(["test"], "avatar.png", { type: "image/png" });
-    fireEvent.change(screen.getByLabelText("Avatar"), {
-      target: { files: [file] },
-    });
-    await waitFor(() =>
-      expect(screen.getByText("Failed to upload avatar")).toBeInTheDocument(),
-    );
-  });
+    const deleteButton = screen.getByRole("button", { name: "Delete" });
+    fireEvent.click(deleteButton);
 
-  // Environment Config Tests
-  it("calls same-origin /api endpoint", async () => {
-    const mockFetch = createFetchMock([profileLoadResponse()]);
-    globalThis.fetch = mockFetch;
-    render(<ProfileSettingsPage />);
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        "/api/profile/me",
-        expect.any(Object),
-      );
+      expect(currentUserContext.refreshUser).toHaveBeenCalled();
+    });
+  });
+
+  it("disables form inputs while saving", async () => {
+    currentUserContext = createMockUserContext({
+      user: mockProfileData,
+      refreshUser: vi.fn().mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            setTimeout(resolve, 100);
+          }),
+      ),
+    });
+
+    mockApiFetchWithRefresh.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(
+            () =>
+              resolve({
+                ok: true,
+                status: 200,
+                json: async () => mockProfileData,
+              }),
+            100,
+          );
+        }),
+    );
+
+    render(<ProfileSettingsPage />);
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Display name")).toBeDisabled();
+    });
+  });
+
+  it("shows error message from API response", async () => {
+    currentUserContext = createMockUserContext({
+      user: mockProfileData,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    });
+
+    mockApiFetchWithRefresh.mockResolvedValue({
+      ok: false,
+      status: 400,
+      text: async () => "Bad request - validation failed",
+    });
+
+    render(<ProfileSettingsPage />);
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Failed to save profile: 400/),
+      ).toBeInTheDocument();
     });
   });
 });

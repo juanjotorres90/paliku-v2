@@ -6,6 +6,7 @@ export interface SignoutResult {
   ok: true;
 }
 
+// Parameters kept for hexagonal architecture consistency
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export async function signout(
   _input: SignoutInput,

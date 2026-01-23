@@ -34,32 +34,15 @@ async function getApp(): Promise<Hono> {
 }
 
 // Create handlers that lazily initialize the app
-export const GET = async (req: Request) => {
+// Next.js requires named exports for each HTTP method we want to support
+const createHandler = () => async (req: Request) => {
   const resolvedApp = await getApp();
   return handle(resolvedApp)(req);
 };
 
-export const POST = async (req: Request) => {
-  const resolvedApp = await getApp();
-  return handle(resolvedApp)(req);
-};
-
-export const PATCH = async (req: Request) => {
-  const resolvedApp = await getApp();
-  return handle(resolvedApp)(req);
-};
-
-export const PUT = async (req: Request) => {
-  const resolvedApp = await getApp();
-  return handle(resolvedApp)(req);
-};
-
-export const DELETE = async (req: Request) => {
-  const resolvedApp = await getApp();
-  return handle(resolvedApp)(req);
-};
-
-export const OPTIONS = async (req: Request) => {
-  const resolvedApp = await getApp();
-  return handle(resolvedApp)(req);
-};
+export const GET = createHandler();
+export const POST = createHandler();
+export const PATCH = createHandler();
+export const PUT = createHandler();
+export const DELETE = createHandler();
+export const OPTIONS = createHandler();

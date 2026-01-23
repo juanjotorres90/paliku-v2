@@ -57,17 +57,28 @@ export function useUser() {
   return context;
 }
 
+const DEFAULT_SETTINGS: Settings = {
+  locale: "en",
+  theme: "system",
+};
+
 async function fetchSettings(): Promise<Settings> {
-  const response = await apiFetchWithRefresh("/settings/me");
+  try {
+    const response = await apiFetchWithRefresh("/settings/me");
 
-  if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
-      throw new Error("Unauthorized");
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error("Unauthorized");
+      }
+      console.warn("Failed to fetch settings, using defaults");
+      return DEFAULT_SETTINGS;
     }
-    throw new Error("Failed to fetch settings");
-  }
 
-  return response.json() as Promise<Settings>;
+    return (await response.json()) as Promise<Settings>;
+  } catch {
+    console.warn("Failed to fetch settings, using defaults");
+    return DEFAULT_SETTINGS;
+  }
 }
 
 function applyUserTheme(theme: Theme) {
@@ -115,8 +126,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const settings = await fetchSettings();
       applyUserTheme(settings.theme);
       setUser((prev) => (prev ? { ...prev, settings } : null));
-    } catch {
-      // Silently fail for settings refresh
+    } catch (err) {
+      console.warn("Settings refresh failed:", err);
     }
   }, []);
 

@@ -6,9 +6,12 @@ import {
   useEffect,
   useState,
   useCallback,
+  useRef,
 } from "react";
 import {
   applyTheme,
+  getResolvedTheme,
+  getStoredTheme,
   getSystemTheme,
   setTheme,
   type Theme,
@@ -87,10 +90,26 @@ function applyUserTheme(theme: Theme) {
   setTheme(theme);
 }
 
+// Get the stored theme value (light, dark, or null for system)
+function getInitialTheme(): Theme {
+  const stored = getStoredTheme();
+  return stored ?? "system";
+}
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  // Track the initially applied theme to avoid flickering on API response
+  const initialThemeRef = useRef<Theme>(getInitialTheme());
+
+  // Apply theme immediately on mount to prevent FOUC
+  // This uses the stored theme from localStorage (managed by next-themes)
+  useEffect(() => {
+    const resolved = getResolvedTheme();
+    applyTheme(resolved);
+  }, []);
 
   const refreshUser = useCallback(async () => {
     try {
@@ -111,7 +130,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
       const json = await response.json();
       const settings = await fetchSettings();
-      applyUserTheme(settings.theme);
+
+      // Only apply theme if server setting differs from initial stored value
+      // This prevents flickering when themes match
+      if (settings.theme !== initialThemeRef.current) {
+        applyUserTheme(settings.theme);
+        initialThemeRef.current = settings.theme;
+      }
+
       setUser({ ...json, settings });
       setLoading(false);
       setError(false);
@@ -124,7 +150,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const refreshSettings = useCallback(async () => {
     try {
       const settings = await fetchSettings();
-      applyUserTheme(settings.theme);
+
+      // Only apply theme if server setting differs from stored value
+      if (settings.theme !== initialThemeRef.current) {
+        applyUserTheme(settings.theme);
+        initialThemeRef.current = settings.theme;
+      }
+
       setUser((prev) => (prev ? { ...prev, settings } : null));
     } catch (err) {
       console.warn("Settings refresh failed:", err);

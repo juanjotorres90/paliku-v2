@@ -36,11 +36,19 @@ function SettingsPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const savedThemeRef = useRef<Theme | null>(null);
-  const [formData, setFormData] = useState<SettingsFormData>({
-    locale: "en",
-    theme: "system",
-  });
 
+  // Sync formData with user.settings - this prevents flicker on navigation
+  const formData: SettingsFormData = user
+    ? {
+        locale: user.settings.locale as Locale,
+        theme: user.settings.theme,
+      }
+    : {
+        locale: "en",
+        theme: "system",
+      };
+
+  // Track saved theme for cleanup on unmount
   useEffect(() => {
     if (userLoading) return;
 
@@ -50,20 +58,34 @@ function SettingsPageContent() {
       return;
     }
 
-    setFormData({
-      locale: user.settings.locale as Locale,
-      theme: user.settings.theme,
-    });
     savedThemeRef.current = user.settings.theme;
   }, [user, userLoading, userError, router]);
 
+  // Local state for unsaved changes
+  const [localChanges, setLocalChanges] = useState<Partial<SettingsFormData>>(
+    {},
+  );
+
+  // Clear local changes when user settings update from server
+  useEffect(() => {
+    if (user) {
+      setLocalChanges({});
+    }
+  }, [user?.settings.locale, user?.settings.theme]);
+
+  const effectiveFormData = { ...formData, ...localChanges };
+
   const handleThemeChange = useCallback((theme: Theme) => {
-    setFormData((prev) => ({ ...prev, theme }));
+    setLocalChanges((prev) => ({ ...prev, theme }));
 
     // Apply theme immediately for better UX
     const resolved = theme === "system" ? getSystemTheme() : theme;
     applyTheme(resolved);
     setTheme(theme);
+  }, []);
+
+  const handleLocaleChange = useCallback((locale: string) => {
+    setLocalChanges((prev) => ({ ...prev, locale: locale as Locale }));
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -77,7 +99,7 @@ function SettingsPageContent() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(effectiveFormData),
       });
 
       if (response.status === 401) {
@@ -94,7 +116,7 @@ function SettingsPageContent() {
       }
 
       await refreshSettings();
-      savedThemeRef.current = formData.theme;
+      savedThemeRef.current = effectiveFormData.theme;
       setSaving(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save settings");
@@ -155,15 +177,13 @@ function SettingsPageContent() {
               <LanguageSwitcher
                 id="language"
                 name="language"
-                value={formData.locale}
-                onChange={(locale) =>
-                  setFormData((prev) => ({ ...prev, locale: locale as Locale }))
-                }
+                value={effectiveFormData.locale}
+                onChange={handleLocaleChange}
                 options={LOCALE_OPTIONS}
                 className="w-full md:w-64"
               />
               <p className="text-xs text-muted-foreground">
-                Current: {AUTONYMS[formData.locale]}
+                Current: {AUTONYMS[effectiveFormData.locale]}
               </p>
             </div>
           </section>
@@ -182,16 +202,20 @@ function SettingsPageContent() {
               <label className="text-sm font-medium">Appearance</label>
               <ThemeRadioGroup
                 name="theme"
-                value={formData.theme}
+                value={effectiveFormData.theme}
                 onChange={handleThemeChange}
                 className="w-full md:w-96"
               />
               <p className="text-xs text-muted-foreground">
-                {formData.theme === "system" && (
+                {effectiveFormData.theme === "system" && (
                   <>Theme matches your system settings (light/dark)</>
                 )}
-                {formData.theme === "light" && <>Always use light theme</>}
-                {formData.theme === "dark" && <>Always use dark theme</>}
+                {effectiveFormData.theme === "light" && (
+                  <>Always use light theme</>
+                )}
+                {effectiveFormData.theme === "dark" && (
+                  <>Always use dark theme</>
+                )}
               </p>
             </div>
           </section>

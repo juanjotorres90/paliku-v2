@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "description": "Benutzerauthentifizierung und Profilverwaltung"
+  },
+  "ui": {
+    "common": {
+      "loading": "Laden...",
+      "error": "Fehler",
+      "success": "Erfolg",
+      "submit": "Absenden",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "close": "Schließen",
+      "back": "Zurück",
+      "next": "Weiter",
+      "previous": "Vorherige",
+      "search": "Suchen",
+      "filter": "Filtern",
+      "actions": "Aktionen",
+      "language": "Sprache"
+    },
+    "nav": {
+      "home": "Startseite",
+      "people": "Personen",
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "logout": "Abmelden",
+      "login": "Anmelden",
+      "signup": "Registrieren"
+    },
+    "auth": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "fullName": "Vollständiger Name",
+      "forgotPassword": "Passwort vergessen?",
+      "resetPassword": "Passwort zurücksetzen",
+      "noAccount": "Haben Sie kein Konto?",
+      "hasAccount": "Haben Sie bereits ein Konto?",
+      "signIn": "Anmelden",
+      "signUp": "Registrieren",
+      "orContinueWith": "Oder fortfahren mit"
+    },
+    "profile": {
+      "title": "Profil",
+      "avatar": "Profilbild",
+      "uploadAvatar": "Profilbild hochladen",
+      "removeAvatar": "Profilbild entfernen",
+      "updateProfile": "Profil aktualisieren",
+      "locale": "Spracheinstellung",
+      "localeUpdated": "Spracheinstellung aktualisiert"
+    }
+  },
+  "api": {
+    "errors": {
+      "auth": {
+        "invalid_credentials": "Ungültige E-Mail oder Passwort",
+        "email_not_confirmed": "Bitte bestätigen Sie Ihre E-Mail-Adresse",
+        "user_exists": "Ein Konto mit dieser E-Mail existiert bereits",
+        "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an",
+        "token_invalid": "Ungültiger oder abgelaufener Token",
+        "unauthorized": "Sie müssen angemeldet sein, um diese Aktion auszuführen",
+        "forbidden": "Sie haben keine Berechtigung für diese Aktion"
+      },
+      "request": {
+        "invalid_json": "Ungültiges JSON im Anforderungstext",
+        "invalid_request": "Ungültige Anforderung",
+        "method_not_allowed": "Methode nicht zulässig",
+        "not_found": "Die angeforderte Ressource wurde nicht gefunden",
+        "rate_limited": "Zu viele Anfragen. Bitte versuchen Sie es später erneut",
+        "payload_too_large": "Anforderungstext ist zu groß"
+      },
+      "upstream": {
+        "auth_failed": "Fehler des Authentifizierungsdienstes",
+        "database_error": "Datenbankfehler",
+        "storage_error": "Fehler des Speicherdienstes",
+        "unknown_error": "Ein unerwarteter Fehler ist aufgetreten"
+      },
+      "profile": {
+        "not_found": "Profil nicht gefunden",
+        "update_failed": "Fehler beim Aktualisieren des Profils",
+        "avatar_upload_failed": "Fehler beim Hochladen des Profilbilds",
+        "invalid_locale": "Ungültige Spracheinstellung"
+      },
+      "validation": {
+        "invalid_input": "Ungültige Eingabedaten"
+      }
+    }
+  },
+  "validation": {
+    "string": {
+      "min": "{field} muss mindestens {min, number} {min, plural, one{Zeichen} other{Zeichen}} haben",
+      "max": "{field} darf höchstens {max, number} {max, plural, one{Zeichen} other{Zeichen}} haben",
+      "email": "Muss eine gültige E-Mail-Adresse sein",
+      "url": "Muss eine gültige URL sein"
+    },
+    "number": {
+      "min": "{field} muss mindestens {min, number} sein",
+      "max": "{field} darf höchstens {max, number} sein",
+      "int": "{field} muss eine ganze Zahl sein"
+    },
+    "common": {
+      "required": "{field} ist erforderlich",
+      "invalid": "{field} ist ungültig",
+      "oneOf": "{field} muss eines der folgenden sein: {options}"
+    }
+  }
+}

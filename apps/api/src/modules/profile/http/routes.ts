@@ -27,7 +27,7 @@ export function createProfileRoutes(
   ctx: ProfileRoutesContext,
   jwtAuth: MiddlewareHandler<RouteEnv>,
 ) {
-  const { config, profileRepo, storage, userEmail } = ctx;
+  const { profileRepo, storage, userEmail } = ctx;
   const router = new Hono<RouteEnv>();
 
   router.use("/me", jwtAuth);

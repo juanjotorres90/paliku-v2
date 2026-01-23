@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "description": "Autenticació d'usuari i gestió de perfil"
+  },
+  "ui": {
+    "common": {
+      "loading": "Carregant...",
+      "error": "Error",
+      "success": "Èxit",
+      "submit": "Enviar",
+      "cancel": "Cancel·lar",
+      "save": "Desar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "close": "Tancar",
+      "back": "Enrere",
+      "next": "Següent",
+      "previous": "Anterior",
+      "search": "Cercar",
+      "filter": "Filtrar",
+      "actions": "Accions",
+      "language": "Idioma"
+    },
+    "nav": {
+      "home": "Inici",
+      "people": "Gent",
+      "profile": "Perfil",
+      "settings": "Configuració",
+      "logout": "Tancar sessió",
+      "login": "Iniciar sessió",
+      "signup": "Registrar-se"
+    },
+    "auth": {
+      "email": "Correu electrònic",
+      "password": "Contrasenya",
+      "confirmPassword": "Confirmar contrasenya",
+      "fullName": "Nom complet",
+      "forgotPassword": "Has oblidat la teva contrasenya?",
+      "resetPassword": "Restablir contrasenya",
+      "noAccount": "No tens compte?",
+      "hasAccount": "Ja tens compte?",
+      "signIn": "Iniciar sessió",
+      "signUp": "Registrar-se",
+      "orContinueWith": "O continuar amb"
+    },
+    "profile": {
+      "title": "Perfil",
+      "avatar": "Avatar",
+      "uploadAvatar": "Pujar avatar",
+      "removeAvatar": "Eliminar avatar",
+      "updateProfile": "Actualitzar perfil",
+      "locale": "Preferència d'idioma",
+      "localeUpdated": "Preferència d'idioma actualitzada"
+    }
+  },
+  "api": {
+    "errors": {
+      "auth": {
+        "invalid_credentials": "Correu electrònic o contrasenya invàlids",
+        "email_not_confirmed": "Si us plau, confirma la teva adreça de correu electrònic",
+        "user_exists": "Ja existeix un compte amb aquest correu electrònic",
+        "session_expired": "La teva sessió ha expirat. Si us plau, inicia sessió novament",
+        "token_invalid": "Token invàlid o expirat",
+        "unauthorized": "Has d'iniciar sessió per realitzar aquesta acció",
+        "forbidden": "No tens permís per realitzar aquesta acció"
+      },
+      "request": {
+        "invalid_json": "JSON invàlid al cos de la sol·licitud",
+        "invalid_request": "Sol·licitud invàlida",
+        "method_not_allowed": "Mètode no permès",
+        "not_found": "El recurs sol·licitat no s'ha trobat",
+        "rate_limited": "Massa sol·licituds. Si us plau, intenta-ho més tard",
+        "payload_too_large": "El cos de la sol·licitud és massa gran"
+      },
+      "upstream": {
+        "auth_failed": "Error del servei d'autenticació",
+        "database_error": "Error de base de dades",
+        "storage_error": "Error del servei d'emmagatzematge",
+        "unknown_error": "Ha ocorregut un error inesperat"
+      },
+      "profile": {
+        "not_found": "Perfil no trobat",
+        "update_failed": "Error en actualitzar el perfil",
+        "avatar_upload_failed": "Error en pujar l'avatar",
+        "invalid_locale": "Preferència d'idioma invàlida"
+      },
+      "validation": {
+        "invalid_input": "Dades d'entrada invàlides"
+      }
+    }
+  },
+  "validation": {
+    "string": {
+      "min": "{field} ha de tenir com a mínim {min, number} {min, plural, one{caràcter} other{caràcters}}",
+      "max": "{field} ha de tenir com a màxim {max, number} {max, plural, one{caràcter} other{caràcters}}",
+      "email": "Ha de ser una adreça de correu electrònic vàlida",
+      "url": "Ha de ser una URL vàlida"
+    },
+    "number": {
+      "min": "{field} ha de ser com a mínim {min, number}",
+      "max": "{field} ha de ser com a màxim {max, number}",
+      "int": "{field} ha de ser un número enter"
+    },
+    "common": {
+      "required": "{field} és requerit",
+      "invalid": "{field} és invàlid",
+      "oneOf": "{field} ha de ser un de: {options}"
+    }
+  }
+}

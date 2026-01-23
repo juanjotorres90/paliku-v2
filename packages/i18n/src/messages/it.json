@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "description": "Autenticazione utente e gestione profilo"
+  },
+  "ui": {
+    "common": {
+      "loading": "Caricamento...",
+      "error": "Errore",
+      "success": "Successo",
+      "submit": "Invia",
+      "cancel": "Annulla",
+      "save": "Salva",
+      "delete": "Elimina",
+      "edit": "Modifica",
+      "close": "Chiudi",
+      "back": "Indietro",
+      "next": "Avanti",
+      "previous": "Precedente",
+      "search": "Cerca",
+      "filter": "Filtra",
+      "actions": "Azioni",
+      "language": "Lingua"
+    },
+    "nav": {
+      "home": "Home",
+      "people": "Persone",
+      "profile": "Profilo",
+      "settings": "Impostazioni",
+      "logout": "Esci",
+      "login": "Accedi",
+      "signup": "Registrati"
+    },
+    "auth": {
+      "email": "E-mail",
+      "password": "Password",
+      "confirmPassword": "Conferma password",
+      "fullName": "Nome completo",
+      "forgotPassword": "Hai dimenticato la password?",
+      "resetPassword": "Reimposta password",
+      "noAccount": "Non hai un account?",
+      "hasAccount": "Hai già un account?",
+      "signIn": "Accedi",
+      "signUp": "Registrati",
+      "orContinueWith": "O continua con"
+    },
+    "profile": {
+      "title": "Profilo",
+      "avatar": "Avatar",
+      "uploadAvatar": "Carica avatar",
+      "removeAvatar": "Rimuovi avatar",
+      "updateProfile": "Aggiorna profilo",
+      "locale": "Preferenza lingua",
+      "localeUpdated": "Preferenza lingua aggiornata"
+    }
+  },
+  "api": {
+    "errors": {
+      "auth": {
+        "invalid_credentials": "E-mail o password non validi",
+        "email_not_confirmed": "Si prega di confermare il proprio indirizzo e-mail",
+        "user_exists": "Esiste già un account con questa e-mail",
+        "session_expired": "La sessione è scaduta. Accedi di nuovo",
+        "token_invalid": "Token non valido o scaduto",
+        "unauthorized": "Devi essere loggato per eseguire questa azione",
+        "forbidden": "Non hai il permesso di eseguire questa azione"
+      },
+      "request": {
+        "invalid_json": "JSON non valido nel corpo della richiesta",
+        "invalid_request": "Richiesta non valida",
+        "method_not_allowed": "Metodo non consentito",
+        "not_found": "La risorsa richiesta non è stata trovata",
+        "rate_limited": "Troppe richieste. Riprova più tardi",
+        "payload_too_large": "Il corpo della richiesta è troppo grande"
+      },
+      "upstream": {
+        "auth_failed": "Errore del servizio di autenticazione",
+        "database_error": "Errore del database",
+        "storage_error": "Errore del servizio di archiviazione",
+        "unknown_error": "Si è verificato un errore imprevisto"
+      },
+      "profile": {
+        "not_found": "Profilo non trovato",
+        "update_failed": "Impossibile aggiornare il profilo",
+        "avatar_upload_failed": "Impossibile caricare l'avatar",
+        "invalid_locale": "Preferenza lingua non valida"
+      },
+      "validation": {
+        "invalid_input": "Dati di input non validi"
+      }
+    }
+  },
+  "validation": {
+    "string": {
+      "min": "{field} deve essere di almeno {min, number} {min, plural, one{carattere} other{caratteri}}",
+      "max": "{field} deve essere di al massimo {max, number} {max, plural, one{carattere} other{caratteri}}",
+      "email": "Deve essere un indirizzo e-mail valido",
+      "url": "Deve essere un URL valido"
+    },
+    "number": {
+      "min": "{field} deve essere almeno {min, number}",
+      "max": "{field} deve essere al massimo {max, number}",
+      "int": "{field} deve essere un numero intero"
+    },
+    "common": {
+      "required": "{field} è richiesto",
+      "invalid": "{field} non è valido",
+      "oneOf": "{field} deve essere uno di: {options}"
+    }
+  }
+}

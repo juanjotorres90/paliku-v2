@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "description": "Authentification utilisateur et gestion de profil"
+  },
+  "ui": {
+    "common": {
+      "loading": "Chargement...",
+      "error": "Erreur",
+      "success": "Succès",
+      "submit": "Soumettre",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "close": "Fermer",
+      "back": "Retour",
+      "next": "Suivant",
+      "previous": "Précédent",
+      "search": "Rechercher",
+      "filter": "Filtrer",
+      "actions": "Actions",
+      "language": "Langue"
+    },
+    "nav": {
+      "home": "Accueil",
+      "people": "Personnes",
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "logout": "Se déconnecter",
+      "login": "Se connecter",
+      "signup": "S'inscrire"
+    },
+    "auth": {
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "fullName": "Nom complet",
+      "forgotPassword": "Mot de passe oublié ?",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter",
+      "signUp": "S'inscrire",
+      "orContinueWith": "Ou continuer avec"
+    },
+    "profile": {
+      "title": "Profil",
+      "avatar": "Avatar",
+      "uploadAvatar": "Télécharger un avatar",
+      "removeAvatar": "Supprimer l'avatar",
+      "updateProfile": "Mettre à jour le profil",
+      "locale": "Préférence de langue",
+      "localeUpdated": "Préférence de langue mise à jour"
+    }
+  },
+  "api": {
+    "errors": {
+      "auth": {
+        "invalid_credentials": "E-mail ou mot de passe invalide",
+        "email_not_confirmed": "Veuillez confirmer votre adresse e-mail",
+        "user_exists": "Un compte avec cet e-mail existe déjà",
+        "session_expired": "Votre session a expiré. Veuillez vous reconnecter",
+        "token_invalid": "Jeton invalide ou expiré",
+        "unauthorized": "Vous devez être connecté pour effectuer cette action",
+        "forbidden": "Vous n'avez pas la permission d'effectuer cette action"
+      },
+      "request": {
+        "invalid_json": "JSON invalide dans le corps de la requête",
+        "invalid_request": "Requête invalide",
+        "method_not_allowed": "Méthode non autorisée",
+        "not_found": "La ressource demandée n'a pas été trouvée",
+        "rate_limited": "Trop de requêtes. Veuillez réessayer plus tard",
+        "payload_too_large": "Le corps de la requête est trop volumineux"
+      },
+      "upstream": {
+        "auth_failed": "Erreur du service d'authentification",
+        "database_error": "Erreur de base de données",
+        "storage_error": "Erreur du service de stockage",
+        "unknown_error": "Une erreur inattendue s'est produite"
+      },
+      "profile": {
+        "not_found": "Profil non trouvé",
+        "update_failed": "Échec de la mise à jour du profil",
+        "avatar_upload_failed": "Échec du téléchargement de l'avatar",
+        "invalid_locale": "Préférence de langue invalide"
+      },
+      "validation": {
+        "invalid_input": "Données d'entrée invalides"
+      }
+    }
+  },
+  "validation": {
+    "string": {
+      "min": "{field} doit contenir au moins {min, number} {min, plural, one{caractère} other{caractères}}",
+      "max": "{field} doit contenir au plus {max, number} {max, plural, one{caractère} other{caractères}}",
+      "email": "Doit être une adresse e-mail valide",
+      "url": "Doit être une URL valide"
+    },
+    "number": {
+      "min": "{field} doit être au moins {min, number}",
+      "max": "{field} doit être au plus {max, number}",
+      "int": "{field} doit être un nombre entier"
+    },
+    "common": {
+      "required": "{field} est requis",
+      "invalid": "{field} est invalide",
+      "oneOf": "{field} doit être l'un de : {options}"
+    }
+  }
+}

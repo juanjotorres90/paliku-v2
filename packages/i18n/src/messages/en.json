@@ -1,0 +1,151 @@
+{
+  "metadata": {
+    "description": "User authentication and profile management"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "language": "Language",
+    "characters": "characters"
+  },
+  "nav": {
+    "home": "Home",
+    "people": "People",
+    "profile": "Profile",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signingOut": "Signing out...",
+    "login": "Login",
+    "signup": "Sign up"
+  },
+  "auth": {
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "displayName": "Display name",
+    "yourName": "Your name",
+    "fullName": "Full Name",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "newHere": "New here?",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign In",
+    "signUp": "Sign up",
+    "createAccount": "Create account",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "signInDescription": "Enter your email and password to continue",
+    "signUpDescription": "Sign up with your email. You may need to confirm via email.",
+    "orContinueWith": "Or continue with",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidForm": "Invalid form",
+    "failedToCreateAccount": "Failed to create account",
+    "loginFailed": "Failed to sign in",
+    "unexpectedError": "An unexpected error occurred",
+    "checkEmailConfirmation": "Check your email to confirm your account. After confirming, please sign in.",
+    "accountCreatedSignIn": "Account created successfully. Please sign in to continue."
+  },
+  "profile": {
+    "title": "Profile Settings",
+    "description": "Update your public profile information.",
+    "avatar": "Avatar",
+    "uploadAvatar": "Upload avatar",
+    "removeAvatar": "Remove avatar",
+    "updateProfile": "Update profile",
+    "locale": "Language preference",
+    "localeUpdated": "Language preference updated",
+    "email": "Email",
+    "emailReadOnly": "Email is read-only. Contact support to change your email.",
+    "displayName": "Display name",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell others about yourself...",
+    "location": "Location",
+    "locationPlaceholder": "e.g., San Francisco, CA",
+    "intents": "Intents",
+    "selectUpToIntents": "Select up to 3 intents",
+    "intentPractice": "Practice",
+    "intentFriends": "Friends",
+    "intentDate": "Date",
+    "publicProfile": "Public profile",
+    "publicProfileDescription": "When disabled, only you can view your profile.",
+    "saveChanges": "Save changes",
+    "saving": "Saving...",
+    "failedToFetchProfile": "Failed to fetch profile",
+    "invalidProfile": "Invalid profile",
+    "failedToSaveProfile": "Failed to save profile",
+    "failedToUploadAvatar": "Failed to upload avatar",
+    "failedToDeleteAvatar": "Failed to delete avatar",
+    "loadingProfile": "Loading profile..."
+  },
+  "api": {
+    "errors": {
+      "auth": {
+        "invalid_credentials": "Invalid email or password",
+        "email_not_confirmed": "Please confirm your email address",
+        "user_exists": "An account with this email already exists",
+        "session_expired": "Your session has expired. Please log in again",
+        "token_invalid": "Invalid or expired token",
+        "unauthorized": "You must be logged in to perform this action",
+        "forbidden": "You don't have permission to perform this action"
+      },
+      "request": {
+        "invalid_json": "Invalid JSON in request body",
+        "invalid_request": "Invalid request",
+        "method_not_allowed": "Method not allowed",
+        "not_found": "The requested resource was not found",
+        "rate_limited": "Too many requests. Please try again later",
+        "payload_too_large": "Request payload is too large"
+      },
+      "upstream": {
+        "auth_failed": "Authentication service error",
+        "database_error": "Database error",
+        "storage_error": "Storage service error",
+        "unknown_error": "An unexpected error occurred"
+      },
+      "profile": {
+        "not_found": "Profile not found",
+        "update_failed": "Failed to update profile",
+        "avatar_upload_failed": "Failed to upload avatar",
+        "invalid_locale": "Invalid language preference"
+      },
+      "validation": {
+        "invalid_input": "Invalid input data"
+      }
+    }
+  },
+  "validation": {
+    "string": {
+      "min": "{field} must be at least {min, number} {min, plural, one{character} other{characters}}",
+      "max": "{field} must be at most {max, number} {max, plural, one{character} other{characters}}",
+      "email": "Must be a valid email address",
+      "url": "Must be a valid URL"
+    },
+    "number": {
+      "min": "{field} must be at least {min, number}",
+      "max": "{field} must be at most {max, number}",
+      "int": "{field} must be a whole number"
+    },
+    "common": {
+      "required": "{field} is required",
+      "invalid": "{field} is invalid",
+      "oneOf": "{field} must be one of: {options}"
+    }
+  }
+}

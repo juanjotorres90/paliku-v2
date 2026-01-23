@@ -11,6 +11,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@repo/i18n": "workspace:*",
     "@repo/validators": "workspace:*",
     "hono": "^4.11.3",
     "jose": "^6.0.11"

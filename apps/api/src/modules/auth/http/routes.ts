@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { setCookie, deleteCookie, getCookie } from "hono/cookie";
 import type { RouteEnv } from "../../../http/context";
 import { parseJsonBody } from "../../../http/utils/parse-json";
@@ -23,6 +23,14 @@ interface AuthRoutesContext {
   config: AppConfig;
   authProvider: AuthProviderPort;
   pkceHelpers: PKCEHelpers;
+}
+
+function isSecureRequest(c: Context) {
+  const forwardedProto = c.req.header("x-forwarded-proto");
+  if (forwardedProto) {
+    return forwardedProto.split(",")[0]?.trim() === "https";
+  }
+  return new URL(c.req.url).protocol === "https:";
 }
 
 export function createAuthRoutes(ctx: AuthRoutesContext) {
@@ -68,12 +76,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
       redirectTo: parsed.data.redirectTo,
     };
 
-    const webOrigin = resolveWebOrigin([c.req.header("Origin")], corsConfig);
-
-    const cookieOptions = getCookieOptions(
-      cookieConfig,
-      webOrigin.startsWith("https://"),
-    );
+    const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));
 
     const codeVerifierCookieName = getCookieName(cookieConfig, "code-verifier");
     const apiOrigin = process.env.API_URL ?? new URL(c.req.url).origin;
@@ -116,12 +119,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
       password: parsed.data.password,
     };
 
-    const webOrigin = resolveWebOrigin([c.req.header("Origin")], corsConfig);
-
-    const cookieOptions = getCookieOptions(
-      cookieConfig,
-      webOrigin.startsWith("https://"),
-    );
+    const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));
     const refreshTokenOptions = {
       ...cookieOptions,
       maxAge: 60 * 60 * 24 * 30,
@@ -168,12 +166,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
   });
 
   router.post("/refresh", refreshRateLimiter, async (c) => {
-    const webOrigin = resolveWebOrigin([c.req.header("Origin")], corsConfig);
-
-    const cookieOptions = getCookieOptions(
-      cookieConfig,
-      webOrigin.startsWith("https://"),
-    );
+    const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));
     const refreshTokenOptions = {
       ...cookieOptions,
       maxAge: 60 * 60 * 24 * 30,
@@ -240,12 +233,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
   });
 
   router.post("/signout", async (c) => {
-    const webOrigin = resolveWebOrigin([c.req.header("Origin")], corsConfig);
-
-    const cookieOptions = getCookieOptions(
-      cookieConfig,
-      webOrigin.startsWith("https://"),
-    );
+    const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));
     const accessTokenCookieName = getCookieName(cookieConfig, "access-token");
     const refreshTokenCookieName = getCookieName(cookieConfig, "refresh-token");
 
@@ -268,11 +256,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
       [c.req.header("Origin"), c.req.header("Referer")],
       corsConfig,
     );
-
-    const cookieOptions = getCookieOptions(
-      cookieConfig,
-      webOrigin.startsWith("https://"),
-    );
+    const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));
     const codeVerifierCookieName = getCookieName(cookieConfig, "code-verifier");
 
     const codeVerifier = getCookie(c, codeVerifierCookieName);

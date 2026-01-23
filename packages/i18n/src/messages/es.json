@@ -1,0 +1,151 @@
+{
+  "metadata": {
+    "description": "Autenticación de usuario y gestión de perfil"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "actions": "Acciones",
+    "language": "Idioma",
+    "characters": "caracteres"
+  },
+  "nav": {
+    "home": "Inicio",
+    "people": "Personas",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión...",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse"
+  },
+  "auth": {
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "displayName": "Nombre visible",
+    "yourName": "Tu nombre",
+    "fullName": "Nombre completo",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "resetPassword": "Restablecer contraseña",
+    "noAccount": "¿No tienes una cuenta?",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "newHere": "¿Eres nuevo aquí?",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "createAccount": "Crear cuenta",
+    "signingIn": "Iniciando sesión...",
+    "creatingAccount": "Creando cuenta...",
+    "signInDescription": "Introduce tu correo electrónico y contraseña para continuar",
+    "signUpDescription": "Regístrate con tu correo electrónico. Es posible que debas confirmar por correo.",
+    "orContinueWith": "O continuar con",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "invalidForm": "Formulario inválido",
+    "failedToCreateAccount": "Error al crear la cuenta",
+    "loginFailed": "Error al iniciar sesión",
+    "unexpectedError": "Ocurrió un error inesperado",
+    "checkEmailConfirmation": "Revisa tu correo para confirmar tu cuenta. Después de confirmar, inicia sesión.",
+    "accountCreatedSignIn": "Cuenta creada exitosamente. Por favor inicia sesión para continuar."
+  },
+  "profile": {
+    "title": "Configuración del perfil",
+    "description": "Actualiza la información de tu perfil público.",
+    "avatar": "Avatar",
+    "uploadAvatar": "Subir avatar",
+    "removeAvatar": "Eliminar avatar",
+    "updateProfile": "Actualizar perfil",
+    "locale": "Preferencia de idioma",
+    "localeUpdated": "Preferencia de idioma actualizada",
+    "email": "Correo electrónico",
+    "emailReadOnly": "El correo es de solo lectura. Contacta a soporte para cambiarlo.",
+    "displayName": "Nombre visible",
+    "bio": "Biografía",
+    "bioPlaceholder": "Cuéntales a otros sobre ti...",
+    "location": "Ubicación",
+    "locationPlaceholder": "ej. Ciudad de México, CDMX",
+    "intents": "Intenciones",
+    "selectUpToIntents": "Selecciona hasta 3 intenciones",
+    "intentPractice": "Práctica",
+    "intentFriends": "Amigos",
+    "intentDate": "Citas",
+    "publicProfile": "Perfil público",
+    "publicProfileDescription": "Cuando está desactivado, solo tú puedes ver tu perfil.",
+    "saveChanges": "Guardar cambios",
+    "saving": "Guardando...",
+    "failedToFetchProfile": "Error al cargar el perfil",
+    "invalidProfile": "Perfil inválido",
+    "failedToSaveProfile": "Error al guardar el perfil",
+    "failedToUploadAvatar": "Error al subir el avatar",
+    "failedToDeleteAvatar": "Error al eliminar el avatar",
+    "loadingProfile": "Cargando perfil..."
+  },
+  "api": {
+    "errors": {
+      "auth": {
+        "invalid_credentials": "Correo electrónico o contraseña inválidos",
+        "email_not_confirmed": "Por favor confirma tu dirección de correo electrónico",
+        "user_exists": "Ya existe una cuenta con este correo electrónico",
+        "session_expired": "Tu sesión ha expirado. Por favor inicia sesión nuevamente",
+        "token_invalid": "Token inválido o expirado",
+        "unauthorized": "Debes iniciar sesión para realizar esta acción",
+        "forbidden": "No tienes permiso para realizar esta acción"
+      },
+      "request": {
+        "invalid_json": "JSON inválido en el cuerpo de la solicitud",
+        "invalid_request": "Solicitud inválida",
+        "method_not_allowed": "Método no permitido",
+        "not_found": "El recurso solicitado no fue encontrado",
+        "rate_limited": "Demasiadas solicitudes. Por favor intenta más tarde",
+        "payload_too_large": "El cuerpo de la solicitud es demasiado grande"
+      },
+      "upstream": {
+        "auth_failed": "Error del servicio de autenticación",
+        "database_error": "Error de base de datos",
+        "storage_error": "Error del servicio de almacenamiento",
+        "unknown_error": "Ocurrió un error inesperado"
+      },
+      "profile": {
+        "not_found": "Perfil no encontrado",
+        "update_failed": "Error al actualizar el perfil",
+        "avatar_upload_failed": "Error al subir el avatar",
+        "invalid_locale": "Preferencia de idioma inválida"
+      },
+      "validation": {
+        "invalid_input": "Datos de entrada inválidos"
+      }
+    }
+  },
+  "validation": {
+    "string": {
+      "min": "{field} debe tener al menos {min, number} {min, plural, one{carácter} other{caracteres}}",
+      "max": "{field} debe tener como máximo {max, number} {max, plural, one{carácter} other{caracteres}}",
+      "email": "Debe ser una dirección de correo electrónico válida",
+      "url": "Debe ser una URL válida"
+    },
+    "number": {
+      "min": "{field} debe ser al menos {min, number}",
+      "max": "{field} debe ser como máximo {max, number}",
+      "int": "{field} debe ser un número entero"
+    },
+    "common": {
+      "required": "{field} es requerido",
+      "invalid": "{field} es inválido",
+      "oneOf": "{field} debe ser uno de: {options}"
+    }
+  }
+}

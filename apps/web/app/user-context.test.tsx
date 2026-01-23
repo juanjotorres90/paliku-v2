@@ -269,6 +269,11 @@ describe("UserProvider", () => {
       },
     };
 
+    const mockSettings = {
+      locale: "en",
+      theme: "system",
+    };
+
     const mockUser2 = {
       email: "updated@example.com",
       profile: {
@@ -283,17 +288,32 @@ describe("UserProvider", () => {
       },
     };
 
-    vi.mocked(apiFetchWithRefresh)
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => mockUser1,
-      } as Response)
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => mockUser2,
-      } as Response);
+    let profileCallCount = 0;
+    vi.mocked(apiFetchWithRefresh).mockImplementation(async (path) => {
+      if (path === "/profile/me") {
+        profileCallCount += 1;
+        const payload = profileCallCount === 1 ? mockUser1 : mockUser2;
+        return {
+          ok: true,
+          status: 200,
+          json: async () => payload,
+        } as Response;
+      }
+
+      if (path === "/settings/me") {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => mockSettings,
+        } as Response;
+      }
+
+      return {
+        ok: false,
+        status: 404,
+        json: async () => ({}),
+      } as Response;
+    });
 
     const TestComponent = () => {
       const { user, loading, refreshUser } = useUser();
@@ -332,7 +352,7 @@ describe("UserProvider", () => {
       );
     });
 
-    expect(apiFetchWithRefresh).toHaveBeenCalledTimes(2);
+    expect(apiFetchWithRefresh).toHaveBeenCalledTimes(4);
   });
 
   it("shares user state across components", async () => {

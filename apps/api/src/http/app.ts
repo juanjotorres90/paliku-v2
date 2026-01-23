@@ -6,6 +6,7 @@ import { createAuthRoutes } from "../modules/auth/http/routes";
 import { createMeRoutes } from "../modules/auth/http/me.routes";
 import { createProfileRoutes } from "../modules/profile/http/routes";
 import { createJwtAuth } from "../modules/auth/http/middleware/jwt-auth";
+import { createSettingsRoutes } from "../modules/settings/http/routes";
 import type {
   AuthProviderPort,
   JWTVerifierPort,
@@ -16,6 +17,7 @@ import type {
   ProfileRepositoryPort,
   UserEmailPort,
 } from "../modules/profile/application/ports";
+import type { SettingsRepositoryPort } from "../modules/settings/application/ports";
 
 interface HttpAppContext {
   config: AppConfig;
@@ -25,6 +27,7 @@ interface HttpAppContext {
   profileRepo: ProfileRepositoryPort;
   avatarStorage: AvatarStoragePort;
   userEmail: UserEmailPort;
+  settingsRepo: SettingsRepositoryPort;
 }
 
 export function createHttpApp(ctx: HttpAppContext) {
@@ -90,7 +93,7 @@ export function createHttpApp(ctx: HttpAppContext) {
         return undefined;
       },
       allowHeaders: ["Authorization", "Content-Type"],
-      allowMethods: ["GET", "POST", "OPTIONS"],
+      allowMethods: ["GET", "POST", "PATCH", "OPTIONS"],
       credentials: true,
     }),
   );
@@ -118,6 +121,17 @@ export function createHttpApp(ctx: HttpAppContext) {
         profileRepo: ctx.profileRepo,
         storage: ctx.avatarStorage,
         userEmail: ctx.userEmail,
+      },
+      jwtAuth,
+    ),
+  );
+
+  app.route(
+    "/settings",
+    createSettingsRoutes(
+      {
+        config: ctx.config,
+        settingsRepo: ctx.settingsRepo,
       },
       jwtAuth,
     ),

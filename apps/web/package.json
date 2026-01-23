@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@next/env": "^16.1.1",
+    "@repo/i18n": "workspace:*",
     "@repo/ui": "workspace:*",
     "@repo/validators": "workspace:*",
     "@supabase/ssr": "^0.6.1",
@@ -22,6 +23,7 @@
     "hono": "^4.11.3",
     "jose": "^6.0.11",
     "next": "^16.1.1",
+    "next-intl": "^4.0.14",
     "next-themes": "^0.4.6",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"

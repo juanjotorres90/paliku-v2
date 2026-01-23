@@ -11,6 +11,7 @@ import type {
   ProfileRepositoryPort,
   UserEmailPort,
 } from "../modules/profile/application/ports";
+import type { SettingsRepositoryPort } from "../modules/settings/application/ports";
 
 describe("createHttpApp", () => {
   const mockContext: {
@@ -21,6 +22,7 @@ describe("createHttpApp", () => {
     profileRepo: ProfileRepositoryPort;
     avatarStorage: AvatarStoragePort;
     userEmail: UserEmailPort;
+    settingsRepo: SettingsRepositoryPort;
   } = {
     config: {
       supabase: {
@@ -63,6 +65,10 @@ describe("createHttpApp", () => {
     userEmail: {
       getEmailForAccessToken: vi.fn(),
     } as unknown as UserEmailPort,
+    settingsRepo: {
+      getById: vi.fn(),
+      updateById: vi.fn(),
+    } as unknown as SettingsRepositoryPort,
   };
 
   it("should create app with root endpoint", async () => {

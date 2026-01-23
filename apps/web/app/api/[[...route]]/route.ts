@@ -44,6 +44,21 @@ export const POST = async (req: Request) => {
   return handle(resolvedApp)(req);
 };
 
+export const PATCH = async (req: Request) => {
+  const resolvedApp = await getApp();
+  return handle(resolvedApp)(req);
+};
+
+export const PUT = async (req: Request) => {
+  const resolvedApp = await getApp();
+  return handle(resolvedApp)(req);
+};
+
+export const DELETE = async (req: Request) => {
+  const resolvedApp = await getApp();
+  return handle(resolvedApp)(req);
+};
+
 export const OPTIONS = async (req: Request) => {
   const resolvedApp = await getApp();
   return handle(resolvedApp)(req);

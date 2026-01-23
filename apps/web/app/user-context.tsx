@@ -7,6 +7,12 @@ import {
   useState,
   useCallback,
 } from "react";
+import {
+  applyTheme,
+  getSystemTheme,
+  setTheme,
+  type Theme,
+} from "@repo/ui/theme";
 import { apiFetchWithRefresh } from "./lib/api";
 
 interface Profile {
@@ -20,9 +26,15 @@ interface Profile {
   updatedAt: string;
 }
 
+interface Settings {
+  locale: string;
+  theme: Theme;
+}
+
 interface User {
   email: string;
   profile: Profile;
+  settings: Settings;
 }
 
 interface UserContextValue {
@@ -30,6 +42,7 @@ interface UserContextValue {
   loading: boolean;
   error: boolean;
   refreshUser: () => Promise<void>;
+  refreshSettings: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
@@ -42,6 +55,25 @@ export function useUser() {
     throw new Error("useUser must be used within a UserProvider");
   }
   return context;
+}
+
+async function fetchSettings(): Promise<Settings> {
+  const response = await apiFetchWithRefresh("/settings/me");
+
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new Error("Unauthorized");
+    }
+    throw new Error("Failed to fetch settings");
+  }
+
+  return response.json() as Promise<Settings>;
+}
+
+function applyUserTheme(theme: Theme) {
+  const resolved = theme === "system" ? getSystemTheme() : theme;
+  applyTheme(resolved);
+  setTheme(theme);
 }
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
@@ -67,7 +99,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
 
       const json = await response.json();
-      setUser(json);
+      const settings = await fetchSettings();
+      applyUserTheme(settings.theme);
+      setUser({ ...json, settings });
       setLoading(false);
       setError(false);
     } catch {
@@ -76,12 +110,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const refreshSettings = useCallback(async () => {
+    try {
+      const settings = await fetchSettings();
+      applyUserTheme(settings.theme);
+      setUser((prev) => (prev ? { ...prev, settings } : null));
+    } catch {
+      // Silently fail for settings refresh
+    }
+  }, []);
+
   useEffect(() => {
     refreshUser();
   }, [refreshUser]);
 
   return (
-    <UserContext.Provider value={{ user, loading, error, refreshUser }}>
+    <UserContext.Provider
+      value={{ user, loading, error, refreshUser, refreshSettings }}
+    >
       {children}
     </UserContext.Provider>
   );

@@ -8,6 +8,7 @@ import { createPKCEHelpers } from "../modules/auth/infrastructure/pkce-crypto.ad
 import { createSupabaseProfileRepo } from "../modules/profile/infrastructure/supabase-profile.repo";
 import { createSupabaseAvatarStorage } from "../modules/profile/infrastructure/supabase-avatar-storage.adapter";
 import { createAuthUserEmailPort } from "../modules/profile/infrastructure/user-email.adapter";
+import { createSupabaseSettingsRepo } from "../modules/settings";
 
 export interface CreateAppOptions {
   config?: AppConfig;
@@ -23,6 +24,7 @@ export function createApp(options: CreateAppOptions = {}) {
   const profileRepo = createSupabaseProfileRepo(config.supabase, httpClient);
   const avatarStorage = createSupabaseAvatarStorage(config.supabase);
   const userEmail = createAuthUserEmailPort(authProvider);
+  const settingsRepo = createSupabaseSettingsRepo(config.supabase, httpClient);
 
   return createHttpApp({
     config,
@@ -32,5 +34,6 @@ export function createApp(options: CreateAppOptions = {}) {
     profileRepo,
     avatarStorage,
     userEmail,
+    settingsRepo,
   });
 }

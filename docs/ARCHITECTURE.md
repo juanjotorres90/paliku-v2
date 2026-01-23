@@ -66,3 +66,10 @@ Initial schema focuses on **profiles**:
 - Avatars:
   - `avatar_url` column (see `packages/db/sql/003_profiles_avatar_url.sql`)
   - Storage RLS policies for an `avatars` bucket (see `packages/db/sql/004_storage_avatars_policies.sql`)
+
+User settings are stored separately:
+
+- `public.user_settings` (see `packages/db/sql/005_user_settings.sql`)
+  - Stores theme and locale (language preference).
+  - RLS: owners can read/write their own row.
+- Signup trigger also creates `user_settings` (see `packages/db/sql/006_user_settings_on_signup.sql`).

@@ -67,10 +67,12 @@ function SettingsPageContent() {
   );
 
   // Clear local changes when user settings update from server
+  // Only trigger on actual value changes, not on every user object render
   useEffect(() => {
     if (user) {
       setLocalChanges({});
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.settings.locale, user?.settings.theme]);
 
   const effectiveFormData = { ...formData, ...localChanges };

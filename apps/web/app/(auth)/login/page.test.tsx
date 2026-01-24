@@ -53,7 +53,7 @@ describe("LoginPage", () => {
     render(<LoginPage />);
 
     const registerLink = screen.getByRole("link", {
-      name: "Create an account",
+      name: "Create account",
     });
     expect(registerLink).toHaveAttribute("href", "/register");
   });
@@ -65,7 +65,7 @@ describe("LoginPage", () => {
     render(<LoginPage />);
 
     const registerLink = screen.getByRole("link", {
-      name: "Create an account",
+      name: "Create account",
     });
     expect(registerLink).toHaveAttribute(
       "href",

@@ -7,6 +7,7 @@ import { createMeRoutes } from "../modules/auth/http/me.routes";
 import { createProfileRoutes } from "../modules/profile/http/routes";
 import { createJwtAuth } from "../modules/auth/http/middleware/jwt-auth";
 import { createSettingsRoutes } from "../modules/settings/http/routes";
+import { createI18nRoutes } from "../modules/i18n/http/routes";
 import type {
   AuthProviderPort,
   JWTVerifierPort,
@@ -101,6 +102,14 @@ export function createHttpApp(ctx: HttpAppContext) {
   app.get("/", (c) => c.text("ok"));
 
   const jwtAuth = createJwtAuth(ctx.jwtVerifier, ctx.config.cookie);
+
+  // i18n routes (no auth required for guest locale switching)
+  app.route(
+    "/i18n",
+    createI18nRoutes({
+      config: ctx.config,
+    }),
+  );
 
   app.route(
     "/auth",

@@ -472,9 +472,7 @@ describe("ProfileSettingsPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Failed to save profile: 400/),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Failed to save profile/)).toBeInTheDocument();
     });
   });
 });

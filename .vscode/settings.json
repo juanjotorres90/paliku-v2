@@ -4,14 +4,11 @@
       "mode": "auto"
     }
   ],
-  "conventionalCommits.scopes": [
-    "api",
-    "web",
-    "app"
-  ],
+  "conventionalCommits.scopes": ["api", "web", "app"],
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
-  }
+  },
+  "vitest.disableWorkspaceWarning": true
 }

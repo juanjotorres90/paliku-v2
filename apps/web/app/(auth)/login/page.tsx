@@ -3,15 +3,17 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { LoginRequestSchema } from "@repo/validators/auth";
 import { getSafeRedirect } from "../../../lib/redirect";
-import { apiFetch } from "../../lib/api";
+import { apiFetch, apiFetchWithRefresh } from "../../lib/api";
 
 function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("auth");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +31,7 @@ function LoginPageContent() {
     try {
       const parsed = LoginRequestSchema.safeParse({ email, password });
       if (!parsed.success) {
-        setError(parsed.error.issues[0]?.message ?? "Invalid form");
+        setError(parsed.error.issues[0]?.message ?? t("invalidForm"));
         setLoading(false);
         return;
       }
@@ -45,7 +47,7 @@ function LoginPageContent() {
       const text = await response.text();
 
       if (!response.ok) {
-        let message = "Failed to sign in";
+        let message = t("loginFailed");
         if (text) {
           try {
             const json: unknown = JSON.parse(text);
@@ -62,11 +64,20 @@ function LoginPageContent() {
         return;
       }
 
+      // After successful login, fetch settings to establish locale cookie
+      // This ensures the UI renders in the user's preferred language
+      try {
+        await apiFetchWithRefresh("/settings/me");
+      } catch {
+        // Settings fetch failure should not block login
+        console.warn("Failed to fetch settings after login");
+      }
+
       const redirectTo = getSafeRedirect(searchParams.get("redirect"));
       router.replace(redirectTo);
       router.refresh();
     } catch {
-      setError("An unexpected error occurred");
+      setError(t("unexpectedError"));
       setLoading(false);
     }
   };
@@ -81,14 +92,12 @@ function LoginPageContent() {
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Sign In</h1>
-          <p className="text-muted-foreground mt-2">
-            Enter your email and password to continue
-          </p>
+          <h1 className="text-2xl font-bold">{t("signIn")}</h1>
+          <p className="text-muted-foreground mt-2">{t("signInDescription")}</p>
           <p className="text-sm text-muted-foreground mt-2">
-            New here?{" "}
+            {t("newHere")}{" "}
             <Link href={registerHref} className="underline underline-offset-4">
-              Create an account
+              {t("createAccount")}
             </Link>
           </p>
         </div>
@@ -96,12 +105,12 @@ function LoginPageContent() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t("email")}
             </label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t("emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -111,7 +120,7 @@ function LoginPageContent() {
 
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              Password
+              {t("password")}
             </label>
             <Input
               id="password"
@@ -131,7 +140,7 @@ function LoginPageContent() {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? t("signingIn") : t("signIn")}
           </Button>
         </form>
       </div>
@@ -139,9 +148,14 @@ function LoginPageContent() {
   );
 }
 
+function LoginPageFallback() {
+  const t = useTranslations("common");
+  return <div>{t("loading")}</div>;
+}
+
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoginPageFallback />}>
       <LoginPageContent />
     </Suspense>
   );

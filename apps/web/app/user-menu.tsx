@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Avatar } from "@repo/ui/components/avatar";
 import {
@@ -17,6 +18,7 @@ import { useUser } from "./user-context";
 
 export function UserMenu() {
   const router = useRouter();
+  const tNav = useTranslations("nav");
   const { user, loading, error } = useUser();
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -41,7 +43,7 @@ export function UserMenu() {
         type="button"
         disabled
         className="rounded-full opacity-50 cursor-not-allowed"
-        aria-label="User menu unavailable"
+        aria-label={tNav("userMenuUnavailable")}
       >
         <Avatar size="sm" fallback={<span className="font-medium">?</span>} />
       </button>
@@ -54,7 +56,7 @@ export function UserMenu() {
         href="/login"
         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
-        Sign in
+        {tNav("signIn")}
       </Link>
     );
   }
@@ -72,7 +74,7 @@ export function UserMenu() {
         <button
           type="button"
           className="flex items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
-          aria-label="User menu"
+          aria-label={tNav("userMenu")}
         >
           <Avatar
             src={user?.profile.avatarUrl ?? undefined}
@@ -95,12 +97,12 @@ export function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/profile/settings" className="w-full cursor-pointer">
-            Profile
+            {tNav("profile")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/settings" className="w-full cursor-pointer">
-            Settings
+            {tNav("settings")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -109,7 +111,7 @@ export function UserMenu() {
           disabled={loggingOut}
           className="text-destructive focus:text-destructive"
         >
-          {loggingOut ? "Signing out..." : "Sign out"}
+          {loggingOut ? tNav("signingOut") : tNav("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,8 +1,8 @@
 // Locale constants and types
-export * from "./locales.js";
+export * from "./locales";
 
 // Message loading and formatting
-export * from "./messages.js";
+export * from "./messages";
 
 // Re-export commonly used items for convenience
 export {
@@ -11,7 +11,7 @@ export {
   getMessagesSync,
   hasMessage,
   preloadMessages,
-} from "./messages.js";
+} from "./messages";
 export {
   DEFAULT_LOCALE,
   LOCALES,
@@ -19,7 +19,7 @@ export {
   isDefaultLocale,
   type Locale,
   AUTONYMS,
-} from "./locales.js";
+} from "./locales";
 
 // Message types
-export type { Messages, MessageValue } from "./messages.js";
+export type { Messages, MessageValue } from "./messages";

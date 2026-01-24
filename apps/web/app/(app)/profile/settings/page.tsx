@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { AvatarUpload } from "@repo/ui/components/avatar-upload";
@@ -11,14 +12,10 @@ import { useUser } from "../../../user-context";
 
 type IntentValue = "practice" | "friends" | "date";
 
-const INTENT_OPTIONS = [
-  { value: "practice" as IntentValue, label: "Practice" },
-  { value: "friends" as IntentValue, label: "Friends" },
-  { value: "date" as IntentValue, label: "Date" },
-];
-
 function ProfileSettingsPageContent() {
   const router = useRouter();
+  const t = useTranslations("profile");
+  const tCommon = useTranslations("common");
   const {
     user,
     loading: userLoading,
@@ -37,11 +34,17 @@ function ProfileSettingsPageContent() {
     isPublic: true,
   });
 
+  const INTENT_OPTIONS: { value: IntentValue; label: string }[] = [
+    { value: "practice", label: t("intentPractice") },
+    { value: "friends", label: t("intentFriends") },
+    { value: "date", label: t("intentDate") },
+  ];
+
   useEffect(() => {
     if (userLoading) return;
 
     if (userError) {
-      setError("Failed to fetch profile");
+      setError(t("failedToFetchProfile"));
       return;
     }
 
@@ -55,7 +58,7 @@ function ProfileSettingsPageContent() {
       });
       setAvatarPreview(user.profile.avatarUrl || null);
     }
-  }, [user, userLoading, userError]);
+  }, [t, user, userLoading, userError]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +68,7 @@ function ProfileSettingsPageContent() {
     try {
       const parsed = ProfileUpsertSchema.safeParse(formData);
       if (!parsed.success) {
-        setError(parsed.error.issues[0]?.message ?? "Invalid profile");
+        setError(parsed.error.issues[0]?.message ?? t("invalidProfile"));
         setSaving(false);
         return;
       }
@@ -87,8 +90,7 @@ function ProfileSettingsPageContent() {
       }
 
       if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Failed to save profile: ${response.status} - ${text}`);
+        throw new Error(t("failedToSaveProfile"));
       }
 
       const updatedProfile = await response.json();
@@ -103,7 +105,7 @@ function ProfileSettingsPageContent() {
       setAvatarPreview(updatedProfile.profile.avatarUrl);
       setSaving(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save profile");
+      setError(err instanceof Error ? err.message : t("failedToSaveProfile"));
       setSaving(false);
     }
   };
@@ -135,10 +137,7 @@ function ProfileSettingsPageContent() {
       }
 
       if (!response.ok) {
-        const text = await response.text();
-        throw new Error(
-          `Failed to upload avatar: ${response.status} - ${text}`,
-        );
+        throw new Error(t("failedToUploadAvatar"));
       }
 
       const updatedProfile = await response.json();
@@ -153,7 +152,7 @@ function ProfileSettingsPageContent() {
       setAvatarPreview(updatedProfile.profile.avatarUrl);
       setUploading(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload avatar");
+      setError(err instanceof Error ? err.message : t("failedToUploadAvatar"));
       setUploading(false);
     }
   };
@@ -186,17 +185,14 @@ function ProfileSettingsPageContent() {
       }
 
       if (!response.ok) {
-        const text = await response.text();
-        throw new Error(
-          `Failed to delete avatar: ${response.status} - ${text}`,
-        );
+        throw new Error(t("failedToDeleteAvatar"));
       }
 
       const updatedProfile = await response.json();
       await refreshUser();
       setAvatarPreview(updatedProfile.profile.avatarUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete avatar");
+      setError(err instanceof Error ? err.message : t("failedToDeleteAvatar"));
     }
   };
 
@@ -217,7 +213,7 @@ function ProfileSettingsPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
         <div className="text-center text-muted-foreground">
-          Loading profile...
+          {t("loadingProfile")}
         </div>
       </div>
     );
@@ -227,10 +223,8 @@ function ProfileSettingsPageContent() {
     <main className="min-h-screen p-8">
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <h1 className="text-2xl font-bold">Profile Settings</h1>
-          <p className="text-muted-foreground mt-2">
-            Update your public profile information.
-          </p>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground mt-2">{t("description")}</p>
         </div>
 
         {error && (
@@ -242,7 +236,7 @@ function ProfileSettingsPageContent() {
         <form onSubmit={handleSave} className="space-y-6">
           <div className="space-y-2">
             <label htmlFor="avatar" className="text-sm font-medium">
-              Avatar
+              {t("avatar")}
             </label>
             <AvatarUpload
               src={avatarPreview ?? undefined}
@@ -261,7 +255,7 @@ function ProfileSettingsPageContent() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t("email")}
             </label>
             <Input
               id="email"
@@ -271,13 +265,13 @@ function ProfileSettingsPageContent() {
               className="bg-muted"
             />
             <p className="text-xs text-muted-foreground">
-              Email is read-only. Contact support to change your email.
+              {t("emailReadOnly")}
             </p>
           </div>
 
           <div className="space-y-2">
             <label htmlFor="displayName" className="text-sm font-medium">
-              Display name
+              {t("displayName")}
             </label>
             <Input
               id="displayName"
@@ -296,7 +290,7 @@ function ProfileSettingsPageContent() {
 
           <div className="space-y-2">
             <label htmlFor="bio" className="text-sm font-medium">
-              Bio
+              {t("bio")}
             </label>
             <textarea
               id="bio"
@@ -307,16 +301,16 @@ function ProfileSettingsPageContent() {
               maxLength={500}
               disabled={saving}
               className="w-full min-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="Tell others about yourself..."
+              placeholder={t("bioPlaceholder")}
             />
             <p className="text-xs text-muted-foreground">
-              {formData.bio.length}/500 characters
+              {formData.bio.length}/500 {tCommon("characters")}
             </p>
           </div>
 
           <div className="space-y-2">
             <label htmlFor="location" className="text-sm font-medium">
-              Location
+              {t("location")}
             </label>
             <Input
               id="location"
@@ -327,14 +321,14 @@ function ProfileSettingsPageContent() {
               }
               maxLength={120}
               disabled={saving}
-              placeholder="e.g., San Francisco, CA"
+              placeholder={t("locationPlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Intents</label>
+            <label className="text-sm font-medium">{t("intents")}</label>
             <p className="text-xs text-muted-foreground mb-2">
-              Select up to 3 intents
+              {t("selectUpToIntents")}
             </p>
             <div className="flex flex-wrap gap-2">
               {INTENT_OPTIONS.map((option) => (
@@ -368,16 +362,16 @@ function ProfileSettingsPageContent() {
               className="h-4 w-4"
             />
             <label htmlFor="isPublic" className="text-sm font-medium">
-              Public profile
+              {t("publicProfile")}
             </label>
             <p className="text-xs text-muted-foreground">
-              When disabled, only you can view your profile.
+              {t("publicProfileDescription")}
             </p>
           </div>
 
           <div className="flex gap-4">
             <Button type="submit" disabled={saving || uploading}>
-              {saving ? "Saving..." : "Save changes"}
+              {saving ? t("saving") : t("saveChanges")}
             </Button>
           </div>
         </form>

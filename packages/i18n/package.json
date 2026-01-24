@@ -12,6 +12,7 @@
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
+    "check-keys": "tsx scripts/check-key-parity.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -22,8 +23,10 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.0.10",
     "@vitest/coverage-v8": "^4.0.16",
     "eslint": "^9.39.1",
+    "tsx": "^4.19.2",
     "typescript": "5.9.3",
     "vitest": "^4.0.16"
   }

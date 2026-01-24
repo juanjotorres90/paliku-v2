@@ -1,4 +1,11 @@
-export default function ChatsPage() {
+import { getTranslations } from "next-intl/server";
+
+export default async function ChatsPage() {
+  const [t, tLanguages] = await Promise.all([
+    getTranslations("pages.chats"),
+    getTranslations("languages"),
+  ]);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">
@@ -8,7 +15,7 @@ export default function ChatsPage() {
             {/* Header */}
             <div className="p-4 border-b border-border">
               <div className="flex items-center justify-between mb-4">
-                <h1 className="text-xl font-bold">Messages</h1>
+                <h1 className="text-xl font-bold">{t("messages")}</h1>
                 <button className="p-2 rounded-lg hover:bg-muted transition-colors">
                   {/* New message icon placeholder */}
                   <span className="text-lg">+</span>
@@ -18,7 +25,7 @@ export default function ChatsPage() {
               {/* Search */}
               <input
                 type="text"
-                placeholder="Search conversations..."
+                placeholder={t("searchConversations")}
                 className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               />
             </div>
@@ -26,13 +33,13 @@ export default function ChatsPage() {
             {/* Filter tabs */}
             <div className="flex border-b border-border">
               <button className="flex-1 px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary">
-                All
+                {t("all")}
               </button>
               <button className="flex-1 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Unread
+                {t("unread")}
               </button>
               <button className="flex-1 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Groups
+                {t("groups")}
               </button>
             </div>
 
@@ -55,16 +62,18 @@ export default function ChatsPage() {
                   {/* Conversation info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium truncate">Partner Name</span>
+                      <span className="font-medium truncate">
+                        {t("partnerName")}
+                      </span>
                       <span className="text-xs text-muted-foreground flex-shrink-0">
-                        {i === 1 ? "Now" : `${i}h ago`}
+                        {i === 1 ? t("now") : t("hoursAgo", { hours: i })}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-muted-foreground truncate flex-1">
                         {i === 1
-                          ? "¡Hola! ¿Cómo estás?"
-                          : "Last message preview..."}
+                          ? t("sampleGreetingShort")
+                          : t("lastMessagePreview")}
                       </p>
                       {/* Unread badge */}
                       {i <= 2 && (
@@ -76,7 +85,9 @@ export default function ChatsPage() {
                     {/* Language tag */}
                     <div className="mt-1">
                       <span className="px-1.5 py-0.5 rounded text-xs bg-muted text-muted-foreground">
-                        {i % 2 === 0 ? "Spanish" : "Japanese"}
+                        {i % 2 === 0
+                          ? tLanguages("spanish")
+                          : tLanguages("japanese")}
                       </span>
                     </div>
                   </div>
@@ -92,12 +103,17 @@ export default function ChatsPage() {
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-muted" />
                 <div>
-                  <h2 className="font-semibold">Maria García</h2>
+                  <h2 className="font-semibold">{t("samplePartnerName")}</h2>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span className="h-2 w-2 rounded-full bg-green-500" />
-                    <span>Online</span>
+                    <span>{t("online")}</span>
                     <span>•</span>
-                    <span>Spanish ↔ English</span>
+                    <span>
+                      {t("languageExchange", {
+                        lang1: tLanguages("spanish"),
+                        lang2: tLanguages("english"),
+                      })}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -119,7 +135,7 @@ export default function ChatsPage() {
               {/* Date separator */}
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <div className="flex-1 h-px bg-border" />
-                <span>Today</span>
+                <span>{t("today")}</span>
                 <div className="flex-1 h-px bg-border" />
               </div>
 
@@ -128,7 +144,7 @@ export default function ChatsPage() {
                 <div className="h-8 w-8 rounded-full bg-muted flex-shrink-0" />
                 <div>
                   <div className="rounded-2xl rounded-tl-sm bg-muted p-3">
-                    <p className="text-sm">¡Hola! ¿Cómo estás hoy?</p>
+                    <p className="text-sm">{t("sampleGreeting")}</p>
                   </div>
                   <span className="text-xs text-muted-foreground mt-1 block">
                     10:30 AM
@@ -141,12 +157,10 @@ export default function ChatsPage() {
                 <div className="h-8 w-8 rounded-full bg-primary/20 flex-shrink-0" />
                 <div>
                   <div className="rounded-2xl rounded-tr-sm bg-primary text-primary-foreground p-3">
-                    <p className="text-sm">
-                      ¡Hola Maria! Estoy bien, gracias. ¿Y tú?
-                    </p>
+                    <p className="text-sm">{t("sampleReply")}</p>
                   </div>
                   <span className="text-xs text-muted-foreground mt-1 block text-right">
-                    10:32 AM • Seen
+                    10:32 AM • {t("seen")}
                   </span>
                 </div>
               </div>
@@ -156,15 +170,12 @@ export default function ChatsPage() {
                 <div className="h-8 w-8 rounded-full bg-muted flex-shrink-0" />
                 <div>
                   <div className="rounded-2xl rounded-tl-sm bg-muted p-3">
-                    <p className="text-sm">
-                      ¡Muy bien! 😊 Tu español está mejorando mucho.
-                    </p>
+                    <p className="text-sm">{t("sampleCorrection")}</p>
                   </div>
                   {/* Correction suggestion */}
                   <div className="mt-2 p-2 rounded-lg bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800">
                     <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                      💡 Tip: You could also say &quot;¿Qué tal?&quot; as a more
-                      casual greeting
+                      💡 {t("tip", { suggestion: t("sampleSuggestion") })}
                     </p>
                   </div>
                   <span className="text-xs text-muted-foreground mt-1 block">
@@ -189,16 +200,16 @@ export default function ChatsPage() {
             {/* Quick Tools Bar */}
             <div className="px-4 py-2 border-t border-border flex items-center gap-2">
               <button className="px-3 py-1 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors">
-                📝 Request Correction
+                📝 {t("requestCorrection")}
               </button>
               <button className="px-3 py-1 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors">
-                🔊 Voice Message
+                🔊 {t("voiceMessage")}
               </button>
               <button className="px-3 py-1 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors">
-                📚 Share Resource
+                📚 {t("shareResource")}
               </button>
               <button className="px-3 py-1 rounded-full bg-muted text-xs hover:bg-muted/80 transition-colors">
-                📅 Schedule Session
+                📅 {t("scheduleSession")}
               </button>
             </div>
 
@@ -210,13 +221,15 @@ export default function ChatsPage() {
                 </button>
                 <div className="flex-1 relative">
                   <textarea
-                    placeholder="Type a message in Spanish..."
+                    placeholder={t("typeMessage", {
+                      language: tLanguages("spanish"),
+                    })}
                     rows={1}
                     className="w-full px-4 py-3 rounded-xl border border-border bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   />
                 </div>
                 <button className="p-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-                  Send
+                  {t("send")}
                 </button>
               </div>
             </div>

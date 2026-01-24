@@ -5,7 +5,8 @@ describe("Home", () => {
   it("renders the welcome section", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     expect(
       screen.getByRole("heading", { name: "Welcome back!" }),
@@ -15,7 +16,8 @@ describe("Home", () => {
   it("renders quick action buttons", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     expect(screen.getAllByText("Find a Partner").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Practice Now").length).toBeGreaterThan(0);
@@ -25,7 +27,8 @@ describe("Home", () => {
   it("renders activity feed section", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     expect(
       screen.getAllByRole("heading", { name: "Activity Feed" }).length,
@@ -35,7 +38,8 @@ describe("Home", () => {
   it("renders multiple feed items", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     const feedItems = screen.getAllByText(/Post content goes here/);
     expect(feedItems.length).toBeGreaterThan(0);
@@ -44,7 +48,8 @@ describe("Home", () => {
   it("renders feed interaction buttons", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     expect(
       screen.getAllByRole("button", { name: "Like" }).length,
@@ -60,7 +65,8 @@ describe("Home", () => {
   it("renders progress stats section", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     expect(
       screen.getAllByRole("heading", { name: "Your Progress" }).length,
@@ -73,7 +79,8 @@ describe("Home", () => {
   it("renders suggested partners section", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     expect(
       screen.getAllByRole("heading", { name: "Suggested Partners" }).length,
@@ -86,7 +93,8 @@ describe("Home", () => {
   it("renders upcoming sessions section", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     expect(
       screen.getAllByRole("heading", { name: "Upcoming Sessions" }).length,
@@ -100,7 +108,8 @@ describe("Home", () => {
   it("displays language tags on feed items", async () => {
     const { default: Home } = await import("./page");
 
-    render(<Home />);
+    const ui = await Home();
+    render(ui);
 
     expect(screen.getAllByText("English").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Spanish").length).toBeGreaterThan(0);

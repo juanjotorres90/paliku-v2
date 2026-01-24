@@ -5,7 +5,8 @@ describe("PeoplePage", () => {
   it("renders the main heading", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     expect(
       screen.getByRole("heading", { name: "Find Language Partners" }),
@@ -15,7 +16,8 @@ describe("PeoplePage", () => {
   it("renders search input", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     const searchInputs = screen.getAllByPlaceholderText(
       "Search by name, language, or location...",
@@ -26,7 +28,8 @@ describe("PeoplePage", () => {
   it("renders all filter dropdowns", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     const selects = screen.getAllByRole("combobox");
     expect(selects.length).toBeGreaterThanOrEqual(4); // Native Language, Learning Language, Proficiency Level, Availability
@@ -35,7 +38,8 @@ describe("PeoplePage", () => {
   it("renders tab navigation", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     const discoverButtons = screen.getAllByRole("button", { name: "Discover" });
     const myPartnersButtons = screen.getAllByRole("button", {
@@ -48,7 +52,8 @@ describe("PeoplePage", () => {
   it("shows notification badge on Requests tab", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     const requestsTabs = screen.getAllByRole("button", { name: /Requests/ });
     expect(requestsTabs.length).toBeGreaterThan(0);
@@ -59,7 +64,8 @@ describe("PeoplePage", () => {
   it("renders multiple people cards", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     const connectButtons = screen.getAllByRole("button", { name: "Connect" });
     expect(connectButtons.length).toBeGreaterThanOrEqual(6); // 6 people cards
@@ -68,7 +74,8 @@ describe("PeoplePage", () => {
   it("shows online status indicators", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     const onlineStatuses = screen.getAllByText("Online now");
     expect(onlineStatuses.length).toBeGreaterThan(0);
@@ -77,7 +84,8 @@ describe("PeoplePage", () => {
   it("displays language information on cards", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     expect(screen.getAllByText("Speaks").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Learning").length).toBeGreaterThan(0);
@@ -86,7 +94,8 @@ describe("PeoplePage", () => {
   it("renders Connect and View Profile buttons for each card", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     const connectButtons = screen.getAllByRole("button", { name: "Connect" });
     const viewProfileButtons = screen.getAllByRole("button", {
@@ -100,7 +109,8 @@ describe("PeoplePage", () => {
   it("renders pagination controls", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     const previousButtons = screen.getAllByRole("button", { name: "Previous" });
     const nextButtons = screen.getAllByRole("button", { name: "Next" });
@@ -112,7 +122,8 @@ describe("PeoplePage", () => {
   it("displays bio preview on cards", async () => {
     const { default: PeoplePage } = await import("./page");
 
-    render(<PeoplePage />);
+    const ui = await PeoplePage();
+    render(ui);
 
     expect(
       screen.getAllByText(/Hi! I'm looking for language exchange partners/)

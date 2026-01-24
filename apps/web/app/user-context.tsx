@@ -8,6 +8,8 @@ import {
   useCallback,
   useRef,
 } from "react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import {
   applyTheme,
   getResolvedTheme,
@@ -32,6 +34,11 @@ interface Profile {
 interface Settings {
   locale: string;
   theme: Theme;
+}
+
+interface SettingsResult {
+  settings: Settings;
+  source: "server" | "fallback";
 }
 
 interface User {
@@ -65,7 +72,7 @@ const DEFAULT_SETTINGS: Settings = {
   theme: "system",
 };
 
-async function fetchSettings(): Promise<Settings> {
+async function fetchSettings(): Promise<SettingsResult> {
   try {
     const response = await apiFetchWithRefresh("/settings/me");
 
@@ -74,13 +81,14 @@ async function fetchSettings(): Promise<Settings> {
         throw new Error("Unauthorized");
       }
       console.warn("Failed to fetch settings, using defaults");
-      return DEFAULT_SETTINGS;
+      return { settings: DEFAULT_SETTINGS, source: "fallback" };
     }
 
-    return (await response.json()) as Promise<Settings>;
+    const settings = (await response.json()) as Settings;
+    return { settings, source: "server" };
   } catch {
     console.warn("Failed to fetch settings, using defaults");
-    return DEFAULT_SETTINGS;
+    return { settings: DEFAULT_SETTINGS, source: "fallback" };
   }
 }
 
@@ -100,6 +108,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const router = useRouter();
+  const currentLocale = useLocale();
 
   // Track the initially applied theme to avoid flickering on API response
   const initialThemeRef = useRef<Theme>(getInitialTheme());
@@ -129,13 +139,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
 
       const json = await response.json();
-      const settings = await fetchSettings();
+      const { settings, source } = await fetchSettings();
 
       // Only apply theme if server setting differs from initial stored value
       // This prevents flickering when themes match
-      if (settings.theme !== initialThemeRef.current) {
+      if (source === "server" && settings.theme !== initialThemeRef.current) {
         applyUserTheme(settings.theme);
         initialThemeRef.current = settings.theme;
+      }
+
+      // Detect locale mismatch and refresh if needed
+      // The API sets the locale cookie, so we need to refresh to get the new locale
+      if (source === "server" && settings.locale !== currentLocale) {
+        router.refresh();
       }
 
       setUser({ ...json, settings });
@@ -145,23 +161,29 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setError(true);
       setLoading(false);
     }
-  }, []);
+  }, [currentLocale, router]);
 
   const refreshSettings = useCallback(async () => {
     try {
-      const settings = await fetchSettings();
+      const { settings, source } = await fetchSettings();
 
       // Only apply theme if server setting differs from stored value
-      if (settings.theme !== initialThemeRef.current) {
+      if (source === "server" && settings.theme !== initialThemeRef.current) {
         applyUserTheme(settings.theme);
         initialThemeRef.current = settings.theme;
+      }
+
+      // Detect locale mismatch and refresh if needed
+      // The API sets the locale cookie, so we need to refresh to get the new locale
+      if (source === "server" && settings.locale !== currentLocale) {
+        router.refresh();
       }
 
       setUser((prev) => (prev ? { ...prev, settings } : null));
     } catch (err) {
       console.warn("Settings refresh failed:", err);
     }
-  }, []);
+  }, [currentLocale, router]);
 
   useEffect(() => {
     refreshUser();

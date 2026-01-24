@@ -9,6 +9,7 @@ import type { AppConfig } from "../../../server/config";
 import type { SettingsRepositoryPort } from "../application/ports";
 import { getSettingsMe } from "../application/use-cases/get-settings-me";
 import { updateSettingsMe } from "../application/use-cases/update-settings-me";
+import { setLocaleCookie } from "./locale-cookie";
 
 interface SettingsRoutesContext {
   config: AppConfig;
@@ -19,7 +20,7 @@ export function createSettingsRoutes(
   ctx: SettingsRoutesContext,
   jwtAuth: MiddlewareHandler<RouteEnv>,
 ) {
-  const { settingsRepo } = ctx;
+  const { settingsRepo, config } = ctx;
   const router = new Hono<RouteEnv>();
 
   router.use("/me", jwtAuth);
@@ -34,6 +35,9 @@ export function createSettingsRoutes(
         { accessToken, userId },
         { settingsRepo },
       );
+
+      // Set locale cookie to keep it in sync with user settings
+      setLocaleCookie(c, config.cookie, result.locale);
 
       return c.json(result);
     } catch (err) {
@@ -74,6 +78,9 @@ export function createSettingsRoutes(
         },
         { settingsRepo },
       );
+
+      // Set locale cookie to keep it in sync with user settings
+      setLocaleCookie(c, config.cookie, result.locale);
 
       return c.json(result);
     } catch (err) {

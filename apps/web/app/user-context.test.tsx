@@ -20,6 +20,11 @@ describe("UserContext", () => {
   });
 
   it("provides context value", () => {
+    vi.mocked(apiFetchWithRefresh).mockResolvedValue({
+      ok: false,
+      status: 401,
+    } as Response);
+
     let contextValue: unknown = null;
     const TestComponent = () => {
       contextValue = useUser();
@@ -58,9 +63,10 @@ describe("UserProvider", () => {
   });
 
   it("starts in loading state", () => {
-    vi.mocked(apiFetchWithRefresh).mockImplementation(
-      () => new Promise(() => {}),
-    );
+    vi.mocked(apiFetchWithRefresh).mockResolvedValue({
+      ok: false,
+      status: 401,
+    } as Response);
 
     const TestComponent = () => {
       const { loading } = useUser();
@@ -93,11 +99,29 @@ describe("UserProvider", () => {
       },
     };
 
-    vi.mocked(apiFetchWithRefresh).mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => mockUser,
-    } as Response);
+    vi.mocked(apiFetchWithRefresh).mockImplementation(async (path) => {
+      if (path === "/profile/me") {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => mockUser,
+        } as Response;
+      }
+
+      if (path === "/settings/me") {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ locale: "en", theme: "system" }),
+        } as Response;
+      }
+
+      return {
+        ok: false,
+        status: 404,
+        json: async () => ({}),
+      } as Response;
+    });
 
     const TestComponent = () => {
       const { user, loading } = useUser();
@@ -128,10 +152,20 @@ describe("UserProvider", () => {
   });
 
   it("handles 401 response by setting user to null", async () => {
-    vi.mocked(apiFetchWithRefresh).mockResolvedValue({
-      ok: false,
-      status: 401,
-    } as Response);
+    vi.mocked(apiFetchWithRefresh).mockImplementation(async (path) => {
+      if (path === "/profile/me") {
+        return {
+          ok: false,
+          status: 401,
+        } as Response;
+      }
+
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ locale: "en", theme: "system" }),
+      } as Response;
+    });
 
     const TestComponent = () => {
       const { user, loading } = useUser();
@@ -160,10 +194,20 @@ describe("UserProvider", () => {
   });
 
   it("handles 403 response by setting user to null", async () => {
-    vi.mocked(apiFetchWithRefresh).mockResolvedValue({
-      ok: false,
-      status: 403,
-    } as Response);
+    vi.mocked(apiFetchWithRefresh).mockImplementation(async (path) => {
+      if (path === "/profile/me") {
+        return {
+          ok: false,
+          status: 403,
+        } as Response;
+      }
+
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ locale: "en", theme: "system" }),
+      } as Response;
+    });
 
     const TestComponent = () => {
       const { user, loading } = useUser();
@@ -192,10 +236,20 @@ describe("UserProvider", () => {
   });
 
   it("handles non-401/403 errors by setting error state", async () => {
-    vi.mocked(apiFetchWithRefresh).mockResolvedValue({
-      ok: false,
-      status: 500,
-    } as Response);
+    vi.mocked(apiFetchWithRefresh).mockImplementation(async (path) => {
+      if (path === "/profile/me") {
+        return {
+          ok: false,
+          status: 500,
+        } as Response;
+      }
+
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ locale: "en", theme: "system" }),
+      } as Response;
+    });
 
     const TestComponent = () => {
       const { error, loading } = useUser();
@@ -370,11 +424,29 @@ describe("UserProvider", () => {
       },
     };
 
-    vi.mocked(apiFetchWithRefresh).mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => mockUser,
-    } as Response);
+    vi.mocked(apiFetchWithRefresh).mockImplementation(async (path) => {
+      if (path === "/profile/me") {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => mockUser,
+        } as Response;
+      }
+
+      if (path === "/settings/me") {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ locale: "en", theme: "system" }),
+        } as Response;
+      }
+
+      return {
+        ok: false,
+        status: 404,
+        json: async () => ({}),
+      } as Response;
+    });
 
     const ComponentA = () => {
       const { user } = useUser();

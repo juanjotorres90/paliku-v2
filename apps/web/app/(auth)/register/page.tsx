@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { RegisterRequestSchema } from "@repo/validators/auth";
 import { getSafeRedirect } from "../../../lib/redirect";
-import { apiFetch } from "../../lib/api";
+import { apiFetch, apiFetchWithRefresh } from "../../lib/api";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -16,6 +17,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("auth");
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -35,7 +37,7 @@ function RegisterPageContent() {
     const redirectTo = getSafeRedirect(searchParams.get("redirect"));
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("passwordsDoNotMatch"));
       setLoading(false);
       return;
     }
@@ -48,7 +50,7 @@ function RegisterPageContent() {
     });
 
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Invalid form");
+      setError(parsed.error.issues[0]?.message ?? t("invalidForm"));
       setLoading(false);
       return;
     }
@@ -65,7 +67,7 @@ function RegisterPageContent() {
       const text = await response.text();
 
       if (!response.ok) {
-        let message = "Failed to create account";
+        let message = t("failedToCreateAccount");
         if (text) {
           try {
             const json: unknown = JSON.parse(text);
@@ -90,9 +92,7 @@ function RegisterPageContent() {
       }
 
       if (isRecord(json) && json.needsEmailConfirmation === true) {
-        setSuccess(
-          "Check your email to confirm your account. After confirming, please sign in.",
-        );
+        setSuccess(t("checkEmailConfirmation"));
         setLoading(false);
         return;
       }
@@ -109,15 +109,24 @@ function RegisterPageContent() {
       });
 
       if (loginResponse.ok) {
+        // After successful auto-login, fetch settings to establish locale cookie
+        // This ensures the UI renders in the user's preferred language
+        try {
+          await apiFetchWithRefresh("/settings/me");
+        } catch {
+          // Settings fetch failure should not block registration
+          console.warn("Failed to fetch settings after registration");
+        }
+
         router.replace(redirectTo);
         router.refresh();
         return;
       }
 
-      setSuccess("Account created successfully. Please sign in to continue.");
+      setSuccess(t("accountCreatedSignIn"));
       setLoading(false);
     } catch {
-      setError("An unexpected error occurred");
+      setError(t("unexpectedError"));
       setLoading(false);
     }
   };
@@ -132,14 +141,12 @@ function RegisterPageContent() {
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold">Create account</h1>
-          <p className="text-muted-foreground">
-            Sign up with your email. You may need to confirm via email.
-          </p>
+          <h1 className="text-2xl font-bold">{t("createAccount")}</h1>
+          <p className="text-muted-foreground">{t("signUpDescription")}</p>
           <p className="text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t("alreadyHaveAccount")}{" "}
             <Link href={loginHref} className="underline underline-offset-4">
-              Sign in
+              {t("signIn")}
             </Link>
           </p>
         </div>
@@ -147,12 +154,12 @@ function RegisterPageContent() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="displayName" className="text-sm font-medium">
-              Display name
+              {t("displayName")}
             </label>
             <Input
               id="displayName"
               type="text"
-              placeholder="Your name"
+              placeholder={t("yourName")}
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               required
@@ -162,12 +169,12 @@ function RegisterPageContent() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t("email")}
             </label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t("emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -177,7 +184,7 @@ function RegisterPageContent() {
 
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              Password
+              {t("password")}
             </label>
             <Input
               id="password"
@@ -192,7 +199,7 @@ function RegisterPageContent() {
 
           <div className="space-y-2">
             <label htmlFor="confirmPassword" className="text-sm font-medium">
-              Confirm password
+              {t("confirmPassword")}
             </label>
             <Input
               id="confirmPassword"
@@ -218,7 +225,7 @@ function RegisterPageContent() {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating account..." : "Create account"}
+            {loading ? t("creatingAccount") : t("createAccount")}
           </Button>
         </form>
       </div>
@@ -226,9 +233,14 @@ function RegisterPageContent() {
   );
 }
 
+function RegisterPageFallback() {
+  const t = useTranslations("common");
+  return <div>{t("loading")}</div>;
+}
+
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<RegisterPageFallback />}>
       <RegisterPageContent />
     </Suspense>
   );

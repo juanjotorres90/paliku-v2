@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { LOCALES, AUTONYMS, type Locale } from "@repo/i18n/locales";
 import { Button } from "@repo/ui/components/button";
 import { LanguageSwitcher } from "@repo/ui/components/language-switcher";
@@ -27,6 +28,7 @@ interface SettingsFormData {
 
 function SettingsPageContent() {
   const router = useRouter();
+  const t = useTranslations("settings");
   const {
     user,
     loading: userLoading,
@@ -121,7 +123,7 @@ function SettingsPageContent() {
       savedThemeRef.current = effectiveFormData.theme;
       setSaving(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save settings");
+      setError(err instanceof Error ? err.message : t("failedToSaveSettings"));
       setSaving(false);
     }
   };
@@ -140,7 +142,7 @@ function SettingsPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
         <div className="text-center text-muted-foreground">
-          Loading settings...
+          {t("loadingSettings")}
         </div>
       </div>
     );
@@ -150,10 +152,8 @@ function SettingsPageContent() {
     <main className="min-h-screen p-8">
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your app preferences.
-          </p>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground mt-2">{t("description")}</p>
         </div>
 
         {error && (
@@ -166,15 +166,15 @@ function SettingsPageContent() {
           {/* Language Section */}
           <section className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold">Language</h2>
+              <h2 className="text-lg font-semibold">{t("language.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Select your preferred language for the app interface.
+                {t("language.description")}
               </p>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="language" className="text-sm font-medium">
-                Language
+                {t("language.label")}
               </label>
               <LanguageSwitcher
                 id="language"
@@ -185,7 +185,9 @@ function SettingsPageContent() {
                 className="w-full md:w-64"
               />
               <p className="text-xs text-muted-foreground">
-                Current: {AUTONYMS[effectiveFormData.locale]}
+                {t("language.current", {
+                  language: AUTONYMS[effectiveFormData.locale],
+                })}
               </p>
             </div>
           </section>
@@ -193,15 +195,14 @@ function SettingsPageContent() {
           {/* Theme Section */}
           <section className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold">Theme</h2>
+              <h2 className="text-lg font-semibold">{t("theme.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Choose how the app looks. Your selection will be saved
-                automatically.
+                {t("theme.description")}
               </p>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Appearance</label>
+              <label className="text-sm font-medium">{t("theme.label")}</label>
               <ThemeRadioGroup
                 name="theme"
                 value={effectiveFormData.theme}
@@ -209,15 +210,9 @@ function SettingsPageContent() {
                 className="w-full md:w-96"
               />
               <p className="text-xs text-muted-foreground">
-                {effectiveFormData.theme === "system" && (
-                  <>Theme matches your system settings (light/dark)</>
-                )}
-                {effectiveFormData.theme === "light" && (
-                  <>Always use light theme</>
-                )}
-                {effectiveFormData.theme === "dark" && (
-                  <>Always use dark theme</>
-                )}
+                {effectiveFormData.theme === "system" && t("theme.system")}
+                {effectiveFormData.theme === "light" && t("theme.light")}
+                {effectiveFormData.theme === "dark" && t("theme.dark")}
               </p>
             </div>
           </section>
@@ -225,7 +220,7 @@ function SettingsPageContent() {
           {/* Save Button */}
           <div className="flex gap-4 pt-4">
             <Button type="submit" disabled={saving}>
-              {saving ? "Saving..." : "Save changes"}
+              {saving ? t("saving") : t("saveChanges")}
             </Button>
           </div>
         </form>

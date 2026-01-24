@@ -8,6 +8,9 @@ import { createProfileRoutes } from "../modules/profile/http/routes";
 import { createJwtAuth } from "../modules/auth/http/middleware/jwt-auth";
 import { createSettingsRoutes } from "../modules/settings/http/routes";
 import { createI18nRoutes } from "../modules/i18n/http/routes";
+import { createI18nMiddleware } from "./middleware/i18n";
+import { mapErrorToStatus, formatErrorI18n } from "./utils/error-mapper";
+import { getLocale, getT } from "./utils/i18n";
 import type {
   AuthProviderPort,
   JWTVerifierPort,
@@ -99,6 +102,8 @@ export function createHttpApp(ctx: HttpAppContext) {
     }),
   );
 
+  app.use("*", createI18nMiddleware(ctx.config.cookie));
+
   app.get("/", (c) => c.text("ok"));
 
   const jwtAuth = createJwtAuth(ctx.jwtVerifier, ctx.config.cookie);
@@ -117,6 +122,7 @@ export function createHttpApp(ctx: HttpAppContext) {
       config: ctx.config,
       authProvider: ctx.authProvider,
       pkceHelpers: ctx.pkceHelpers,
+      settingsRepo: ctx.settingsRepo,
     }),
   );
 
@@ -145,6 +151,33 @@ export function createHttpApp(ctx: HttpAppContext) {
       jwtAuth,
     ),
   );
+
+  app.notFound((c) => {
+    const t = getT(c);
+    const locale = getLocale(c);
+    return c.json(
+      {
+        error: t("api.errors.request.not_found"),
+        errorKey: "api.errors.request.not_found",
+        locale,
+      },
+      404,
+    );
+  });
+
+  app.onError((err, c) => {
+    const status = mapErrorToStatus(err);
+    const t = getT(c);
+    const body = formatErrorI18n(err, { t });
+    const locale = getLocale(c);
+    return c.json(
+      {
+        ...body,
+        locale,
+      },
+      status as 400 | 401 | 403 | 404 | 409 | 413 | 429 | 500,
+    );
+  });
 
   return app;
 }

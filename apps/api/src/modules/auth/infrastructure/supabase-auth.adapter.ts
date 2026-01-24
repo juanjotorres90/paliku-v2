@@ -1,12 +1,12 @@
-import type { AuthProviderPort } from "../application/ports";
 import type { SupabaseConfig } from "../../../server/config";
-import type { HttpClient } from "../../../shared/infrastructure/http-client";
 import {
-  ValidationError,
   AuthenticationError,
-  ForbiddenError,
   ConflictError,
+  ForbiddenError,
+  ValidationError,
 } from "../../../shared/domain/errors";
+import type { HttpClient } from "../../../shared/infrastructure/http-client";
+import type { AuthProviderPort } from "../application/ports";
 
 export function createSupabaseAuthAdapter(
   config: SupabaseConfig,
@@ -93,9 +93,40 @@ export function createSupabaseAuthAdapter(
         },
       );
 
-      const result = await parseResponse<{ access_token?: string }>(response);
-      const needsEmailConfirmation = !result?.access_token;
-      return { needsEmailConfirmation };
+      try {
+        const result = await parseResponse<{
+          access_token?: string;
+          session?: { access_token?: string };
+          user?: { identities?: unknown[] };
+          identities?: unknown[];
+        }>(response);
+
+        // Supabase Auth "duplicate email" can return 200 with `user.identities=[]`
+        // (to avoid leaking whether a user exists via status codes).
+        const identities = Array.isArray(result.user?.identities)
+          ? result.user.identities
+          : Array.isArray(result.identities)
+            ? result.identities
+            : undefined;
+        if (Array.isArray(identities) && identities.length === 0) {
+          throw new ConflictError("Email already exists");
+        }
+
+        const accessToken = result.access_token ?? result.session?.access_token;
+        const needsEmailConfirmation = !accessToken;
+        return { needsEmailConfirmation };
+      } catch (err) {
+        // Some Supabase configurations return a 400 with a "already registered" style message.
+        if (
+          err instanceof ValidationError &&
+          /already (?:been )?registered|user already registered|exists/i.test(
+            err.message,
+          )
+        ) {
+          throw new ConflictError("Email already exists");
+        }
+        throw err;
+      }
     },
 
     async login(email: string, password: string) {

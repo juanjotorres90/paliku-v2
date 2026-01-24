@@ -250,6 +250,18 @@ function ProfileSettingsPageContent() {
               onDelete={handleAvatarDelete}
               uploading={uploading}
               maxSizeMB={5}
+              labels={{
+                upload: t("avatarUpload.upload"),
+                uploading: t("avatarUpload.uploading"),
+                choosePhoto: t("avatarUpload.choosePhoto"),
+                delete: tCommon("delete"),
+                dropHint: t("avatarUpload.dropHint"),
+                fileTypeHint: t("avatarUpload.fileTypeHint", { maxSizeMB: 5 }),
+                fileSizeError: t("avatarUpload.fileSizeError", {
+                  maxSizeMB: 5,
+                }),
+                fileTypeError: t("avatarUpload.fileTypeError"),
+              }}
             />
           </div>
 

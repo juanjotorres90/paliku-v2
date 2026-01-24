@@ -4,4 +4,10 @@ import { config } from "@repo/eslint-config/base";
 export default [
   { ignores: ["dist/**"] },
   ...config,
+  {
+    files: ["src/messages.ts"],
+    rules: {
+      "@typescript-eslint/no-empty-object-type": "off",
+    },
+  },
 ];

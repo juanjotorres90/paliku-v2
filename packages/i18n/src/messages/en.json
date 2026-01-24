@@ -107,6 +107,15 @@
     "avatar": "Avatar",
     "uploadAvatar": "Upload avatar",
     "removeAvatar": "Remove avatar",
+    "avatarUpload": {
+      "upload": "Upload",
+      "uploading": "Uploading...",
+      "choosePhoto": "Choose photo",
+      "dropHint": "Drop",
+      "fileTypeHint": "JPG, PNG or GIF (max {maxSizeMB}MB)",
+      "fileSizeError": "File size must be less than {maxSizeMB}MB",
+      "fileTypeError": "Please select an image file"
+    },
     "updateProfile": "Update profile",
     "locale": "Language preference",
     "localeUpdated": "Language preference updated",
@@ -141,8 +150,11 @@
         "user_exists": "An account with this email already exists",
         "session_expired": "Your session has expired. Please log in again",
         "token_invalid": "Invalid or expired token",
+        "missing_token": "Missing authentication token",
         "unauthorized": "You must be logged in to perform this action",
-        "forbidden": "You don't have permission to perform this action"
+        "forbidden": "You don't have permission to perform this action",
+        "missing_refresh_token": "Missing refresh token",
+        "missing_code": "Missing authorization code"
       },
       "request": {
         "invalid_json": "Invalid JSON in request body",
@@ -162,7 +174,9 @@
         "not_found": "Profile not found",
         "update_failed": "Failed to update profile",
         "avatar_upload_failed": "Failed to upload avatar",
-        "invalid_locale": "Invalid language preference"
+        "invalid_locale": "Invalid language preference",
+        "missing_file": "No file provided",
+        "invalid_file": "Invalid file"
       },
       "validation": {
         "invalid_input": "Invalid input data"

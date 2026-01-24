@@ -107,6 +107,15 @@
     "avatar": "Avatar",
     "uploadAvatar": "Télécharger un avatar",
     "removeAvatar": "Supprimer l'avatar",
+    "avatarUpload": {
+      "upload": "Télécharger",
+      "uploading": "Téléchargement...",
+      "choosePhoto": "Choisir une photo",
+      "dropHint": "Déposer",
+      "fileTypeHint": "JPG, PNG ou GIF (max. {maxSizeMB}MB)",
+      "fileSizeError": "La taille du fichier doit être inférieure à {maxSizeMB}MB",
+      "fileTypeError": "Veuillez sélectionner un fichier image"
+    },
     "updateProfile": "Mettre à jour le profil",
     "locale": "Préférence de langue",
     "localeUpdated": "Préférence de langue mise à jour",
@@ -141,8 +150,11 @@
         "user_exists": "Un compte avec cet e-mail existe déjà",
         "session_expired": "Votre session a expiré. Veuillez vous reconnecter",
         "token_invalid": "Jeton invalide ou expiré",
+        "missing_token": "Jeton d'authentification manquant",
         "unauthorized": "Vous devez être connecté pour effectuer cette action",
-        "forbidden": "Vous n'avez pas la permission d'effectuer cette action"
+        "forbidden": "Vous n'avez pas la permission d'effectuer cette action",
+        "missing_refresh_token": "Jeton de rafraîchissement manquant",
+        "missing_code": "Code d'autorisation manquant"
       },
       "request": {
         "invalid_json": "JSON invalide dans le corps de la requête",
@@ -162,7 +174,9 @@
         "not_found": "Profil non trouvé",
         "update_failed": "Échec de la mise à jour du profil",
         "avatar_upload_failed": "Échec du téléchargement de l'avatar",
-        "invalid_locale": "Préférence de langue invalide"
+        "invalid_locale": "Préférence de langue invalide",
+        "missing_file": "Aucun fichier fourni",
+        "invalid_file": "Fichier invalide"
       },
       "validation": {
         "invalid_input": "Données d'entrée invalides"

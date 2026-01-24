@@ -3,8 +3,9 @@ import type { RouteEnv } from "../../../http/context";
 import { parseJsonBody } from "../../../http/utils/parse-json";
 import {
   mapErrorToStatus,
-  formatError,
+  formatErrorI18n,
 } from "../../../http/utils/error-mapper";
+import { getT } from "../../../http/utils/i18n";
 import type { AppConfig } from "../../../server/config";
 import type { SettingsRepositoryPort } from "../application/ports";
 import { getSettingsMe } from "../application/use-cases/get-settings-me";
@@ -42,26 +43,38 @@ export function createSettingsRoutes(
       return c.json(result);
     } catch (err) {
       const status = mapErrorToStatus(err);
-      const body = formatError(err);
+      const t = getT(c);
+      const body = formatErrorI18n(err, { t });
       return c.json(body, status as 400 | 401 | 403 | 404 | 500);
     }
   });
 
   router.patch("/me", async (c) => {
+    const t = getT(c);
     const payload = c.get("jwtPayload")!;
     const accessToken = c.get("accessToken")!;
     const userId = payload.sub as string;
 
     const body = await parseJsonBody(c);
     if (!body.ok) {
-      return c.json({ error: "Invalid JSON body" }, 400);
+      return c.json(
+        {
+          error: t("api.errors.request.invalid_json"),
+          errorKey: "api.errors.request.invalid_json",
+        },
+        400,
+      );
     }
 
     const { SettingsUpdateSchema } = await import("@repo/validators/settings");
     const parsed = SettingsUpdateSchema.safeParse(body.value);
     if (!parsed.success) {
       return c.json(
-        { error: "Invalid request", issues: parsed.error.flatten() },
+        {
+          error: t("api.errors.request.invalid_request"),
+          errorKey: "api.errors.request.invalid_request",
+          issues: parsed.error.flatten(),
+        },
         400,
       );
     }
@@ -85,7 +98,8 @@ export function createSettingsRoutes(
       return c.json(result);
     } catch (err) {
       const status = mapErrorToStatus(err);
-      const body = formatError(err);
+      const t = getT(c);
+      const body = formatErrorI18n(err, { t });
       return c.json(body, status as 400 | 401 | 403 | 404 | 500);
     }
   });

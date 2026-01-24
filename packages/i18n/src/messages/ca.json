@@ -107,6 +107,15 @@
     "avatar": "Avatar",
     "uploadAvatar": "Pujar avatar",
     "removeAvatar": "Eliminar avatar",
+    "avatarUpload": {
+      "upload": "Pujar",
+      "uploading": "Pujant...",
+      "choosePhoto": "Triar foto",
+      "dropHint": "Deixar anar",
+      "fileTypeHint": "JPG, PNG o GIF (màx. {maxSizeMB}MB)",
+      "fileSizeError": "La mida de l'arxiu ha de ser menor de {maxSizeMB}MB",
+      "fileTypeError": "Si us plau, selecciona un arxiu d'imatge"
+    },
     "updateProfile": "Actualitzar perfil",
     "locale": "Preferència d'idioma",
     "localeUpdated": "Preferència d'idioma actualitzada",
@@ -141,8 +150,11 @@
         "user_exists": "Ja existeix un compte amb aquest correu electrònic",
         "session_expired": "La teva sessió ha expirat. Si us plau, inicia sessió novament",
         "token_invalid": "Token invàlid o expirat",
+        "missing_token": "Falta el token d'autenticació",
         "unauthorized": "Has d'iniciar sessió per realitzar aquesta acció",
-        "forbidden": "No tens permís per realitzar aquesta acció"
+        "forbidden": "No tens permís per realitzar aquesta acció",
+        "missing_refresh_token": "Falta el token d'actualització",
+        "missing_code": "Falta el codi d'autorització"
       },
       "request": {
         "invalid_json": "JSON invàlid al cos de la sol·licitud",
@@ -162,7 +174,9 @@
         "not_found": "Perfil no trobat",
         "update_failed": "Error en actualitzar el perfil",
         "avatar_upload_failed": "Error en pujar l'avatar",
-        "invalid_locale": "Preferència d'idioma invàlida"
+        "invalid_locale": "Preferència d'idioma invàlida",
+        "missing_file": "No s'ha proporcionat cap fitxer",
+        "invalid_file": "Fitxer invàlid"
       },
       "validation": {
         "invalid_input": "Dades d'entrada invàlides"

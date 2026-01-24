@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { RouteEnv } from "../../../http/context";
 import { parseJsonBody } from "../../../http/utils/parse-json";
+import { getT } from "../../../http/utils/i18n";
 import { isLocale, LOCALES, AUTONYMS, type Locale } from "@repo/i18n";
 import { setLocaleCookie } from "../../settings/http/locale-cookie";
 import type { AppConfig } from "../../../server/config";
@@ -27,9 +28,16 @@ export function createI18nRoutes(ctx: I18nRoutesContext) {
    * - 400: { error: string }
    */
   router.post("/locale", async (c) => {
+    const t = getT(c);
     const body = await parseJsonBody(c);
     if (!body.ok) {
-      return c.json({ error: "Invalid JSON body" }, 400);
+      return c.json(
+        {
+          error: t("api.errors.request.invalid_json"),
+          errorKey: "api.errors.request.invalid_json",
+        },
+        400,
+      );
     }
 
     const value = body.value;
@@ -39,12 +47,17 @@ export function createI18nRoutes(ctx: I18nRoutesContext) {
       !("locale" in value) ||
       typeof value.locale !== "string"
     ) {
-      return c.json({ error: "locale is required" }, 400);
+      return c.json(
+        {
+          error: t("api.errors.request.invalid_request"),
+          errorKey: "api.errors.request.invalid_request",
+        },
+        400,
+      );
     }
 
     const locale = value.locale as string;
 
-    // Validate locale against supported locales
     if (!isLocale(locale)) {
       return c.json(
         {
@@ -54,7 +67,6 @@ export function createI18nRoutes(ctx: I18nRoutesContext) {
       );
     }
 
-    // Set the locale cookie
     setLocaleCookie(c, config.cookie, locale);
 
     return c.json({ ok: true, locale });

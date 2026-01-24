@@ -41,8 +41,13 @@ describe("mapErrorToStatus", () => {
     expect(mapErrorToStatus(error)).toBe(413);
   });
 
+  it("maps RateLimitError to 429", () => {
+    const error = new RateLimitError("Too many");
+    expect(mapErrorToStatus(error)).toBe(429);
+  });
+
   it("returns 500 for unknown errors", () => {
-    expect(mapErrorToStatus(new RateLimitError("Too many"))).toBe(500);
+    expect(mapErrorToStatus(new Error("Boom"))).toBe(500);
   });
 });
 

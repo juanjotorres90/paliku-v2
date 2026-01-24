@@ -107,6 +107,15 @@
     "avatar": "Avatar",
     "uploadAvatar": "Carregar avatar",
     "removeAvatar": "Remover avatar",
+    "avatarUpload": {
+      "upload": "Carregar",
+      "uploading": "Carregando...",
+      "choosePhoto": "Escolher foto",
+      "dropHint": "Soltar",
+      "fileTypeHint": "JPG, PNG ou GIF (máx. {maxSizeMB}MB)",
+      "fileSizeError": "O tamanho do arquivo deve ser menor que {maxSizeMB}MB",
+      "fileTypeError": "Por favor, selecione um arquivo de imagem"
+    },
     "updateProfile": "Atualizar perfil",
     "locale": "Preferência de idioma",
     "localeUpdated": "Preferência de idioma atualizada",
@@ -141,8 +150,11 @@
         "user_exists": "Já existe uma conta com este e-mail",
         "session_expired": "Sua sessão expirou. Por favor, entre novamente",
         "token_invalid": "Token inválido ou expirado",
+        "missing_token": "Token de autenticação ausente",
         "unauthorized": "Você deve estar logado para realizar esta ação",
-        "forbidden": "Você não tem permissão para realizar esta ação"
+        "forbidden": "Você não tem permissão para realizar esta ação",
+        "missing_refresh_token": "Token de atualização ausente",
+        "missing_code": "Código de autorização ausente"
       },
       "request": {
         "invalid_json": "JSON inválido no corpo da solicitação",
@@ -162,7 +174,9 @@
         "not_found": "Perfil não encontrado",
         "update_failed": "Falha ao atualizar o perfil",
         "avatar_upload_failed": "Falha ao carregar o avatar",
-        "invalid_locale": "Preferência de idioma inválida"
+        "invalid_locale": "Preferência de idioma inválida",
+        "missing_file": "Nenhum arquivo fornecido",
+        "invalid_file": "Arquivo inválido"
       },
       "validation": {
         "invalid_input": "Dados de entrada inválidos"

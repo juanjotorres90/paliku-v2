@@ -6,8 +6,9 @@ import { getCookieName, getCookieOptions } from "./cookies";
 import { resolveWebOrigin } from "../../../http/utils/origin";
 import {
   mapErrorToStatus,
-  formatError,
+  formatErrorI18n,
 } from "../../../http/utils/error-mapper";
+import { getLocale, getT } from "../../../http/utils/i18n";
 import { createRateLimiter } from "../../../http/middleware/rate-limiter";
 import type { LoginInput } from "../application/use-cases/login";
 import type { RegisterInput } from "../application/use-cases/register";
@@ -18,11 +19,14 @@ import { callback } from "../application/use-cases/callback";
 import type { AuthProviderPort } from "../application/ports";
 import type { PKCEHelpers } from "../domain/pkce";
 import type { AppConfig } from "../../../server/config";
+import type { SettingsRepositoryPort } from "../../settings/application/ports";
+import { DEFAULT_LOCALE } from "@repo/i18n";
 
 interface AuthRoutesContext {
   config: AppConfig;
   authProvider: AuthProviderPort;
   pkceHelpers: PKCEHelpers;
+  settingsRepo: SettingsRepositoryPort;
 }
 
 function isSecureRequest(c: Context) {
@@ -34,7 +38,7 @@ function isSecureRequest(c: Context) {
 }
 
 export function createAuthRoutes(ctx: AuthRoutesContext) {
-  const { config, authProvider, pkceHelpers } = ctx;
+  const { config, authProvider, pkceHelpers, settingsRepo } = ctx;
   const { cors: corsConfig, cookie: cookieConfig } = config;
 
   const router = new Hono<RouteEnv>();
@@ -55,16 +59,28 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
   });
 
   router.post("/register", registerRateLimiter, async (c) => {
+    const t = getT(c);
+
     const body = await parseJsonBody(c);
     if (!body.ok) {
-      return c.json({ error: "Invalid JSON body" }, 400);
+      return c.json(
+        {
+          error: t("api.errors.request.invalid_json"),
+          errorKey: "api.errors.request.invalid_json",
+        },
+        400,
+      );
     }
 
     const { RegisterRequestSchema } = await import("@repo/validators/auth");
     const parsed = RegisterRequestSchema.safeParse(body.value);
     if (!parsed.success) {
       return c.json(
-        { error: "Invalid request", issues: parsed.error.flatten() },
+        {
+          error: t("api.errors.request.invalid_request"),
+          errorKey: "api.errors.request.invalid_request",
+          issues: parsed.error.flatten(),
+        },
         400,
       );
     }
@@ -97,21 +113,35 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
     } catch (err) {
       deleteCookie(c, codeVerifierCookieName, cookieOptions);
       const status = mapErrorToStatus(err);
-      const body = formatError(err);
+      const body = formatErrorI18n(err, { t });
       return c.json(body, status as 400 | 401 | 403 | 404 | 409 | 413 | 500);
     }
   });
 
   router.post("/login", loginRateLimiter, async (c) => {
+    const t = getT(c);
+
     const body = await parseJsonBody(c);
     if (!body.ok) {
-      return c.json({ error: "Invalid JSON body" }, 400);
+      return c.json(
+        {
+          error: t("api.errors.request.invalid_json"),
+          errorKey: "api.errors.request.invalid_json",
+        },
+        400,
+      );
     }
 
     const { LoginRequestSchema } = await import("@repo/validators/auth");
     const parsed = LoginRequestSchema.safeParse(body.value);
     if (!parsed.success) {
-      return c.json({ error: "Invalid request" }, 400);
+      return c.json(
+        {
+          error: t("api.errors.request.invalid_request"),
+          errorKey: "api.errors.request.invalid_request",
+        },
+        400,
+      );
     }
 
     const input: LoginInput = {
@@ -151,6 +181,14 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
         deleteCookie(c, refreshTokenCookieName, cookieOptions);
       }
 
+      // Best-effort: persist initial locale based on the current request locale.
+      // Only sets it if the user is still on the default locale.
+      await persistInitialLocale({
+        accessToken: result.tokens.accessToken,
+        requestLocale: getLocale(c),
+        settingsRepo,
+      });
+
       return c.json({
         ok: true,
         tokens: {
@@ -160,12 +198,13 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
       });
     } catch (err) {
       const status = mapErrorToStatus(err);
-      const body = formatError(err);
+      const body = formatErrorI18n(err, { t });
       return c.json(body, status as 400 | 401 | 403 | 404 | 409 | 413 | 500);
     }
   });
 
   router.post("/refresh", refreshRateLimiter, async (c) => {
+    const t = getT(c);
     const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));
     const refreshTokenOptions = {
       ...cookieOptions,
@@ -191,7 +230,13 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
     }
 
     if (!refreshToken) {
-      return c.json({ error: "Missing refresh token" }, 401);
+      return c.json(
+        {
+          error: t("api.errors.auth.missing_refresh_token"),
+          errorKey: "api.errors.auth.missing_refresh_token",
+        },
+        401,
+      );
     }
 
     try {
@@ -225,10 +270,9 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
       deleteCookie(c, accessTokenCookieName, cookieOptions);
       deleteCookie(c, refreshTokenCookieName, cookieOptions);
 
-      return c.json(
-        { error: err instanceof Error ? err.message : "Refresh failed" },
-        401,
-      );
+      const status = mapErrorToStatus(err);
+      const body = formatErrorI18n(err, { t });
+      return c.json(body, status as 400 | 401 | 403 | 404 | 409 | 413 | 500);
     }
   });
 
@@ -244,12 +288,19 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
   });
 
   router.get("/callback", async (c) => {
+    const t = getT(c);
     const { searchParams } = new URL(c.req.url);
     const code = searchParams.get("code");
     const nextParam = searchParams.get("next");
 
     if (!code) {
-      return c.text("Missing code", 400);
+      return c.json(
+        {
+          error: t("api.errors.auth.missing_code"),
+          errorKey: "api.errors.auth.missing_code",
+        },
+        400,
+      );
     }
 
     const webOrigin = resolveWebOrigin(
@@ -296,6 +347,14 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
         deleteCookie(c, refreshTokenCookieName, cookieOptions);
       }
 
+      // Best-effort: persist initial locale based on the current request locale.
+      // Only sets it if the user is still on the default locale.
+      await persistInitialLocale({
+        accessToken: tokens.accessToken,
+        requestLocale: getLocale(c),
+        settingsRepo,
+      });
+
       return c.redirect(`${webOrigin}${next}`);
     } catch (err) {
       return c.redirect(
@@ -307,4 +366,61 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
   });
 
   return router;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function base64UrlToUtf8(base64Url: string): string {
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64.padEnd(
+    base64.length + ((4 - (base64.length % 4)) % 4),
+    "=",
+  );
+  return Buffer.from(padded, "base64").toString("utf8");
+}
+
+function getJwtSub(token: string): string | undefined {
+  const parts = token.split(".");
+  if (parts.length < 2) return undefined;
+
+  try {
+    const json = base64UrlToUtf8(parts[1]!);
+    const payload: unknown = JSON.parse(json);
+
+    if (!isRecord(payload)) return undefined;
+    return typeof payload.sub === "string" ? payload.sub : undefined;
+  } catch {
+    // noop
+  }
+
+  return undefined;
+}
+
+async function persistInitialLocale(input: {
+  accessToken: string;
+  requestLocale: string;
+  settingsRepo: SettingsRepositoryPort;
+}): Promise<void> {
+  const { accessToken, requestLocale, settingsRepo } = input;
+
+  if (requestLocale === DEFAULT_LOCALE) return;
+
+  const userId = getJwtSub(accessToken);
+  if (!userId) return;
+
+  try {
+    const settings = await settingsRepo.getById({ userId, accessToken });
+    if (settings.locale !== DEFAULT_LOCALE) return;
+
+    await settingsRepo.updateById({
+      userId,
+      accessToken,
+      data: { locale: requestLocale },
+    });
+  } catch (err) {
+    // Best-effort; auth should succeed even if settings persistence fails.
+    console.error("Failed to persist initial locale:", err);
+  }
 }

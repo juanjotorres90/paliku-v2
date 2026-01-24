@@ -1,6 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import { RateLimitError } from "../../shared/domain/errors";
 import type { RouteEnv } from "../context";
+import { getT } from "../utils/i18n";
 
 interface RateLimitStore {
   count: number;
@@ -44,9 +45,11 @@ export function createRateLimiter(options: {
         "Too many requests. Please try again later.",
         Math.ceil((store.resetTime - now) / 1000),
       );
+      const t = getT(c);
       return c.json(
         {
-          error: error.message,
+          error: t("api.errors.request.rate_limited"),
+          errorKey: "api.errors.request.rate_limited",
           retryAfter: error.retryAfter,
         },
         429,

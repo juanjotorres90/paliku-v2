@@ -44,6 +44,9 @@ describe("createMeRoutes", () => {
 
     expect(res.status).toBe(401);
     const data = await res.json();
-    expect(data).toEqual({ error: "Invalid token" });
+    expect(data).toEqual({
+      error: "api.errors.auth.token_invalid",
+      errorKey: "api.errors.auth.token_invalid",
+    });
   });
 });

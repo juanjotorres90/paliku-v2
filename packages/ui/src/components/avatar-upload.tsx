@@ -16,6 +16,16 @@ export interface AvatarUploadProps {
   className?: string;
   children?: React.ReactNode;
   "aria-label"?: string;
+  labels?: {
+    upload?: string;
+    uploading?: string;
+    choosePhoto?: string;
+    delete?: string;
+    dropHint?: string;
+    fileTypeHint?: string;
+    fileSizeError?: string;
+    fileTypeError?: string;
+  };
 }
 
 export function AvatarUpload({
@@ -31,7 +41,18 @@ export function AvatarUpload({
   className,
   children,
   "aria-label": ariaLabel = "Avatar",
+  labels = {},
 }: AvatarUploadProps) {
+  const {
+    upload = "Upload",
+    uploading: uploadingLabel = "Uploading...",
+    choosePhoto = "Choose photo",
+    delete: deleteLabel = "Delete",
+    dropHint = "Drop",
+    fileTypeHint = `JPG, PNG or GIF (max ${maxSizeMB}MB)`,
+    fileSizeError = `File size must be less than ${maxSizeMB}MB`,
+    fileTypeError = "Please select an image file",
+  } = labels;
   const [isDragging, setIsDragging] = React.useState(false);
   const [preview, setPreview] = React.useState<string | undefined>(src);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -46,12 +67,12 @@ export function AvatarUpload({
 
     const maxSize = maxSizeMB * 1024 * 1024;
     if (file.size > maxSize) {
-      alert(`File size must be less than ${maxSizeMB}MB`);
+      alert(fileSizeError);
       return;
     }
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      alert(fileTypeError);
       return;
     }
 
@@ -157,7 +178,7 @@ export function AvatarUpload({
                   />
                 </svg>
                 <span className="text-xs font-medium">
-                  {isDragging ? "Drop" : size === "sm" ? "" : "Upload"}
+                  {isDragging ? dropHint : size === "sm" ? "" : upload}
                 </span>
               </div>
             </div>
@@ -167,7 +188,7 @@ export function AvatarUpload({
             <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50">
               <div className="flex flex-col items-center gap-1 text-white">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs font-medium">Uploading...</span>
+                <span className="text-xs font-medium">{uploadingLabel}</span>
               </div>
             </div>
           )}
@@ -185,7 +206,7 @@ export function AvatarUpload({
                 onClick={handleClick}
                 disabled={disabled || uploading}
               >
-                {uploading ? "Uploading..." : "Choose photo"}
+                {uploading ? uploadingLabel : choosePhoto}
               </Button>
               {preview && !uploading && (
                 <Button
@@ -201,13 +222,11 @@ export function AvatarUpload({
                   disabled={disabled || uploading}
                   className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
-                  Delete
+                  {deleteLabel}
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              JPG, PNG or GIF (max {maxSizeMB}MB)
-            </p>
+            <p className="text-xs text-muted-foreground">{fileTypeHint}</p>
           </>
         )}
       </div>

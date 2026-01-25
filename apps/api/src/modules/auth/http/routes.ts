@@ -290,8 +290,36 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
     const accessTokenCookieName = getCookieName(cookieConfig, "access-token");
     const refreshTokenCookieName = getCookieName(cookieConfig, "refresh-token");
 
-    deleteCookie(c, accessTokenCookieName, cookieOptions);
-    deleteCookie(c, refreshTokenCookieName, cookieOptions);
+    // Best-effort: delete any legacy auth cookies from previous projects/configs
+    // (e.g. if the Supabase project ref changed), not just the current cookie names.
+    const cookieHeader = c.req.header("Cookie") ?? "";
+    const namesFromHeader = cookieHeader
+      .split(";")
+      .map((part) => part.trim())
+      .map((part) => {
+        const eq = part.indexOf("=");
+        return eq === -1 ? "" : part.slice(0, eq).trim();
+      })
+      .filter(Boolean);
+
+    const cookieOptionsNoDomain = { ...cookieOptions, domain: undefined };
+
+    const cookieNamesToDelete = new Set<string>([
+      accessTokenCookieName,
+      refreshTokenCookieName,
+      ...namesFromHeader.filter(
+        (name) =>
+          name.startsWith("sb-") &&
+          (name.endsWith("-access-token") ||
+            name.endsWith("-refresh-token") ||
+            name.endsWith("-code-verifier")),
+      ),
+    ]);
+
+    for (const name of cookieNamesToDelete) {
+      deleteCookie(c, name, cookieOptions);
+      deleteCookie(c, name, cookieOptionsNoDomain);
+    }
 
     return c.json({ ok: true });
   });

@@ -15,8 +15,14 @@ export async function proxy(request: NextRequest) {
       ?.name ?? "",
   )?.value;
 
-  // If not authenticated and not on login/register page, redirect to login
-  if (!accessToken && pathname !== "/login" && pathname !== "/register") {
+  // Public auth pages that don't require authentication
+  const publicAuthPages = ["/login", "/register", "/auth/check-email"];
+  const isPublicAuthPage = publicAuthPages.some(
+    (page) => pathname === page || pathname.startsWith(page + "/"),
+  );
+
+  // If not authenticated and not on a public auth page, redirect to login
+  if (!accessToken && !isPublicAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     const safeRedirect = getSafeRedirect(
@@ -26,8 +32,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If authenticated and on login page, redirect to home
-  if (accessToken && pathname === "/login") {
+  // If authenticated and on a public auth page, redirect to home
+  if (accessToken && isPublicAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.searchParams.delete("redirect");

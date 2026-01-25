@@ -77,7 +77,17 @@
     "loginFailed": "Échec de la connexion",
     "unexpectedError": "Une erreur inattendue s'est produite",
     "checkEmailConfirmation": "Vérifiez votre e-mail pour confirmer votre compte. Après confirmation, connectez-vous.",
-    "accountCreatedSignIn": "Compte créé avec succès. Veuillez vous connecter pour continuer."
+    "accountCreatedSignIn": "Compte créé avec succès. Veuillez vous connecter pour continuer.",
+    "welcomeTitle": "Bienvenue !",
+    "welcomeGreeting": "Bonjour, {name} !",
+    "welcomeBody": "Votre compte a été créé avec succès. Vous pouvez maintenant commencer à explorer et à vous connecter avec des partenaires linguistiques.",
+    "continue": "Continuer",
+    "completeProfile": "Compléter votre profil",
+    "checkEmailTitle": "Vérifiez votre e-mail",
+    "checkEmailBody": "Nous avons envoyé un lien de confirmation à votre adresse e-mail. Cliquez sur le lien dans l'e-mail pour vérifier votre compte et terminer l'inscription.",
+    "openEmailApp": "Ouvrir l'application e-mail",
+    "checkEmailTip": "Vous n'avez pas reçu l'e-mail ? Vérifiez votre dossier spam ou attendez quelques minutes.",
+    "wrongEmail": "Mauvaise adresse e-mail ? Inscrivez-vous à nouveau"
   },
   "settings": {
     "title": "Paramètres",

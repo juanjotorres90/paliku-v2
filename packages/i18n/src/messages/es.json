@@ -77,7 +77,17 @@
     "loginFailed": "Error al iniciar sesión",
     "unexpectedError": "Ocurrió un error inesperado",
     "checkEmailConfirmation": "Revisa tu correo para confirmar tu cuenta. Después de confirmar, inicia sesión.",
-    "accountCreatedSignIn": "Cuenta creada exitosamente. Por favor inicia sesión para continuar."
+    "accountCreatedSignIn": "Cuenta creada exitosamente. Por favor inicia sesión para continuar.",
+    "welcomeTitle": "¡Bienvenido!",
+    "welcomeGreeting": "¡Hola, {name}!",
+    "welcomeBody": "Tu cuenta ha sido creada exitosamente. Ahora puedes comenzar a explorar y conectar con compañeros de idiomas.",
+    "continue": "Continuar",
+    "completeProfile": "Completa tu perfil",
+    "checkEmailTitle": "Revisa tu correo",
+    "checkEmailBody": "Hemos enviado un enlace de confirmación a tu dirección de correo electrónico. Haz clic en el enlace del correo para verificar tu cuenta y completar el registro.",
+    "openEmailApp": "Abrir aplicación de correo",
+    "checkEmailTip": "¿No recibiste el correo? Revisa tu carpeta de spam o espera unos minutos.",
+    "wrongEmail": "¿Correo incorrecto? Regístrate nuevamente"
   },
   "settings": {
     "title": "Configuración",

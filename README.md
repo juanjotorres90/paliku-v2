@@ -20,6 +20,7 @@ shared packages for UI, validators, and tooling.
 - `packages/ui` - shared React component library + global styles
 - `packages/validators` - shared Zod schemas (API + web)
 - `packages/db` - Supabase/Postgres SQL artifacts
+- `packages/i18n` - internationalization (next-intl, 8 locales)
 - `packages/tailwind-config` - shared Tailwind v4 tokens + PostCSS config
 - `packages/eslint-config`, `packages/typescript-config` - shared tooling
 

@@ -77,7 +77,17 @@
     "loginFailed": "Accesso fallito",
     "unexpectedError": "Si è verificato un errore imprevisto",
     "checkEmailConfirmation": "Controlla la tua e-mail per confermare l'account. Dopo la conferma, effettua l'accesso.",
-    "accountCreatedSignIn": "Account creato con successo. Accedi per continuare."
+    "accountCreatedSignIn": "Account creato con successo. Accedi per continuare.",
+    "welcomeTitle": "Benvenuto!",
+    "welcomeGreeting": "Ciao, {name}!",
+    "welcomeBody": "Il tuo account è stato creato con successo. Ora puoi iniziare a esplorare e connetterti con partner linguistici.",
+    "continue": "Continua",
+    "completeProfile": "Completa il tuo profilo",
+    "checkEmailTitle": "Controlla la tua e-mail",
+    "checkEmailBody": "Abbiamo inviato un link di conferma al tuo indirizzo e-mail. Clicca sul link nell'e-mail per verificare il tuo account e completare la registrazione.",
+    "openEmailApp": "Apri app e-mail",
+    "checkEmailTip": "Non hai ricevuto l'e-mail? Controlla la cartella spam o attendi qualche minuto.",
+    "wrongEmail": "E-mail sbagliata? Registrati di nuovo"
   },
   "settings": {
     "title": "Impostazioni",

@@ -77,7 +77,17 @@
     "loginFailed": "Falha ao entrar",
     "unexpectedError": "Ocorreu um erro inesperado",
     "checkEmailConfirmation": "Verifique seu e-mail para confirmar sua conta. Após confirmar, faça login.",
-    "accountCreatedSignIn": "Conta criada com sucesso. Por favor, faça login para continuar."
+    "accountCreatedSignIn": "Conta criada com sucesso. Por favor, faça login para continuar.",
+    "welcomeTitle": "Bem-vindo!",
+    "welcomeGreeting": "Olá, {name}!",
+    "welcomeBody": "Sua conta foi criada com sucesso. Agora você pode começar a explorar e se conectar com parceiros de idiomas.",
+    "continue": "Continuar",
+    "completeProfile": "Completar seu perfil",
+    "checkEmailTitle": "Verifique seu e-mail",
+    "checkEmailBody": "Enviamos um link de confirmação para o seu endereço de e-mail. Clique no link no e-mail para verificar sua conta e concluir o cadastro.",
+    "openEmailApp": "Abrir app de e-mail",
+    "checkEmailTip": "Não recebeu o e-mail? Verifique sua pasta de spam ou aguarde alguns minutos.",
+    "wrongEmail": "E-mail errado? Cadastre-se novamente"
   },
   "settings": {
     "title": "Configurações",

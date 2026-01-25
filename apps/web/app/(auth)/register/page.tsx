@@ -25,16 +25,15 @@ function RegisterPageContent() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setSuccess(null);
     setLoading(true);
 
-    const redirectTo = getSafeRedirect(searchParams.get("redirect"));
+    const finalNext = getSafeRedirect(searchParams.get("redirect"));
+    const postRegister = `/welcome?next=${encodeURIComponent(finalNext)}`;
 
     if (password !== confirmPassword) {
       setError(t("passwordsDoNotMatch"));
@@ -46,7 +45,7 @@ function RegisterPageContent() {
       email,
       password,
       displayName,
-      redirectTo,
+      redirectTo: postRegister,
     });
 
     if (!parsed.success) {
@@ -92,8 +91,9 @@ function RegisterPageContent() {
       }
 
       if (isRecord(json) && json.needsEmailConfirmation === true) {
-        setSuccess(t("checkEmailConfirmation"));
-        setLoading(false);
+        router.replace(
+          `/auth/check-email?next=${encodeURIComponent(finalNext)}`,
+        );
         return;
       }
 
@@ -118,13 +118,13 @@ function RegisterPageContent() {
           console.warn("Failed to fetch settings after registration");
         }
 
-        router.replace(redirectTo);
+        router.replace(postRegister);
         router.refresh();
         return;
       }
 
-      setSuccess(t("accountCreatedSignIn"));
-      setLoading(false);
+      // Auto-login failed - redirect to login with the welcome flow preserved
+      router.replace(`/login?redirect=${encodeURIComponent(postRegister)}`);
     } catch {
       setError(t("unexpectedError"));
       setLoading(false);
@@ -215,12 +215,6 @@ function RegisterPageContent() {
           {error && (
             <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
               {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="text-sm text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 p-3 rounded-md">
-              {success}
             </div>
           )}
 

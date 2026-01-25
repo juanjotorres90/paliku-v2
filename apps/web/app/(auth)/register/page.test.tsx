@@ -144,9 +144,7 @@ describe("RegisterPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Check your email to confirm your account/),
-      ).toBeInTheDocument();
+      expect(mockReplace).toHaveBeenCalledWith("/auth/check-email?next=%2F");
     });
   });
 
@@ -181,7 +179,7 @@ describe("RegisterPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith("/");
+      expect(mockReplace).toHaveBeenCalledWith("/welcome?next=%2F");
       expect(mockRefresh).toHaveBeenCalled();
     });
   });
@@ -217,9 +215,9 @@ describe("RegisterPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Account created successfully/),
-      ).toBeInTheDocument();
+      expect(mockReplace).toHaveBeenCalledWith(
+        "/login?redirect=%2Fwelcome%3Fnext%3D%252F",
+      );
     });
   });
 
@@ -401,7 +399,7 @@ describe("RegisterPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith("/");
+      expect(mockReplace).toHaveBeenCalledWith("/welcome?next=%2F");
     });
   });
 
@@ -437,7 +435,7 @@ describe("RegisterPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith("/");
+      expect(mockReplace).toHaveBeenCalledWith("/welcome?next=%2F");
     });
   });
 
@@ -564,7 +562,7 @@ describe("RegisterPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith("/dashboard");
+      expect(mockReplace).toHaveBeenCalledWith("/welcome?next=%2Fdashboard");
     });
   });
 });

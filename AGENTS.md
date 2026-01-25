@@ -12,6 +12,7 @@
 - `packages/validators`: shared Zod schemas.
 - `packages/db`: Supabase/Postgres SQL artifacts.
 - `packages/tailwind-config`: shared Tailwind v4 CSS tokens + PostCSS config (`@repo/tailwind-config/postcss`).
+- `packages/i18n`: internationalization (next-intl messages + utilities).
 - `packages/eslint-config`, `packages/typescript-config`: shared tooling configs.
 - Monorepo tooling: `pnpm-workspace.yaml` + `turbo.json`.
 
@@ -74,7 +75,13 @@ For the complete 40+ rule guide with code examples, load the `REACT_BEST_PRACTIC
 
 ## Testing Guidelines
 
-No test framework is configured yet (no `test` scripts, no coverage gates). If you add tests, colocate them (`*.test.ts(x)`) and wire a package-level test script; Vitest is the preferred default.
+Vitest + React Testing Library is configured for the web app:
+
+- `pnpm test`: run all tests
+- `pnpm test:watch`: run tests in watch mode
+- `pnpm -C apps/web test`: run web app tests only
+
+Tests are colocated (`*.test.tsx`) and cover auth flows, page components, user context, and utilities. When adding new features, include tests for critical paths.
 
 ## Commit & Pull Request Guidelines
 

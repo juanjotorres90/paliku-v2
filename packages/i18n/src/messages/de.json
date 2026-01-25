@@ -77,7 +77,17 @@
     "loginFailed": "Anmeldung fehlgeschlagen",
     "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
     "checkEmailConfirmation": "Überprüfe deine E-Mail, um dein Konto zu bestätigen. Nach der Bestätigung melde dich bitte an.",
-    "accountCreatedSignIn": "Konto erfolgreich erstellt. Bitte melde dich an, um fortzufahren."
+    "accountCreatedSignIn": "Konto erfolgreich erstellt. Bitte melde dich an, um fortzufahren.",
+    "welcomeTitle": "Willkommen!",
+    "welcomeGreeting": "Hallo, {name}!",
+    "welcomeBody": "Dein Konto wurde erfolgreich erstellt. Du kannst jetzt anfangen zu erkunden und dich mit Sprachpartnern zu verbinden.",
+    "continue": "Weiter",
+    "completeProfile": "Profil vervollständigen",
+    "checkEmailTitle": "Überprüfe deine E-Mail",
+    "checkEmailBody": "Wir haben einen Bestätigungslink an deine E-Mail-Adresse gesendet. Klicke auf den Link in der E-Mail, um dein Konto zu verifizieren und die Registrierung abzuschließen.",
+    "openEmailApp": "E-Mail-App öffnen",
+    "checkEmailTip": "E-Mail nicht erhalten? Überprüfe deinen Spam-Ordner oder warte ein paar Minuten.",
+    "wrongEmail": "Falsche E-Mail? Registriere dich erneut"
   },
   "settings": {
     "title": "Einstellungen",

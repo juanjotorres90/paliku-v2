@@ -51,6 +51,7 @@ packages/
 ├── ui/           # Shared React component library
 ├── validators/   # Shared Zod schemas
 ├── db/           # Supabase/Postgres SQL artifacts
+├── i18n/         # Internationalization (next-intl messages + utilities)
 ├── tailwind-config/  # Shared Tailwind v4 configuration
 ├── eslint-config/     # Shared ESLint flat configs
 └── typescript-config/ # Shared TypeScript configs
@@ -100,4 +101,31 @@ packages/
 
 ## Testing
 
-No testing framework is currently configured. When adding tests, prefer Vitest for compatibility with Turborepo and modern tooling.
+Vitest is configured for the web app with React Testing Library:
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Run tests for specific app
+pnpm -C apps/web test
+```
+
+Tests are colocated with source files (`*.test.tsx`). The web app has comprehensive coverage for:
+
+- Auth flows (login, register, check-email)
+- User context and providers
+- Page components (home, people, chats, profile, settings, welcome)
+- Utility functions (redirect sanitization)
+
+## Internationalization (i18n)
+
+The `@repo/i18n` package provides translations via `next-intl`:
+
+- Locale files: `packages/i18n/src/messages/{en,es,fr,de,it,pt,ru,ca}.json`
+- Namespaces: `common`, `auth`, `nav`, `settings`, `profile`, `pages`, `validation`, `api.errors`
+- Usage: `const t = useTranslations("namespace")` in client components
+- Middleware handles locale detection and cookie persistence

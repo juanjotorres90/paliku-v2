@@ -77,7 +77,17 @@
     "loginFailed": "Failed to sign in",
     "unexpectedError": "An unexpected error occurred",
     "checkEmailConfirmation": "Check your email to confirm your account. After confirming, please sign in.",
-    "accountCreatedSignIn": "Account created successfully. Please sign in to continue."
+    "accountCreatedSignIn": "Account created successfully. Please sign in to continue.",
+    "welcomeTitle": "Welcome!",
+    "welcomeGreeting": "Hi, {name}!",
+    "welcomeBody": "Your account has been created successfully. You can now start exploring and connecting with language partners.",
+    "continue": "Continue",
+    "completeProfile": "Complete your profile",
+    "checkEmailTitle": "Check your email",
+    "checkEmailBody": "We've sent a confirmation link to your email address. Click the link in the email to verify your account and complete registration.",
+    "openEmailApp": "Open email app",
+    "checkEmailTip": "Didn't receive the email? Check your spam folder or wait a few minutes.",
+    "wrongEmail": "Wrong email? Register again"
   },
   "settings": {
     "title": "Settings",

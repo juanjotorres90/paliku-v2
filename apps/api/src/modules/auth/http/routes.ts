@@ -347,15 +347,14 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
         deleteCookie(c, refreshTokenCookieName, cookieOptions);
       }
 
-      // Best-effort: persist initial locale based on the current request locale.
-      // Only sets it if the user is still on the default locale.
-      await persistInitialLocale({
-        accessToken: tokens.accessToken,
-        requestLocale: getLocale(c),
-        settingsRepo,
-      });
-
-      return c.redirect(`${webOrigin}${next}`);
+      // Email verified via PKCE exchange. Redirect to login with verified flag
+      // so user can sign in manually and see the confirmation message.
+      const loginUrl = new URL(`${webOrigin}/login`);
+      loginUrl.searchParams.set("verified", "true");
+      if (next && next !== "/") {
+        loginUrl.searchParams.set("redirect", next);
+      }
+      return c.redirect(loginUrl.toString());
     } catch (err) {
       return c.redirect(
         `${webOrigin}?error=${

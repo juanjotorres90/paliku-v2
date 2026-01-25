@@ -156,7 +156,7 @@ describe("WelcomePage", () => {
     const profileLink = screen.getByRole("link", {
       name: "Complete your profile",
     });
-    expect(profileLink).toHaveAttribute("href", "/profile");
+    expect(profileLink).toHaveAttribute("href", "/profile/settings");
   });
 
   it("handles user without display name", async () => {

@@ -83,6 +83,7 @@ function LoginPageContent() {
   };
 
   const redirectParam = getSafeRedirect(searchParams.get("redirect"));
+  const verified = searchParams.get("verified") === "true";
   const registerHref =
     redirectParam === "/"
       ? "/register"
@@ -94,6 +95,11 @@ function LoginPageContent() {
         <div className="text-center">
           <h1 className="text-2xl font-bold">{t("signIn")}</h1>
           <p className="text-muted-foreground mt-2">{t("signInDescription")}</p>
+          {verified && (
+            <p className="text-sm text-green-600 dark:text-green-400 mt-2 bg-green-50 dark:bg-green-950 p-2 rounded-md">
+              {t("emailVerified")}
+            </p>
+          )}
           <p className="text-sm text-muted-foreground mt-2">
             {t("newHere")}{" "}
             <Link href={registerHref} className="underline underline-offset-4">

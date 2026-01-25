@@ -87,7 +87,8 @@
     "checkEmailBody": "Hemos enviado un enlace de confirmación a tu dirección de correo electrónico. Haz clic en el enlace del correo para verificar tu cuenta y completar el registro.",
     "openEmailApp": "Abrir aplicación de correo",
     "checkEmailTip": "¿No recibiste el correo? Revisa tu carpeta de spam o espera unos minutos.",
-    "wrongEmail": "¿Correo incorrecto? Regístrate nuevamente"
+    "wrongEmail": "¿Correo incorrecto? Regístrate nuevamente",
+    "emailVerified": "¡Tu correo electrónico ha sido verificado! Inicia sesión para continuar."
   },
   "settings": {
     "title": "Configuración",

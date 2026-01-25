@@ -87,7 +87,8 @@
     "checkEmailBody": "We've sent a confirmation link to your email address. Click the link in the email to verify your account and complete registration.",
     "openEmailApp": "Open email app",
     "checkEmailTip": "Didn't receive the email? Check your spam folder or wait a few minutes.",
-    "wrongEmail": "Wrong email? Register again"
+    "wrongEmail": "Wrong email? Register again",
+    "emailVerified": "Your email has been verified! Please sign in to continue."
   },
   "settings": {
     "title": "Settings",

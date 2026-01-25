@@ -87,7 +87,8 @@
     "checkEmailBody": "Wir haben einen Bestätigungslink an deine E-Mail-Adresse gesendet. Klicke auf den Link in der E-Mail, um dein Konto zu verifizieren und die Registrierung abzuschließen.",
     "openEmailApp": "E-Mail-App öffnen",
     "checkEmailTip": "E-Mail nicht erhalten? Überprüfe deinen Spam-Ordner oder warte ein paar Minuten.",
-    "wrongEmail": "Falsche E-Mail? Registriere dich erneut"
+    "wrongEmail": "Falsche E-Mail? Registriere dich erneut",
+    "emailVerified": "Deine E-Mail wurde verifiziert! Bitte melde dich an, um fortzufahren."
   },
   "settings": {
     "title": "Einstellungen",

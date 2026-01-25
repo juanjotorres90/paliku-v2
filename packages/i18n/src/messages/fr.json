@@ -87,7 +87,8 @@
     "checkEmailBody": "Nous avons envoyé un lien de confirmation à votre adresse e-mail. Cliquez sur le lien dans l'e-mail pour vérifier votre compte et terminer l'inscription.",
     "openEmailApp": "Ouvrir l'application e-mail",
     "checkEmailTip": "Vous n'avez pas reçu l'e-mail ? Vérifiez votre dossier spam ou attendez quelques minutes.",
-    "wrongEmail": "Mauvaise adresse e-mail ? Inscrivez-vous à nouveau"
+    "wrongEmail": "Mauvaise adresse e-mail ? Inscrivez-vous à nouveau",
+    "emailVerified": "Votre e-mail a été vérifié ! Veuillez vous connecter pour continuer."
   },
   "settings": {
     "title": "Paramètres",

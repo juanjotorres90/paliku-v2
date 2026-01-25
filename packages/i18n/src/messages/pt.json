@@ -87,7 +87,8 @@
     "checkEmailBody": "Enviamos um link de confirmação para o seu endereço de e-mail. Clique no link no e-mail para verificar sua conta e concluir o cadastro.",
     "openEmailApp": "Abrir app de e-mail",
     "checkEmailTip": "Não recebeu o e-mail? Verifique sua pasta de spam ou aguarde alguns minutos.",
-    "wrongEmail": "E-mail errado? Cadastre-se novamente"
+    "wrongEmail": "E-mail errado? Cadastre-se novamente",
+    "emailVerified": "Seu e-mail foi verificado! Faça login para continuar."
   },
   "settings": {
     "title": "Configurações",

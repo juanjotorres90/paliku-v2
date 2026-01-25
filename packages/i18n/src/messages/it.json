@@ -87,7 +87,8 @@
     "checkEmailBody": "Abbiamo inviato un link di conferma al tuo indirizzo e-mail. Clicca sul link nell'e-mail per verificare il tuo account e completare la registrazione.",
     "openEmailApp": "Apri app e-mail",
     "checkEmailTip": "Non hai ricevuto l'e-mail? Controlla la cartella spam o attendi qualche minuto.",
-    "wrongEmail": "E-mail sbagliata? Registrati di nuovo"
+    "wrongEmail": "E-mail sbagliata? Registrati di nuovo",
+    "emailVerified": "La tua email è stata verificata! Accedi per continuare."
   },
   "settings": {
     "title": "Impostazioni",

@@ -87,7 +87,8 @@
     "checkEmailBody": "Hem enviat un enllaç de confirmació a la teva adreça de correu electrònic. Fes clic a l'enllaç del correu per verificar el teu compte i completar el registre.",
     "openEmailApp": "Obre l'aplicació de correu",
     "checkEmailTip": "No has rebut el correu? Comprova la carpeta de correu brossa o espera uns minuts.",
-    "wrongEmail": "Correu incorrecte? Registra't de nou"
+    "wrongEmail": "Correu incorrecte? Registra't de nou",
+    "emailVerified": "El teu correu electrònic s'ha verificat! Inicia la sessió per continuar."
   },
   "settings": {
     "title": "Configuració",

@@ -1,10 +1,10 @@
 "use client";
 
+import { Button } from "@repo/ui/components/button";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { useTranslations } from "next-intl";
-import { Button } from "@repo/ui/components/button";
 import { getSafeRedirect } from "../../../lib/redirect";
 import { useUser } from "../../user-context";
 
@@ -42,7 +42,7 @@ function WelcomePageContent() {
             {t("continue")}
           </Button>
           <Button asChild variant="outline" className="w-full" size="lg">
-            <Link href="/profile">{t("completeProfile")}</Link>
+            <Link href="/profile/settings">{t("completeProfile")}</Link>
           </Button>
         </div>
       </div>

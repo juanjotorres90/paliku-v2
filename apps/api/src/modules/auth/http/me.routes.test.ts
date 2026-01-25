@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { Hono } from "hono";
 import { createMeRoutes } from "./me.routes";
 import type { RouteEnv } from "../../../http/context";
+import { ErrorCode } from "@repo/validators/error-codes";
 
 describe("createMeRoutes", () => {
   it("should return user info for valid JWT", async () => {
@@ -44,9 +45,7 @@ describe("createMeRoutes", () => {
 
     expect(res.status).toBe(401);
     const data = await res.json();
-    expect(data).toEqual({
-      error: "api.errors.auth.token_invalid",
-      errorKey: "api.errors.auth.token_invalid",
-    });
+    expect(data).toHaveProperty("error");
+    expect(data.code).toBe(ErrorCode.AUTH_TOKEN_INVALID);
   });
 });

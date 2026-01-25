@@ -3,13 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { RegisterRequestSchema } from "@repo/validators/auth";
 import { getSafeRedirect } from "../../../lib/redirect";
-import { apiFetch, apiFetchWithRefresh } from "../../lib/api";
+import { apiFetch, apiFetchWithRefresh, clearLogoutState } from "../../lib/api";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -27,6 +27,11 @@ function RegisterPageContent() {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Clear any logout-in-progress state when register page mounts
+  useEffect(() => {
+    clearLogoutState();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

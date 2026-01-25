@@ -4,8 +4,26 @@ import { parseJsonBody } from "../../../http/utils/parse-json";
 import {
   mapErrorToStatus,
   formatErrorI18n,
-} from "../../../http/utils/error-mapper";
+  ErrorCode,
+} from "../../../http/utils/error-i18n";
+import {
+  ErrorCodeToKey,
+  ErrorCodeFallbacks,
+  type ErrorCodeValue,
+} from "@repo/validators/error-codes";
 import { getT } from "../../../http/utils/i18n";
+
+function makeErrorResponse(
+  t: (key: string) => string,
+  code: ErrorCodeValue,
+): { error: string; code: ErrorCodeValue } {
+  const errorKey = ErrorCodeToKey[code];
+  const translated = t(errorKey);
+  return {
+    error: translated === errorKey ? ErrorCodeFallbacks[code] : translated,
+    code,
+  };
+}
 import type { AppConfig } from "../../../server/config";
 import type {
   AvatarFile,
@@ -61,13 +79,7 @@ export function createProfileRoutes(
 
     const body = await parseJsonBody(c);
     if (!body.ok) {
-      return c.json(
-        {
-          error: t("api.errors.request.invalid_json"),
-          errorKey: "api.errors.request.invalid_json",
-        },
-        400,
-      );
+      return c.json(makeErrorResponse(t, ErrorCode.REQUEST_INVALID_JSON), 400);
     }
 
     const { ProfileUpsertSchema } = await import("@repo/validators/profile");
@@ -75,8 +87,7 @@ export function createProfileRoutes(
     if (!parsed.success) {
       return c.json(
         {
-          error: t("api.errors.request.invalid_request"),
-          errorKey: "api.errors.request.invalid_request",
+          ...makeErrorResponse(t, ErrorCode.REQUEST_INVALID_REQUEST),
           issues: parsed.error.flatten(),
         },
         400,
@@ -123,23 +134,11 @@ export function createProfileRoutes(
     const file = formData.get("file");
 
     if (!file) {
-      return c.json(
-        {
-          error: t("api.errors.profile.missing_file"),
-          errorKey: "api.errors.profile.missing_file",
-        },
-        400,
-      );
+      return c.json(makeErrorResponse(t, ErrorCode.PROFILE_MISSING_FILE), 400);
     }
 
     if (!(file instanceof File)) {
-      return c.json(
-        {
-          error: t("api.errors.profile.invalid_file"),
-          errorKey: "api.errors.profile.invalid_file",
-        },
-        400,
-      );
+      return c.json(makeErrorResponse(t, ErrorCode.PROFILE_INVALID_FILE), 400);
     }
 
     const bytes = Buffer.from(await file.arrayBuffer());

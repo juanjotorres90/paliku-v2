@@ -2,6 +2,11 @@ import { createMiddleware } from "hono/factory";
 import { RateLimitError } from "../../shared/domain/errors";
 import type { RouteEnv } from "../context";
 import { getT } from "../utils/i18n";
+import {
+  ErrorCode,
+  ErrorCodeToKey,
+  ErrorCodeFallbacks,
+} from "@repo/validators/error-codes";
 
 interface RateLimitStore {
   count: number;
@@ -46,10 +51,14 @@ export function createRateLimiter(options: {
         Math.ceil((store.resetTime - now) / 1000),
       );
       const t = getT(c);
+      const code = ErrorCode.REQUEST_RATE_LIMITED;
+      const errorKey = ErrorCodeToKey[code];
+      const translated = t(errorKey);
       return c.json(
         {
-          error: t("api.errors.request.rate_limited"),
-          errorKey: "api.errors.request.rate_limited",
+          error:
+            translated === errorKey ? ErrorCodeFallbacks[code] : translated,
+          code,
           retryAfter: error.retryAfter,
         },
         429,

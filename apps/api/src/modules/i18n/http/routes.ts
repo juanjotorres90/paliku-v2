@@ -5,9 +5,27 @@ import { getT } from "../../../http/utils/i18n";
 import { isLocale, LOCALES, AUTONYMS, type Locale } from "@repo/i18n";
 import { setLocaleCookie } from "../../settings/http/locale-cookie";
 import type { AppConfig } from "../../../server/config";
+import {
+  ErrorCode,
+  ErrorCodeToKey,
+  ErrorCodeFallbacks,
+  type ErrorCodeValue,
+} from "@repo/validators/error-codes";
 
 interface I18nRoutesContext {
   config: AppConfig;
+}
+
+function makeErrorResponse(
+  t: (key: string) => string,
+  code: ErrorCodeValue,
+): { error: string; code: ErrorCodeValue } {
+  const errorKey = ErrorCodeToKey[code];
+  const translated = t(errorKey);
+  return {
+    error: translated === errorKey ? ErrorCodeFallbacks[code] : translated,
+    code,
+  };
 }
 
 export function createI18nRoutes(ctx: I18nRoutesContext) {
@@ -31,13 +49,7 @@ export function createI18nRoutes(ctx: I18nRoutesContext) {
     const t = getT(c);
     const body = await parseJsonBody(c);
     if (!body.ok) {
-      return c.json(
-        {
-          error: t("api.errors.request.invalid_json"),
-          errorKey: "api.errors.request.invalid_json",
-        },
-        400,
-      );
+      return c.json(makeErrorResponse(t, ErrorCode.REQUEST_INVALID_JSON), 400);
     }
 
     const value = body.value;
@@ -48,10 +60,7 @@ export function createI18nRoutes(ctx: I18nRoutesContext) {
       typeof value.locale !== "string"
     ) {
       return c.json(
-        {
-          error: t("api.errors.request.invalid_request"),
-          errorKey: "api.errors.request.invalid_request",
-        },
+        makeErrorResponse(t, ErrorCode.REQUEST_INVALID_REQUEST),
         400,
       );
     }

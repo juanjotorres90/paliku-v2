@@ -1,3 +1,11 @@
+import { ErrorCode, isTokenInvalidCode } from "@repo/validators/error-codes";
+
+// Re-export for convenience
+export { ErrorCode };
+
+// Session storage key to prevent logout loops
+const LOGOUT_IN_PROGRESS_KEY = "paliku:logout_in_progress";
+
 function normalizePath(path: string): string {
   if (!path) return "/";
   if (path.startsWith("/")) return path;
@@ -60,26 +68,55 @@ function isMeEndpoint(path: string): boolean {
   return normalized.endsWith("/me");
 }
 
-async function isTokenInvalid(response: Response): Promise<boolean> {
+function getErrorCode(json: unknown): number | null {
+  if (!isRecord(json)) return null;
+  if (typeof json.code === "number") return json.code;
+  return null;
+}
+
+async function parseErrorCode(response: Response): Promise<number | null> {
   try {
     const contentType = response.headers.get("content-type") ?? "";
-    if (!contentType.includes("application/json")) return false;
+    if (!contentType.includes("application/json")) return null;
 
     const json: unknown = await response.clone().json();
-    if (!isRecord(json)) return false;
+    return getErrorCode(json);
+  } catch {
+    return null;
+  }
+}
 
-    return (
-      json.errorKey === "api.errors.auth.token_invalid" ||
-      json.error === "api.errors.auth.token_invalid"
-    );
+function isLogoutInProgress(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem(LOGOUT_IN_PROGRESS_KEY) === "true";
   } catch {
     return false;
   }
 }
 
+function setLogoutInProgress(value: boolean): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (value) {
+      sessionStorage.setItem(LOGOUT_IN_PROGRESS_KEY, "true");
+    } else {
+      sessionStorage.removeItem(LOGOUT_IN_PROGRESS_KEY);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 async function clientSignoutAndGoToLogin(): Promise<void> {
   if (typeof window === "undefined") return;
+
+  // Prevent infinite loops: if we're already in the middle of a logout
+  // (including across page reloads), don't start another one
   if (logoutInFlight) return logoutInFlight;
+  if (isLogoutInProgress()) return;
+
+  setLogoutInProgress(true);
 
   logoutInFlight = (async () => {
     try {
@@ -109,13 +146,30 @@ async function clientSignoutAndGoToLogin(): Promise<void> {
     const isJsdom = window.navigator.userAgent.includes("jsdom");
     if (isJsdom) {
       window.history.replaceState({}, "", href);
+      logoutInFlight = null;
+      setLogoutInProgress(false);
       return;
     }
 
+    // Clear the flag before redirect - the login page will clear it on successful load
+    // This ensures that if redirect fails, we don't stay stuck
+    setLogoutInProgress(false);
+    logoutInFlight = null;
     window.location.replace(href);
   })();
 
   return logoutInFlight;
+}
+
+/**
+ * Clears the logout-in-progress flag. Call this from auth pages (login, register)
+ * when they successfully mount to ensure the flag is cleared after redirect.
+ */
+export function clearLogoutState(): void {
+  setLogoutInProgress(false);
+  logoutInFlight = null;
+  // Also reset refresh failure state to allow fresh auth attempts
+  refreshFailedUntilMs = 0;
 }
 
 export async function apiFetch(
@@ -144,19 +198,22 @@ export async function apiFetchWithRefresh(
 
   const refreshed = await ensureSessionRefreshed(apiUrl);
   if (!refreshed) {
-    if (isMeEndpoint(normalizedPath) && (await isTokenInvalid(firstResponse))) {
-      void clientSignoutAndGoToLogin();
+    if (isMeEndpoint(normalizedPath)) {
+      const errorCode = await parseErrorCode(firstResponse);
+      if (isTokenInvalidCode(errorCode)) {
+        void clientSignoutAndGoToLogin();
+      }
     }
     return firstResponse;
   }
 
   const secondResponse = await fetch(url, withCredentials(init));
   if (secondResponse.status === 401) {
-    if (
-      isMeEndpoint(normalizedPath) &&
-      (await isTokenInvalid(secondResponse))
-    ) {
-      void clientSignoutAndGoToLogin();
+    if (isMeEndpoint(normalizedPath)) {
+      const errorCode = await parseErrorCode(secondResponse);
+      if (isTokenInvalidCode(errorCode)) {
+        void clientSignoutAndGoToLogin();
+      }
     }
   }
 

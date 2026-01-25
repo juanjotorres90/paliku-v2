@@ -7,6 +7,7 @@ import type { JWTVerifierPort } from "../../auth/application/ports";
 import type { AppConfig } from "../../../server/config";
 import type { SettingsRepositoryPort } from "../application/ports";
 import { NotFoundError } from "../../../shared/domain/errors";
+import { ErrorCode } from "@repo/validators/error-codes";
 
 describe("createSettingsRoutes", () => {
   let mockContext: {
@@ -193,7 +194,7 @@ describe("createSettingsRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data.errorKey).toBe("api.errors.request.invalid_json");
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_JSON);
     });
 
     it("should return error for invalid request schema", async () => {
@@ -209,7 +210,7 @@ describe("createSettingsRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data.errorKey).toBe("api.errors.request.invalid_request");
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_REQUEST);
     });
 
     it("should return error for invalid locale", async () => {
@@ -225,7 +226,7 @@ describe("createSettingsRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data.errorKey).toBe("api.errors.request.invalid_request");
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_REQUEST);
     });
 
     it("should return error for invalid theme", async () => {
@@ -241,7 +242,7 @@ describe("createSettingsRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data.errorKey).toBe("api.errors.request.invalid_request");
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_REQUEST);
     });
 
     it.skip("should update only locale - skipped due to schema validation complexity", async () => {

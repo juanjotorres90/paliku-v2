@@ -7,7 +7,13 @@ import { resolveWebOrigin } from "../../../http/utils/origin";
 import {
   mapErrorToStatus,
   formatErrorI18n,
-} from "../../../http/utils/error-mapper";
+  ErrorCode,
+} from "../../../http/utils/error-i18n";
+import {
+  ErrorCodeToKey,
+  ErrorCodeFallbacks,
+  type ErrorCodeValue,
+} from "@repo/validators/error-codes";
 import { getLocale, getT } from "../../../http/utils/i18n";
 import { createRateLimiter } from "../../../http/middleware/rate-limiter";
 import type { LoginInput } from "../application/use-cases/login";
@@ -29,6 +35,18 @@ interface AuthRoutesContext {
   authProvider: AuthProviderPort;
   pkceHelpers: PKCEHelpers;
   settingsRepo: SettingsRepositoryPort;
+}
+
+function makeErrorResponse(
+  t: (key: string) => string,
+  code: ErrorCodeValue,
+): { error: string; code: ErrorCodeValue } {
+  const errorKey = ErrorCodeToKey[code];
+  const translated = t(errorKey);
+  return {
+    error: translated === errorKey ? ErrorCodeFallbacks[code] : translated,
+    code,
+  };
 }
 
 function isSecureRequest(c: Context) {
@@ -65,13 +83,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
 
     const body = await parseJsonBody(c);
     if (!body.ok) {
-      return c.json(
-        {
-          error: t("api.errors.request.invalid_json"),
-          errorKey: "api.errors.request.invalid_json",
-        },
-        400,
-      );
+      return c.json(makeErrorResponse(t, ErrorCode.REQUEST_INVALID_JSON), 400);
     }
 
     const { RegisterRequestSchema } = await import("@repo/validators/auth");
@@ -79,8 +91,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
     if (!parsed.success) {
       return c.json(
         {
-          error: t("api.errors.request.invalid_request"),
-          errorKey: "api.errors.request.invalid_request",
+          ...makeErrorResponse(t, ErrorCode.REQUEST_INVALID_REQUEST),
           issues: parsed.error.flatten(),
         },
         400,
@@ -133,23 +144,14 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
 
     const body = await parseJsonBody(c);
     if (!body.ok) {
-      return c.json(
-        {
-          error: t("api.errors.request.invalid_json"),
-          errorKey: "api.errors.request.invalid_json",
-        },
-        400,
-      );
+      return c.json(makeErrorResponse(t, ErrorCode.REQUEST_INVALID_JSON), 400);
     }
 
     const { LoginRequestSchema } = await import("@repo/validators/auth");
     const parsed = LoginRequestSchema.safeParse(body.value);
     if (!parsed.success) {
       return c.json(
-        {
-          error: t("api.errors.request.invalid_request"),
-          errorKey: "api.errors.request.invalid_request",
-        },
+        makeErrorResponse(t, ErrorCode.REQUEST_INVALID_REQUEST),
         400,
       );
     }
@@ -240,10 +242,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
 
     if (!refreshToken) {
       return c.json(
-        {
-          error: t("api.errors.auth.missing_refresh_token"),
-          errorKey: "api.errors.auth.missing_refresh_token",
-        },
+        makeErrorResponse(t, ErrorCode.AUTH_MISSING_REFRESH_TOKEN),
         401,
       );
     }
@@ -332,13 +331,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
     const safeNext = getSafeNext(nextParam);
 
     if (!code) {
-      return c.json(
-        {
-          error: t("api.errors.auth.missing_code"),
-          errorKey: "api.errors.auth.missing_code",
-        },
-        400,
-      );
+      return c.json(makeErrorResponse(t, ErrorCode.AUTH_MISSING_CODE), 400);
     }
 
     const forwardedProto = c.req.header("x-forwarded-proto");

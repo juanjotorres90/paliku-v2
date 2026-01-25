@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { mapErrorToStatus, formatErrorI18n, formatError } from "./error-i18n";
+import {
+  mapErrorToStatus,
+  formatErrorI18n,
+  formatError,
+  ErrorCode,
+} from "./error-i18n";
 import {
   ValidationError,
   NotFoundError,
@@ -60,7 +65,7 @@ describe("error-i18n", () => {
       const t = vi.fn((key: string) => key);
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.validation.invalid_input");
+      expect(result.code).toBe(ErrorCode.VALIDATION_INVALID_INPUT);
       expect(t).toHaveBeenCalledWith("api.errors.validation.invalid_input");
     });
 
@@ -77,7 +82,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Not found");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.request.not_found");
+      expect(result.code).toBe(ErrorCode.REQUEST_NOT_FOUND);
     });
 
     it("formats AuthenticationError with credentials", () => {
@@ -85,7 +90,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Invalid email or password");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.auth.invalid_credentials");
+      expect(result.code).toBe(ErrorCode.AUTH_INVALID_CREDENTIALS);
     });
 
     it("formats AuthenticationError with confirmation", () => {
@@ -93,7 +98,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Email not confirmed");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.auth.email_not_confirmed");
+      expect(result.code).toBe(ErrorCode.AUTH_EMAIL_NOT_CONFIRMED);
     });
 
     it("formats AuthenticationError with session", () => {
@@ -101,7 +106,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Session expired");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.auth.session_expired");
+      expect(result.code).toBe(ErrorCode.AUTH_SESSION_EXPIRED);
     });
 
     it("formats generic AuthenticationError", () => {
@@ -109,7 +114,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Unauthorized");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.auth.unauthorized");
+      expect(result.code).toBe(ErrorCode.AUTH_UNAUTHORIZED);
     });
 
     it("formats ForbiddenError", () => {
@@ -117,7 +122,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Forbidden");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.auth.forbidden");
+      expect(result.code).toBe(ErrorCode.AUTH_FORBIDDEN);
     });
 
     it("formats PayloadTooLargeError", () => {
@@ -125,7 +130,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Too large");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.request.payload_too_large");
+      expect(result.code).toBe(ErrorCode.REQUEST_PAYLOAD_TOO_LARGE);
     });
 
     it("formats ConflictError with exists", () => {
@@ -133,7 +138,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "User exists");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.auth.user_exists");
+      expect(result.code).toBe(ErrorCode.AUTH_USER_EXISTS);
     });
 
     it("formats generic ConflictError", () => {
@@ -141,7 +146,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Error");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.upstream.unknown_error");
+      expect(result.code).toBe(ErrorCode.UPSTREAM_UNKNOWN_ERROR);
     });
 
     it("formats RateLimitError", () => {
@@ -149,7 +154,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Rate limited");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.request.rate_limited");
+      expect(result.code).toBe(ErrorCode.REQUEST_RATE_LIMITED);
     });
 
     it("includes retryAfter for RateLimitError", () => {
@@ -165,7 +170,7 @@ describe("error-i18n", () => {
       const t = vi.fn(() => "Unknown error");
       const result = formatErrorI18n(error, { t });
 
-      expect(result.errorKey).toBe("api.errors.upstream.unknown_error");
+      expect(result.code).toBe(ErrorCode.UPSTREAM_UNKNOWN_ERROR);
     });
 
     it("uses fallback when translation returns key", () => {

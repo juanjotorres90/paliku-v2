@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { createI18nRoutes } from "./routes";
 import type { RouteEnv } from "../../../http/context";
 import type { AppConfig } from "../../../server/config";
+import { ErrorCode } from "@repo/validators/error-codes";
 
 describe("createI18nRoutes", () => {
   let mockConfig: AppConfig;
@@ -54,10 +55,7 @@ describe("createI18nRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data).toHaveProperty(
-        "errorKey",
-        "api.errors.request.invalid_json",
-      );
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_JSON);
     });
 
     it("should return error for empty body", async () => {
@@ -70,10 +68,7 @@ describe("createI18nRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data).toHaveProperty(
-        "errorKey",
-        "api.errors.request.invalid_request",
-      );
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_REQUEST);
     });
 
     it("should return error for missing locale field", async () => {
@@ -86,10 +81,7 @@ describe("createI18nRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data).toHaveProperty(
-        "errorKey",
-        "api.errors.request.invalid_request",
-      );
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_REQUEST);
     });
 
     it("should return error for non-string locale", async () => {
@@ -102,10 +94,7 @@ describe("createI18nRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data).toHaveProperty(
-        "errorKey",
-        "api.errors.request.invalid_request",
-      );
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_REQUEST);
     });
 
     it("should return error for invalid locale", async () => {
@@ -160,10 +149,7 @@ describe("createI18nRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data).toHaveProperty(
-        "errorKey",
-        "api.errors.request.invalid_request",
-      );
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_REQUEST);
     });
 
     it("should handle malformed JSON", async () => {
@@ -176,10 +162,7 @@ describe("createI18nRoutes", () => {
       expect(res.status).toBe(400);
       const data = await res.json();
       expect(data).toHaveProperty("error");
-      expect(data).toHaveProperty(
-        "errorKey",
-        "api.errors.request.invalid_json",
-      );
+      expect(data.code).toBe(ErrorCode.REQUEST_INVALID_JSON);
     });
   });
 

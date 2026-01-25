@@ -7,6 +7,12 @@ import {
   ConflictError,
   RateLimitError,
 } from "../../shared/domain/errors";
+import {
+  ErrorCode,
+  ErrorCodeToKey,
+  ErrorCodeFallbacks,
+  type ErrorCodeValue,
+} from "@repo/validators/error-codes";
 
 export function mapErrorToStatus(error: unknown): number {
   if (error instanceof ValidationError) return 400;
@@ -19,114 +25,57 @@ export function mapErrorToStatus(error: unknown): number {
   return 500;
 }
 
-type ErrorKey =
-  | "api.errors.request.invalid_json"
-  | "api.errors.request.invalid_request"
-  | "api.errors.request.not_found"
-  | "api.errors.request.rate_limited"
-  | "api.errors.request.payload_too_large"
-  | "api.errors.auth.invalid_credentials"
-  | "api.errors.auth.email_not_confirmed"
-  | "api.errors.auth.user_exists"
-  | "api.errors.auth.session_expired"
-  | "api.errors.auth.token_invalid"
-  | "api.errors.auth.unauthorized"
-  | "api.errors.auth.forbidden"
-  | "api.errors.auth.missing_token"
-  | "api.errors.auth.missing_refresh_token"
-  | "api.errors.upstream.auth_failed"
-  | "api.errors.upstream.database_error"
-  | "api.errors.upstream.storage_error"
-  | "api.errors.upstream.unknown_error"
-  | "api.errors.validation.invalid_input"
-  | "api.errors.profile.not_found"
-  | "api.errors.profile.update_failed"
-  | "api.errors.profile.avatar_upload_failed"
-  | "api.errors.profile.invalid_locale"
-  | "api.errors.profile.missing_file"
-  | "api.errors.profile.invalid_file";
+// Re-export ErrorCode for convenience
+export { ErrorCode };
 
 interface FormatErrorI18nOptions {
   t: (key: string, values?: Record<string, unknown>) => string;
 }
 
-// Fallback messages when translations fail to load
-const ERROR_FALLBACKS: Record<ErrorKey, string> = {
-  "api.errors.request.invalid_json": "Invalid JSON in request body",
-  "api.errors.request.invalid_request": "Invalid request",
-  "api.errors.request.not_found": "Resource not found",
-  "api.errors.request.rate_limited":
-    "Too many requests. Please try again later",
-  "api.errors.request.payload_too_large": "Request payload too large",
-  "api.errors.auth.invalid_credentials": "Invalid email or password",
-  "api.errors.auth.email_not_confirmed": "Email not confirmed",
-  "api.errors.auth.user_exists": "An account with this email already exists",
-  "api.errors.auth.session_expired": "Your session has expired",
-  "api.errors.auth.token_invalid": "Invalid or expired token",
-  "api.errors.auth.unauthorized": "Unauthorized",
-  "api.errors.auth.forbidden": "Forbidden",
-  "api.errors.auth.missing_token": "Missing authentication token",
-  "api.errors.auth.missing_refresh_token": "Missing refresh token",
-  "api.errors.upstream.auth_failed": "Authentication failed",
-  "api.errors.upstream.database_error": "Database error",
-  "api.errors.upstream.storage_error": "Storage error",
-  "api.errors.upstream.unknown_error": "An unexpected error occurred",
-  "api.errors.validation.invalid_input": "Invalid input data",
-  "api.errors.profile.not_found": "Profile not found",
-  "api.errors.profile.update_failed": "Failed to update profile",
-  "api.errors.profile.avatar_upload_failed": "Failed to upload avatar",
-  "api.errors.profile.invalid_locale": "Invalid language preference",
-  "api.errors.profile.missing_file": "No file provided",
-  "api.errors.profile.invalid_file": "Invalid file",
-};
-
 export function formatErrorI18n(
   error: unknown,
   options: FormatErrorI18nOptions,
-): { error: string; errorKey: ErrorKey; [key: string]: unknown } {
+): { error: string; code: ErrorCodeValue; [key: string]: unknown } {
   const { t } = options;
-  let errorKey: ErrorKey = "api.errors.upstream.unknown_error";
+  let code: ErrorCodeValue = ErrorCode.UPSTREAM_UNKNOWN_ERROR;
 
-  // NOTE: Error detection via string matching is fragile and may break if
-  // upstream services change their error messages or localize them.
-  // Consider using error codes if available.
   if (error instanceof ValidationError) {
-    errorKey = "api.errors.validation.invalid_input";
+    code = ErrorCode.VALIDATION_INVALID_INPUT;
   } else if (error instanceof NotFoundError) {
-    errorKey = "api.errors.request.not_found";
+    code = ErrorCode.REQUEST_NOT_FOUND;
   } else if (error instanceof AuthenticationError) {
     if (error.message.includes("credentials")) {
-      errorKey = "api.errors.auth.invalid_credentials";
+      code = ErrorCode.AUTH_INVALID_CREDENTIALS;
     } else if (error.message.includes("confirmed")) {
-      errorKey = "api.errors.auth.email_not_confirmed";
+      code = ErrorCode.AUTH_EMAIL_NOT_CONFIRMED;
     } else if (error.message.includes("session")) {
-      errorKey = "api.errors.auth.session_expired";
+      code = ErrorCode.AUTH_SESSION_EXPIRED;
     } else {
-      errorKey = "api.errors.auth.unauthorized";
+      code = ErrorCode.AUTH_UNAUTHORIZED;
     }
   } else if (error instanceof ForbiddenError) {
-    errorKey = "api.errors.auth.forbidden";
+    code = ErrorCode.AUTH_FORBIDDEN;
   } else if (error instanceof PayloadTooLargeError) {
-    errorKey = "api.errors.request.payload_too_large";
+    code = ErrorCode.REQUEST_PAYLOAD_TOO_LARGE;
   } else if (error instanceof ConflictError) {
     if (error.message.includes("exists")) {
-      errorKey = "api.errors.auth.user_exists";
+      code = ErrorCode.AUTH_USER_EXISTS;
     } else {
-      errorKey = "api.errors.upstream.unknown_error";
+      code = ErrorCode.UPSTREAM_UNKNOWN_ERROR;
     }
   } else if (error instanceof RateLimitError) {
-    errorKey = "api.errors.request.rate_limited";
+    code = ErrorCode.REQUEST_RATE_LIMITED;
   }
 
+  const errorKey = ErrorCodeToKey[code];
   const translated = t(errorKey);
   const result: {
     error: string;
-    errorKey: ErrorKey;
+    code: ErrorCodeValue;
     [key: string]: unknown;
   } = {
-    // Use fallback if translation failed (returns the key itself)
-    error: translated === errorKey ? ERROR_FALLBACKS[errorKey] : translated,
-    errorKey,
+    error: translated === errorKey ? ErrorCodeFallbacks[code] : translated,
+    code,
   };
 
   if (error instanceof ValidationError && error.details) {

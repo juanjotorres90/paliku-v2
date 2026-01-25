@@ -1,1 +1,6 @@
-export { mapErrorToStatus, formatError, formatErrorI18n } from "./error-i18n";
+export {
+  mapErrorToStatus,
+  formatError,
+  formatErrorI18n,
+  ErrorCode,
+} from "./error-i18n";

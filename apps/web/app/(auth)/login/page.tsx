@@ -9,7 +9,7 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { LoginRequestSchema } from "@repo/validators/auth";
 import { getSafeRedirect } from "../../../lib/redirect";
-import { apiFetch, apiFetchWithRefresh } from "../../lib/api";
+import { apiFetch, apiFetchWithRefresh, clearLogoutState } from "../../lib/api";
 
 function LoginPageContent() {
   const router = useRouter();
@@ -22,6 +22,12 @@ function LoginPageContent() {
   const redirectParam = getSafeRedirect(searchParams.get("redirect"));
   const verified = searchParams.get("verified") === "true";
   const code = searchParams.get("code");
+
+  // Clear any logout-in-progress state when login page mounts
+  // This breaks the infinite loop if we got here from an auth error redirect
+  useEffect(() => {
+    clearLogoutState();
+  }, []);
 
   useEffect(() => {
     if (!code || verified) return;

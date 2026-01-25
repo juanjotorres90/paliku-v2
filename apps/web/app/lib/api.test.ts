@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { ErrorCode } from "@repo/validators/error-codes";
 
 function jsonResponse(body: unknown, init: ResponseInit): Response {
   return new Response(JSON.stringify(body), {
@@ -35,8 +36,8 @@ describe("apiFetchWithRefresh", () => {
       if (url.endsWith("/api/profile/me")) {
         return jsonResponse(
           {
-            error: "api.errors.auth.token_invalid",
-            errorKey: "api.errors.auth.token_invalid",
+            error: "Invalid or expired token",
+            code: ErrorCode.AUTH_TOKEN_INVALID,
           },
           { status: 401 },
         );
@@ -44,8 +45,8 @@ describe("apiFetchWithRefresh", () => {
       if (url.endsWith("/api/auth/refresh")) {
         return jsonResponse(
           {
-            error: "api.errors.auth.token_invalid",
-            errorKey: "api.errors.auth.token_invalid",
+            error: "Invalid or expired token",
+            code: ErrorCode.AUTH_TOKEN_INVALID,
           },
           { status: 401 },
         );
@@ -80,8 +81,8 @@ describe("apiFetchWithRefresh", () => {
       if (url.endsWith("/api/settings/me")) {
         return jsonResponse(
           {
-            error: "api.errors.auth.missing_token",
-            errorKey: "api.errors.auth.missing_token",
+            error: "Missing authentication token",
+            code: ErrorCode.AUTH_MISSING_TOKEN,
           },
           { status: 401 },
         );
@@ -89,8 +90,8 @@ describe("apiFetchWithRefresh", () => {
       if (url.endsWith("/api/auth/refresh")) {
         return jsonResponse(
           {
-            error: "api.errors.auth.missing_refresh_token",
-            errorKey: "api.errors.auth.missing_refresh_token",
+            error: "Missing refresh token",
+            code: ErrorCode.AUTH_MISSING_REFRESH_TOKEN,
           },
           { status: 401 },
         );
@@ -119,8 +120,8 @@ describe("apiFetchWithRefresh", () => {
       if (url.endsWith("/api/profile/avatar")) {
         return jsonResponse(
           {
-            error: "api.errors.auth.token_invalid",
-            errorKey: "api.errors.auth.token_invalid",
+            error: "Invalid or expired token",
+            code: ErrorCode.AUTH_TOKEN_INVALID,
           },
           { status: 401 },
         );
@@ -128,8 +129,8 @@ describe("apiFetchWithRefresh", () => {
       if (url.endsWith("/api/auth/refresh")) {
         return jsonResponse(
           {
-            error: "api.errors.auth.token_invalid",
-            errorKey: "api.errors.auth.token_invalid",
+            error: "Invalid or expired token",
+            code: ErrorCode.AUTH_TOKEN_INVALID,
           },
           { status: 401 },
         );

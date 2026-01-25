@@ -155,6 +155,7 @@ describe("createAuthRoutes", () => {
       userId,
       theme: "system",
       locale: "en",
+      welcomeSeen: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
@@ -165,6 +166,7 @@ describe("createAuthRoutes", () => {
       userId,
       theme: "system",
       locale: "es",
+      welcomeSeen: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
@@ -194,7 +196,7 @@ describe("createAuthRoutes", () => {
     expect(mockContext.settingsRepo.updateById).toHaveBeenCalledWith({
       userId,
       accessToken: token,
-      data: { locale: "es" },
+      data: { locale: "es", welcomeSeen: true },
     });
   });
 });

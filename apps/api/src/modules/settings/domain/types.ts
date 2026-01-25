@@ -4,6 +4,7 @@ export interface Settings {
   userId: string;
   theme: Theme;
   locale: string;
+  welcomeSeen: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,4 +17,5 @@ export interface SettingsMeResult {
 export interface UpdateSettingsData {
   locale?: string;
   theme?: Theme;
+  welcomeSeen?: boolean;
 }

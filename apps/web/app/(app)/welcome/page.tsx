@@ -15,6 +15,7 @@ function WelcomePageContent() {
   const { user, loading } = useUser();
 
   const finalNext = getSafeRedirect(searchParams.get("next"));
+  const verified = searchParams.get("verified") === "true";
 
   const handleContinue = () => {
     router.replace(finalNext);
@@ -25,6 +26,11 @@ function WelcomePageContent() {
       <div className="w-full max-w-md space-y-6 text-center">
         <div className="space-y-4">
           <h1 className="text-3xl font-bold">{t("welcomeTitle")}</h1>
+          {verified && (
+            <p className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950 p-2 rounded-md">
+              {t("emailVerified")}
+            </p>
+          )}
           {loading ? (
             <div className="h-6 w-48 mx-auto bg-muted animate-pulse rounded" />
           ) : (

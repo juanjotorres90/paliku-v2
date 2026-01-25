@@ -8,6 +8,7 @@ describe("getSettingsMe", () => {
       userId: "user-123",
       locale: "en",
       theme: "dark" as const,
+      welcomeSeen: false,
       createdAt: "2024-01-01T00:00:00Z",
       updatedAt: "2024-01-01T00:00:00Z",
     };

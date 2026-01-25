@@ -61,6 +61,7 @@ describe("createSettingsRoutes", () => {
         userId: "user-123",
         locale: "en",
         theme: "dark" as const,
+        welcomeSeen: false,
         createdAt: "2024-01-01T00:00:00Z",
         updatedAt: "2024-01-01T00:00:00Z",
       });
@@ -89,6 +90,7 @@ describe("createSettingsRoutes", () => {
           userId: "user-123",
           locale,
           theme: "light" as const,
+          welcomeSeen: false,
           createdAt: "2024-01-01T00:00:00Z",
           updatedAt: "2024-01-01T00:00:00Z",
         });
@@ -114,6 +116,7 @@ describe("createSettingsRoutes", () => {
           userId: "user-123",
           locale: "en",
           theme,
+          welcomeSeen: false,
           createdAt: "2024-01-01T00:00:00Z",
           updatedAt: "2024-01-01T00:00:00Z",
         });
@@ -157,6 +160,7 @@ describe("createSettingsRoutes", () => {
         userId: "user-123",
         locale: "es",
         theme: "dark" as const,
+        welcomeSeen: false,
         createdAt: "2024-01-01T00:00:00Z",
         updatedAt: "2024-01-02T00:00:00Z",
       });
@@ -247,6 +251,7 @@ describe("createSettingsRoutes", () => {
         userId: "user-123",
         locale: "ca",
         theme: "dark" as const,
+        welcomeSeen: false,
         createdAt: "2024-01-01T00:00:00Z",
         updatedAt: "2024-01-02T00:00:00Z",
       });
@@ -272,6 +277,7 @@ describe("createSettingsRoutes", () => {
         userId: "user-123",
         locale: "en",
         theme: "light" as const,
+        welcomeSeen: false,
         createdAt: "2024-01-01T00:00:00Z",
         updatedAt: "2024-01-02T00:00:00Z",
       });

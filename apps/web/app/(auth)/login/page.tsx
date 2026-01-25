@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -18,6 +18,22 @@ function LoginPageContent() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const redirectParam = getSafeRedirect(searchParams.get("redirect"));
+  const verified = searchParams.get("verified") === "true";
+  const code = searchParams.get("code");
+
+  useEffect(() => {
+    if (!code || verified) return;
+
+    const callbackUrl = new URL("/api/auth/callback", window.location.origin);
+    callbackUrl.searchParams.set("code", code);
+
+    if (redirectParam !== "/" && !redirectParam.includes("code=")) {
+      callbackUrl.searchParams.set("next", redirectParam);
+    }
+
+    window.location.replace(callbackUrl.toString());
+  }, [code, redirectParam, verified]);
 
   function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null;
@@ -73,8 +89,24 @@ function LoginPageContent() {
         console.warn("Failed to fetch settings after login");
       }
 
-      const redirectTo = getSafeRedirect(searchParams.get("redirect"));
-      router.replace(redirectTo);
+      let firstLogin = false;
+      if (text) {
+        try {
+          const json: unknown = JSON.parse(text);
+          if (isRecord(json) && json.firstLogin === true) {
+            firstLogin = true;
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      const postLoginHref =
+        firstLogin && !redirectParam.startsWith("/welcome")
+          ? `/welcome?next=${encodeURIComponent(redirectParam)}`
+          : redirectParam;
+
+      router.replace(postLoginHref);
       router.refresh();
     } catch {
       setError(t("unexpectedError"));
@@ -82,8 +114,6 @@ function LoginPageContent() {
     }
   };
 
-  const redirectParam = getSafeRedirect(searchParams.get("redirect"));
-  const verified = searchParams.get("verified") === "true";
   const registerHref =
     redirectParam === "/"
       ? "/register"

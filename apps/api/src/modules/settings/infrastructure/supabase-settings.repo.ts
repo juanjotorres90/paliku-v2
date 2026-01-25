@@ -58,6 +58,7 @@ export function createSupabaseSettingsRepo(
       userId: String(row.user_id),
       theme: String(row.theme ?? "system") as Theme,
       locale: String(row.locale ?? "en"),
+      welcomeSeen: Boolean(row.welcome_seen ?? false),
       createdAt: String(row.created_at ?? new Date().toISOString()),
       updatedAt: String(row.updated_at ?? new Date().toISOString()),
     };
@@ -73,6 +74,7 @@ export function createSupabaseSettingsRepo(
       user_id: input.userId,
       theme: input.data?.theme ?? "system",
       locale: input.data?.locale ?? "en",
+      welcome_seen: input.data?.welcomeSeen ?? false,
     };
 
     const response = await httpClient.post(settingsUrl.toString(), payload, {
@@ -127,6 +129,9 @@ export function createSupabaseSettingsRepo(
     }
     if ("locale" in input.data && input.data.locale !== undefined) {
       payload.locale = input.data.locale;
+    }
+    if ("welcomeSeen" in input.data && input.data.welcomeSeen !== undefined) {
+      payload.welcome_seen = input.data.welcomeSeen;
     }
 
     const response = await httpClient.patch(settingsUrl.toString(), payload, {

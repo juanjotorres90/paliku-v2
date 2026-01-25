@@ -8,6 +8,7 @@ describe("updateSettingsMe", () => {
       userId: "user-123",
       locale: "es",
       theme: "light" as const,
+      welcomeSeen: false,
       createdAt: "2024-01-01T00:00:00Z",
       updatedAt: "2024-01-02T00:00:00Z",
     };
@@ -40,6 +41,7 @@ describe("updateSettingsMe", () => {
       userId: "user-123",
       locale: "es",
       theme: "dark" as const,
+      welcomeSeen: false,
       createdAt: "2024-01-01T00:00:00Z",
       updatedAt: "2024-01-02T00:00:00Z",
     };
@@ -71,6 +73,7 @@ describe("updateSettingsMe", () => {
       userId: "user-123",
       locale: "en",
       theme: "light" as const,
+      welcomeSeen: false,
       createdAt: "2024-01-01T00:00:00Z",
       updatedAt: "2024-01-02T00:00:00Z",
     };
@@ -102,6 +105,7 @@ describe("updateSettingsMe", () => {
       userId: "user-123",
       locale: "en",
       theme: "dark" as const,
+      welcomeSeen: false,
       createdAt: "2024-01-01T00:00:00Z",
       updatedAt: "2024-01-01T00:00:00Z",
     };

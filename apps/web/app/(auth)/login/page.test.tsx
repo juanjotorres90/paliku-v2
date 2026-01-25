@@ -145,6 +145,31 @@ describe("LoginPage", () => {
     });
   });
 
+  it("redirects to welcome on first login", async () => {
+    mockSearchParams = new URLSearchParams("redirect=/people");
+
+    mockFetch.mockResolvedValueOnce({
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve(JSON.stringify({ firstLogin: true })),
+    });
+
+    const { default: LoginPage } = await import("./page");
+    render(<LoginPage />);
+
+    const emailInput = screen.getByLabelText("Email");
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", { name: "Sign In" });
+
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+    fireEvent.change(passwordInput, { target: { value: "password123" } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith("/welcome?next=%2Fpeople");
+    });
+  });
+
   it("sanitizes unsafe redirect URLs starting with //", async () => {
     mockSearchParams = new URLSearchParams("redirect=//evil.com");
 

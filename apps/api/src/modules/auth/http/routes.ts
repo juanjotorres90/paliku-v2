@@ -21,6 +21,7 @@ import type { PKCEHelpers } from "../domain/pkce";
 import type { AppConfig } from "../../../server/config";
 import type { SettingsRepositoryPort } from "../../settings/application/ports";
 import { DEFAULT_LOCALE } from "@repo/i18n";
+import type { UpdateSettingsData } from "../../settings/domain/types";
 
 interface AuthRoutesContext {
   config: AppConfig;
@@ -95,7 +96,15 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
     const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));
 
     const codeVerifierCookieName = getCookieName(cookieConfig, "code-verifier");
-    const apiOrigin = process.env.API_URL ?? new URL(c.req.url).origin;
+    const requestUrl = new URL(c.req.url);
+    const derivedApiOrigin = `${requestUrl.origin}${requestUrl.pathname.replace(
+      /\/auth\/.*$/,
+      "",
+    )}`.replace(/\/+$/, "");
+    const apiOrigin = (process.env.API_URL ?? derivedApiOrigin).replace(
+      /\/+$/,
+      "",
+    );
 
     try {
       const result = await register(input, {
@@ -181,9 +190,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
         deleteCookie(c, refreshTokenCookieName, cookieOptions);
       }
 
-      // Best-effort: persist initial locale based on the current request locale.
-      // Only sets it if the user is still on the default locale.
-      await persistInitialLocale({
+      const { firstLogin } = await bootstrapFirstLogin({
         accessToken: result.tokens.accessToken,
         requestLocale: getLocale(c),
         settingsRepo,
@@ -191,6 +198,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
 
       return c.json({
         ok: true,
+        firstLogin,
         tokens: {
           accessToken: result.tokens.accessToken,
           refreshToken: result.tokens.refreshToken ?? null,
@@ -347,14 +355,20 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
         deleteCookie(c, refreshTokenCookieName, cookieOptions);
       }
 
-      // Email verified via PKCE exchange. Redirect to login with verified flag
-      // so user can sign in manually and see the confirmation message.
-      const loginUrl = new URL(`${webOrigin}/login`);
-      loginUrl.searchParams.set("verified", "true");
-      if (next && next !== "/") {
-        loginUrl.searchParams.set("redirect", next);
+      const { firstLogin } = await bootstrapFirstLogin({
+        accessToken: tokens.accessToken,
+        requestLocale: getLocale(c),
+        settingsRepo,
+      });
+
+      if (firstLogin) {
+        const welcomeUrl = new URL(`${webOrigin}/welcome`);
+        welcomeUrl.searchParams.set("verified", "true");
+        welcomeUrl.searchParams.set("next", next);
+        return c.redirect(welcomeUrl.toString());
       }
-      return c.redirect(loginUrl.toString());
+
+      return c.redirect(`${webOrigin}${next}`);
     } catch (err) {
       return c.redirect(
         `${webOrigin}?error=${
@@ -397,29 +411,47 @@ function getJwtSub(token: string): string | undefined {
   return undefined;
 }
 
-async function persistInitialLocale(input: {
+async function bootstrapFirstLogin(input: {
   accessToken: string;
   requestLocale: string;
   settingsRepo: SettingsRepositoryPort;
-}): Promise<void> {
+}): Promise<{ firstLogin: boolean }> {
   const { accessToken, requestLocale, settingsRepo } = input;
 
-  if (requestLocale === DEFAULT_LOCALE) return;
-
   const userId = getJwtSub(accessToken);
-  if (!userId) return;
+  if (!userId) return { firstLogin: false };
 
   try {
     const settings = await settingsRepo.getById({ userId, accessToken });
-    if (settings.locale !== DEFAULT_LOCALE) return;
+    const data: UpdateSettingsData = {};
 
-    await settingsRepo.updateById({
-      userId,
-      accessToken,
-      data: { locale: requestLocale },
-    });
+    // Best-effort: persist initial locale based on the current request locale.
+    // Only sets it if the user is still on the default locale.
+    if (
+      requestLocale !== DEFAULT_LOCALE &&
+      settings.locale === DEFAULT_LOCALE
+    ) {
+      data.locale = requestLocale;
+    }
+
+    // One-time welcome on first login.
+    const firstLogin = !settings.welcomeSeen;
+    if (firstLogin) {
+      data.welcomeSeen = true;
+    }
+
+    if (Object.keys(data).length > 0) {
+      await settingsRepo.updateById({
+        userId,
+        accessToken,
+        data,
+      });
+    }
+
+    return { firstLogin };
   } catch (err) {
     // Best-effort; auth should succeed even if settings persistence fails.
-    console.error("Failed to persist initial locale:", err);
+    console.error("Failed to bootstrap first login state:", err);
+    return { firstLogin: false };
   }
 }

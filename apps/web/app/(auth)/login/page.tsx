@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -122,15 +123,23 @@ function LoginPageContent() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
+        <div className="text-center space-y-2">
+          <Image
+            src="/logo.svg"
+            alt="Paliku logo"
+            width={166}
+            height={64}
+            priority
+            className="mx-auto"
+          />
           <h1 className="text-2xl font-bold">{t("signIn")}</h1>
-          <p className="text-muted-foreground mt-2">{t("signInDescription")}</p>
+          <p className="text-muted-foreground">{t("signInDescription")}</p>
           {verified && (
-            <p className="text-sm text-green-600 dark:text-green-400 mt-2 bg-green-50 dark:bg-green-950 p-2 rounded-md">
+            <p className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950 p-2 rounded-md">
               {t("emailVerified")}
             </p>
           )}
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-sm text-muted-foreground">
             {t("newHere")}{" "}
             <Link href={registerHref} className="underline underline-offset-4">
               {t("createAccount")}

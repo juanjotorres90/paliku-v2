@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
@@ -141,6 +142,14 @@ function RegisterPageContent() {
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-2">
+          <Image
+            src="/logo.svg"
+            alt="Paliku logo"
+            width={166}
+            height={64}
+            priority
+            className="mx-auto"
+          />
           <h1 className="text-2xl font-bold">{t("createAccount")}</h1>
           <p className="text-muted-foreground">{t("signUpDescription")}</p>
           <p className="text-sm text-muted-foreground">

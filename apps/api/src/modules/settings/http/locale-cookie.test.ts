@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+import type { Context } from "hono";
 import { setLocaleCookie, getLocaleCookieName } from "./locale-cookie";
 import type { CookieConfig } from "../../../server/config";
 import { DEFAULT_LOCALE } from "@repo/i18n";
@@ -14,19 +15,21 @@ describe("locale-cookie", () => {
       const context = {
         req: {
           url: "https://localhost:3000",
-          header: vi.fn((name: string) => {
+          header: vi.fn<(name: string) => string | undefined>((name) => {
             if (name === "x-forwarded-proto") return undefined;
             return undefined;
           }),
         },
-        header: vi.fn((name: string, value: string) => {
-          if (name === "Set-Cookie") {
-            expect(value).toContain("locale=en");
-          }
-          return context;
-        }),
-        set: vi.fn(),
-      } as any;
+        header: vi.fn<(name: string, value: string) => Context>(
+          (name, value) => {
+            if (name === "Set-Cookie") {
+              expect(value).toContain("locale=en");
+            }
+            return context;
+          },
+        ),
+        set: vi.fn<(key: string, value: unknown) => void>(),
+      } as unknown as Context;
 
       setLocaleCookie(context, mockConfig, "en");
 
@@ -37,16 +40,18 @@ describe("locale-cookie", () => {
       const context = {
         req: {
           url: "http://localhost:3000",
-          header: vi.fn(() => undefined),
+          header: vi.fn<(name: string) => string | undefined>(() => undefined),
         },
-        header: vi.fn((name: string, value: string) => {
-          if (name === "Set-Cookie") {
-            expect(value).toContain("locale=en");
-          }
-          return context;
-        }),
-        set: vi.fn(),
-      } as any;
+        header: vi.fn<(name: string, value: string) => Context>(
+          (name, value) => {
+            if (name === "Set-Cookie") {
+              expect(value).toContain("locale=en");
+            }
+            return context;
+          },
+        ),
+        set: vi.fn<(key: string, value: unknown) => void>(),
+      } as unknown as Context;
 
       setLocaleCookie(context, mockConfig, "en");
 
@@ -57,20 +62,22 @@ describe("locale-cookie", () => {
       const context = {
         req: {
           url: "http://localhost:3000",
-          header: vi.fn((name: string) => {
+          header: vi.fn<(name: string) => string | undefined>((name) => {
             if (name === "x-forwarded-proto") return "https";
             return undefined;
           }),
         },
-        header: vi.fn((name: string, value: string) => {
-          if (name === "Set-Cookie") {
-            expect(value).toContain("locale=es");
-            expect(value).toContain("Secure");
-          }
-          return context;
-        }),
-        set: vi.fn(),
-      } as any;
+        header: vi.fn<(name: string, value: string) => Context>(
+          (name, value) => {
+            if (name === "Set-Cookie") {
+              expect(value).toContain("locale=es");
+              expect(value).toContain("Secure");
+            }
+            return context;
+          },
+        ),
+        set: vi.fn<(key: string, value: unknown) => void>(),
+      } as unknown as Context;
 
       setLocaleCookie(context, mockConfig, "es");
 
@@ -81,19 +88,21 @@ describe("locale-cookie", () => {
       const context = {
         req: {
           url: "http://localhost:3000",
-          header: vi.fn((name: string) => {
+          header: vi.fn<(name: string) => string | undefined>((name) => {
             if (name === "x-forwarded-proto") return "http";
             return undefined;
           }),
         },
-        header: vi.fn((name: string, value: string) => {
-          if (name === "Set-Cookie") {
-            expect(value).toContain("locale=ca");
-          }
-          return context;
-        }),
-        set: vi.fn(),
-      } as any;
+        header: vi.fn<(name: string, value: string) => Context>(
+          (name, value) => {
+            if (name === "Set-Cookie") {
+              expect(value).toContain("locale=ca");
+            }
+            return context;
+          },
+        ),
+        set: vi.fn<(key: string, value: unknown) => void>(),
+      } as unknown as Context;
 
       setLocaleCookie(context, mockConfig, "ca");
 
@@ -104,20 +113,22 @@ describe("locale-cookie", () => {
       const context = {
         req: {
           url: "http://localhost:3000",
-          header: vi.fn((name: string) => {
+          header: vi.fn<(name: string) => string | undefined>((name) => {
             if (name === "x-forwarded-proto") return "https, http";
             return undefined;
           }),
         },
-        header: vi.fn((name: string, value: string) => {
-          if (name === "Set-Cookie") {
-            expect(value).toContain("locale=de");
-            expect(value).toContain("Secure");
-          }
-          return context;
-        }),
-        set: vi.fn(),
-      } as any;
+        header: vi.fn<(name: string, value: string) => Context>(
+          (name, value) => {
+            if (name === "Set-Cookie") {
+              expect(value).toContain("locale=de");
+              expect(value).toContain("Secure");
+            }
+            return context;
+          },
+        ),
+        set: vi.fn<(key: string, value: unknown) => void>(),
+      } as unknown as Context;
 
       setLocaleCookie(context, mockConfig, "de");
 
@@ -128,16 +139,18 @@ describe("locale-cookie", () => {
       const context = {
         req: {
           url: "http://localhost:3000",
-          header: vi.fn(() => undefined),
+          header: vi.fn<(name: string) => string | undefined>(() => undefined),
         },
-        header: vi.fn((name: string, value: string) => {
-          if (name === "Set-Cookie") {
-            expect(value).toContain(`locale=${DEFAULT_LOCALE}`);
-          }
-          return context;
-        }),
-        set: vi.fn(),
-      } as any;
+        header: vi.fn<(name: string, value: string) => Context>(
+          (name, value) => {
+            if (name === "Set-Cookie") {
+              expect(value).toContain(`locale=${DEFAULT_LOCALE}`);
+            }
+            return context;
+          },
+        ),
+        set: vi.fn<(key: string, value: unknown) => void>(),
+      } as unknown as Context;
 
       setLocaleCookie(context, mockConfig, "invalid-locale");
 
@@ -148,16 +161,18 @@ describe("locale-cookie", () => {
       const context = {
         req: {
           url: "http://localhost:3000",
-          header: vi.fn(() => undefined),
+          header: vi.fn<(name: string) => string | undefined>(() => undefined),
         },
-        header: vi.fn((name: string, value: string) => {
-          if (name === "Set-Cookie") {
-            expect(value).toContain(`locale=${DEFAULT_LOCALE}`);
-          }
-          return context;
-        }),
-        set: vi.fn(),
-      } as any;
+        header: vi.fn<(name: string, value: string) => Context>(
+          (name, value) => {
+            if (name === "Set-Cookie") {
+              expect(value).toContain(`locale=${DEFAULT_LOCALE}`);
+            }
+            return context;
+          },
+        ),
+        set: vi.fn<(key: string, value: unknown) => void>(),
+      } as unknown as Context;
 
       setLocaleCookie(context, mockConfig, "");
 
@@ -171,16 +186,20 @@ describe("locale-cookie", () => {
         const context = {
           req: {
             url: "http://localhost:3000",
-            header: vi.fn(() => undefined),
+            header: vi.fn<(name: string) => string | undefined>(
+              () => undefined,
+            ),
           },
-          header: vi.fn((name: string, value: string) => {
-            if (name === "Set-Cookie") {
-              expect(value).toContain(`locale=${locale}`);
-            }
-            return context;
-          }),
-          set: vi.fn(),
-        } as any;
+          header: vi.fn<(name: string, value: string) => Context>(
+            (name, value) => {
+              if (name === "Set-Cookie") {
+                expect(value).toContain(`locale=${locale}`);
+              }
+              return context;
+            },
+          ),
+          set: vi.fn<(key: string, value: unknown) => void>(),
+        } as unknown as Context;
 
         setLocaleCookie(context, mockConfig, locale);
         expect(getLocaleCookieName(mockConfig)).toBe("sb-test-project-locale");
@@ -191,16 +210,18 @@ describe("locale-cookie", () => {
       const context = {
         req: {
           url: "http://localhost:3000",
-          header: vi.fn(() => undefined),
+          header: vi.fn<(name: string) => string | undefined>(() => undefined),
         },
-        header: vi.fn((name: string, value: string) => {
-          if (name === "Set-Cookie") {
-            expect(value).toContain(`locale=${DEFAULT_LOCALE}`);
-          }
-          return context;
-        }),
-        set: vi.fn(),
-      } as any;
+        header: vi.fn<(name: string, value: string) => Context>(
+          (name, value) => {
+            if (name === "Set-Cookie") {
+              expect(value).toContain(`locale=${DEFAULT_LOCALE}`);
+            }
+            return context;
+          },
+        ),
+        set: vi.fn<(key: string, value: unknown) => void>(),
+      } as unknown as Context;
 
       setLocaleCookie(context, mockConfig, DEFAULT_LOCALE);
 

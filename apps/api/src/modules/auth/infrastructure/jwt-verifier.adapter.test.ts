@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { SignJWT, generateKeyPair } from "jose";
+import { SignJWT } from "jose";
 import { createJWTVerifier } from "./jwt-verifier.adapter";
 import type { SupabaseConfig } from "../../../server/config";
 
@@ -219,11 +219,3 @@ describe("createJWTVerifier", () => {
     });
   });
 });
-
-async function importKeyToBase64(
-  key: CryptoKey,
-  property: "n" | "e",
-): Promise<string> {
-  const jsonKey = await crypto.subtle.exportKey("jwk", key);
-  return jsonKey[property] || "";
-}

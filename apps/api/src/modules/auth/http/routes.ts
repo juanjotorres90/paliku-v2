@@ -18,6 +18,7 @@ import { refresh } from "../application/use-cases/refresh";
 import { callback } from "../application/use-cases/callback";
 import type { AuthProviderPort } from "../application/ports";
 import type { PKCEHelpers } from "../domain/pkce";
+import { getSafeNext } from "../domain/redirect";
 import type { AppConfig } from "../../../server/config";
 import type { SettingsRepositoryPort } from "../../settings/application/ports";
 import { DEFAULT_LOCALE } from "@repo/i18n";
@@ -300,6 +301,7 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
     const { searchParams } = new URL(c.req.url);
     const code = searchParams.get("code");
     const nextParam = searchParams.get("next");
+    const safeNext = getSafeNext(nextParam);
 
     if (!code) {
       return c.json(
@@ -336,26 +338,35 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
     );
     const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));
     const codeVerifierCookieName = getCookieName(cookieConfig, "code-verifier");
+    const accessTokenCookieName = getCookieName(cookieConfig, "access-token");
+    const refreshTokenCookieName = getCookieName(cookieConfig, "refresh-token");
 
     const codeVerifier = getCookie(c, codeVerifierCookieName);
     if (!codeVerifier) {
-      return c.redirect(`${webOrigin}?error=invalid_state`);
+      // If the user opened a confirmation link in a different browser/session
+      // (or while logged in as a different user), we can't exchange the PKCE
+      // code without the code verifier. Clear any existing session so we don't
+      // silently keep the wrong user logged in.
+      deleteCookie(c, accessTokenCookieName, cookieOptions);
+      deleteCookie(c, refreshTokenCookieName, cookieOptions);
+
+      const loginUrl = new URL(`${webOrigin}/login`);
+      loginUrl.searchParams.set("verified", "true");
+      if (safeNext !== "/") {
+        loginUrl.searchParams.set("redirect", safeNext);
+      }
+      return c.redirect(loginUrl.toString());
     }
 
     deleteCookie(c, codeVerifierCookieName, cookieOptions);
 
     try {
       const result = await callback(
-        { code, codeVerifier, next: nextParam ?? undefined },
+        { code, codeVerifier, next: safeNext },
         { authProvider },
       );
 
       const { tokens, next } = result;
-      const accessTokenCookieName = getCookieName(cookieConfig, "access-token");
-      const refreshTokenCookieName = getCookieName(
-        cookieConfig,
-        "refresh-token",
-      );
 
       const refreshTokenOptions = {
         ...cookieOptions,
@@ -389,11 +400,20 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
 
       return c.redirect(`${webOrigin}${next}`);
     } catch (err) {
-      return c.redirect(
-        `${webOrigin}?error=${
-          err instanceof Error ? encodeURIComponent(err.message) : "token_error"
-        }`,
+      // Avoid keeping a stale session if the user expected this link to switch
+      // accounts.
+      deleteCookie(c, accessTokenCookieName, cookieOptions);
+      deleteCookie(c, refreshTokenCookieName, cookieOptions);
+
+      const loginUrl = new URL(`${webOrigin}/login`);
+      if (safeNext !== "/") {
+        loginUrl.searchParams.set("redirect", safeNext);
+      }
+      loginUrl.searchParams.set(
+        "error",
+        err instanceof Error ? err.message : "token_error",
       );
+      return c.redirect(loginUrl.toString());
     }
   });
 

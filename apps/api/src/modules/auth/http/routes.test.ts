@@ -136,6 +136,59 @@ describe("createAuthRoutes", () => {
     expect(res.status).toBe(200);
   });
 
+  it("clears session and redirects to login when code verifier is missing", async () => {
+    const app = new Hono<RouteEnv>();
+    app.route("/auth", createAuthRoutes(mockContext));
+
+    const res = await app.request("/auth/callback?code=abc&next=%2Fwelcome", {
+      method: "GET",
+      headers: {
+        Origin: "http://localhost:3000",
+        Cookie:
+          "sb-test-project-access-token=old-access; sb-test-project-refresh-token=old-refresh",
+      },
+    });
+
+    expect(res.status).toBe(302);
+    expect(res.headers.get("location")).toBe(
+      "http://localhost:3000/login?verified=true&redirect=%2Fwelcome",
+    );
+
+    const cookies = res.headers.get("set-cookie") ?? "";
+    expect(cookies).toContain("sb-test-project-access-token=");
+    expect(cookies).toContain("sb-test-project-refresh-token=");
+  });
+
+  it("clears session and redirects to login when token exchange fails", async () => {
+    (
+      mockContext.authProvider.exchangeAuthCodeForTokens as ReturnType<
+        typeof vi.fn
+      >
+    ).mockRejectedValue(new Error("invalid_grant"));
+
+    const app = new Hono<RouteEnv>();
+    app.route("/auth", createAuthRoutes(mockContext));
+
+    const res = await app.request("/auth/callback?code=abc&next=%2Fwelcome", {
+      method: "GET",
+      headers: {
+        Origin: "http://localhost:3000",
+        Cookie:
+          "sb-test-project-code-verifier=verifier; sb-test-project-access-token=old-access; sb-test-project-refresh-token=old-refresh",
+      },
+    });
+
+    expect(res.status).toBe(302);
+    expect(res.headers.get("location")).toBe(
+      "http://localhost:3000/login?redirect=%2Fwelcome&error=invalid_grant",
+    );
+
+    const cookies = res.headers.get("set-cookie") ?? "";
+    expect(cookies).toContain("sb-test-project-code-verifier=");
+    expect(cookies).toContain("sb-test-project-access-token=");
+    expect(cookies).toContain("sb-test-project-refresh-token=");
+  });
+
   it("should persist browser locale to user settings on first login", async () => {
     const userId = "11111111-1111-1111-1111-111111111111";
     const token = createFakeJwt({ sub: userId });

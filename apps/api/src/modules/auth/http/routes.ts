@@ -311,8 +311,27 @@ export function createAuthRoutes(ctx: AuthRoutesContext) {
       );
     }
 
+    const forwardedProto = c.req.header("x-forwarded-proto");
+    const forwardedHost = c.req.header("x-forwarded-host");
+    const host = forwardedHost?.split(",")[0]?.trim() ?? c.req.header("host");
+    const protocol = (forwardedProto ?? new URL(c.req.url).protocol).replace(
+      /:$/,
+      "",
+    );
+    const requestOrigin = host ? `${protocol}://${host}` : undefined;
+
+    const referer = c.req.header("Referer");
+    let refererOrigin: string | undefined;
+    if (referer) {
+      try {
+        refererOrigin = new URL(referer).origin;
+      } catch {
+        refererOrigin = undefined;
+      }
+    }
+
     const webOrigin = resolveWebOrigin(
-      [c.req.header("Origin"), c.req.header("Referer")],
+      [c.req.header("Origin"), refererOrigin, requestOrigin],
       corsConfig,
     );
     const cookieOptions = getCookieOptions(cookieConfig, isSecureRequest(c));

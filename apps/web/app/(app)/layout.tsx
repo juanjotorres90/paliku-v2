@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { UserMenu } from "../user-menu";
 import { UserProvider } from "../user-context";
+import { NavLinks } from "./nav-links";
 
 export default async function AppLayout({
   children,
@@ -36,26 +37,13 @@ export default async function AppLayout({
                   priority
                 />
               </Link>
-              <nav className="flex items-center gap-4 text-sm">
-                <Link
-                  href="/"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {tNav("home")}
-                </Link>
-                <Link
-                  href="/people"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {tNav("people")}
-                </Link>
-                <Link
-                  href="/chats"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {tNav("chats")}
-                </Link>
-              </nav>
+              <NavLinks
+                links={[
+                  { href: "/", label: tNav("home") },
+                  { href: "/people", label: tNav("people") },
+                  { href: "/chats", label: tNav("chats") },
+                ]}
+              />
             </div>
             <div className="flex items-center gap-4">
               <UserMenu />

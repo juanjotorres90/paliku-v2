@@ -46,7 +46,7 @@ export default function ParallaxScrollView({
         },
       ],
     };
-  });
+  }, [scrollOffset]);
 
   return (
     <Animated.ScrollView

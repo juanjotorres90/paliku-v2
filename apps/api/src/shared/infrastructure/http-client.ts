@@ -25,6 +25,14 @@ export interface HttpClient {
     status: number;
     text: () => Promise<string>;
   }>;
+  delete(
+    url: string,
+    headers: Record<string, string>,
+  ): Promise<{
+    ok: boolean;
+    status: number;
+    text: () => Promise<string>;
+  }>;
 }
 
 export function createFetchHttpClient(): HttpClient {
@@ -57,6 +65,17 @@ export function createFetchHttpClient(): HttpClient {
         method: "PATCH",
         headers,
         body: JSON.stringify(body),
+      });
+      return {
+        ok: response.ok,
+        status: response.status,
+        text: () => response.text(),
+      };
+    },
+    async delete(url: string, headers: Record<string, string>) {
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers,
       });
       return {
         ok: response.ok,

@@ -151,7 +151,19 @@
     "failedToSaveProfile": "Profil konnte nicht gespeichert werden",
     "failedToUploadAvatar": "Profilbild konnte nicht hochgeladen werden",
     "failedToDeleteAvatar": "Profilbild konnte nicht gelöscht werden",
-    "loadingProfile": "Profil wird geladen..."
+    "loadingProfile": "Profil wird geladen...",
+    "languages": {
+      "title": "Sprachen",
+      "speaks": "Ich spreche",
+      "learning": "Ich lerne",
+      "addLanguage": "Sprache hinzufügen",
+      "removeLanguage": "Entfernen",
+      "selectLanguage": "Sprache auswählen",
+      "selectLevel": "Niveau auswählen",
+      "maxReached": "Maximal {max} Sprachen",
+      "failedToFetchLanguages": "Sprachen konnten nicht geladen werden",
+      "failedToSaveLanguages": "Sprachen konnten nicht gespeichert werden"
+    }
   },
   "api": {
     "errors": {
@@ -191,6 +203,12 @@
       },
       "validation": {
         "invalid_input": "Ungültige Eingabedaten"
+      },
+      "people": {
+        "self_connect": "Du kannst dich nicht mit dir selbst verbinden",
+        "already_exists": "Die Verbindung existiert bereits",
+        "request_not_found": "Verbindungsanfrage nicht gefunden",
+        "not_authorized": "Nicht autorisiert für diese Aktion"
       }
     }
   },
@@ -257,7 +275,22 @@
       "viewProfile": "Profil anzeigen",
       "previous": "Vorherige",
       "next": "Nächste",
-      "pageOf": "Seite {current} von {total}"
+      "pageOf": "Seite {current} von {total}",
+      "loadMore": "Mehr laden",
+      "noResults": "Keine Ergebnisse gefunden",
+      "connectionSent": "Verbindungsanfrage gesendet",
+      "connectionAccepted": "Verbindung akzeptiert",
+      "connectionDeclined": "Verbindung abgelehnt",
+      "connectionCancelled": "Verbindungsanfrage abgebrochen",
+      "pending": "Ausstehend",
+      "accepted": "Partner",
+      "declined": "Abgelehnt",
+      "incoming": "Eingehende",
+      "outgoing": "Ausgehende",
+      "cancel": "Abbrechen",
+      "accept": "Akzeptieren",
+      "decline": "Ablehnen",
+      "backToResults": "Zurück zu den Ergebnissen"
     },
     "chats": {
       "messages": "Nachrichten",

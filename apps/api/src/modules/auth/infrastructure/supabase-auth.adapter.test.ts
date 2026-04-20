@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createSupabaseAuthAdapter } from "./supabase-auth.adapter";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SupabaseConfig } from "../../../server/config";
-import type { HttpClient } from "../../../shared/infrastructure/http-client";
 import {
-  ConflictError,
-  ValidationError,
   AuthenticationError,
+  ConflictError,
   ForbiddenError,
+  ValidationError,
 } from "../../../shared/domain/errors";
+import type { HttpClient } from "../../../shared/infrastructure/http-client";
+import { createSupabaseAuthAdapter } from "./supabase-auth.adapter";
 
 describe("createSupabaseAuthAdapter", () => {
   const config: SupabaseConfig = {
@@ -25,6 +25,7 @@ describe("createSupabaseAuthAdapter", () => {
       post: vi.fn(),
       get: vi.fn(),
       patch: vi.fn(),
+      delete: vi.fn(),
     };
   });
 

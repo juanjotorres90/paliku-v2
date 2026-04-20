@@ -1,16 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { AvatarUpload } from "@repo/ui/components/avatar-upload";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
-import { AvatarUpload } from "@repo/ui/components/avatar-upload";
+import {
+  LanguageCodeSchema,
+  ProficiencySchema,
+  ProfileLanguagesUpsertSchema,
+  type LanguageCode,
+  type Proficiency,
+} from "@repo/validators/people";
 import { ProfileUpsertSchema } from "@repo/validators/profile";
-import { apiFetchWithRefresh } from "../../../lib/api";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import useSWR from "swr";
+import { apiFetcher, apiFetchWithRefresh } from "../../../lib/api";
 import { useUser } from "../../../user-context";
 
+interface LanguagesResponse {
+  speaks: LanguageEntry[];
+  learning: LanguageEntry[];
+}
+
 type IntentValue = "practice" | "friends" | "date";
+
+interface LanguageEntry {
+  languageCode: LanguageCode;
+  level: Proficiency;
+}
+
+const LANGUAGE_CODES = LanguageCodeSchema.options;
+const PROFICIENCY_LEVELS = ProficiencySchema.options;
 
 function ProfileSettingsPageContent() {
   const router = useRouter();
@@ -33,6 +54,16 @@ function ProfileSettingsPageContent() {
     intents: ["practice"] as IntentValue[],
     isPublic: true,
   });
+  const tLang = useTranslations("profile.languages");
+  const tLanguages = useTranslations("languages");
+  const tPeople = useTranslations("pages.people");
+  const { data: languagesData, mutate: mutateLanguages } =
+    useSWR<LanguagesResponse>(user ? "/people/languages" : null, apiFetcher, {
+      revalidateOnFocus: false,
+    });
+  const speaks = languagesData?.speaks ?? [];
+  const learning = languagesData?.learning ?? [];
+  const [savingLanguages, setSavingLanguages] = useState(false);
 
   const INTENT_OPTIONS: { value: IntentValue; label: string }[] = [
     { value: "practice", label: t("intentPractice") },
@@ -59,6 +90,81 @@ function ProfileSettingsPageContent() {
       setAvatarPreview(user.profile.avatarUrl || null);
     }
   }, [t, user, userLoading, userError]);
+
+  const saveLanguages = useCallback(
+    async (nextSpeaks: LanguageEntry[], nextLearning: LanguageEntry[]) => {
+      const parsed = ProfileLanguagesUpsertSchema.safeParse({
+        speaks: nextSpeaks,
+        learning: nextLearning,
+      });
+      if (!parsed.success) return;
+
+      const optimistic = { speaks: nextSpeaks, learning: nextLearning };
+      setSavingLanguages(true);
+      try {
+        await mutateLanguages(
+          async () => {
+            const res = await apiFetchWithRefresh("/people/languages", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(parsed.data),
+            });
+            if (!res.ok) throw new Error();
+            return (await res.json()) as LanguagesResponse;
+          },
+          {
+            optimisticData: optimistic,
+            rollbackOnError: true,
+            revalidate: false,
+          },
+        );
+      } catch {
+        setError(tLang("failedToSaveLanguages"));
+      } finally {
+        setSavingLanguages(false);
+      }
+    },
+    [mutateLanguages, tLang],
+  );
+
+  const addLanguage = (kind: "speaks" | "learning") => {
+    const current = kind === "speaks" ? speaks : learning;
+    if (current.length >= 3) return;
+    const entry: LanguageEntry = {
+      languageCode: LANGUAGE_CODES[0]!,
+      level: "beginner",
+    };
+    const next = [...current, entry];
+    void saveLanguages(
+      kind === "speaks" ? next : speaks,
+      kind === "learning" ? next : learning,
+    );
+  };
+
+  const removeLanguage = (kind: "speaks" | "learning", index: number) => {
+    const current = kind === "speaks" ? speaks : learning;
+    const next = current.filter((_, i) => i !== index);
+    void saveLanguages(
+      kind === "speaks" ? next : speaks,
+      kind === "learning" ? next : learning,
+    );
+  };
+
+  const updateLanguage = (
+    kind: "speaks" | "learning",
+    index: number,
+    field: "languageCode" | "level",
+    value: string,
+  ) => {
+    const current = kind === "speaks" ? speaks : learning;
+    const next = current.map((entry, i) =>
+      i === index ? { ...entry, [field]: value } : entry,
+    );
+    void saveLanguages(
+      kind === "speaks" ? next : speaks,
+      kind === "learning" ? next : learning,
+    );
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -387,6 +493,85 @@ function ProfileSettingsPageContent() {
             </Button>
           </div>
         </form>
+
+        {/* Languages Section */}
+        <div className="space-y-6 border-t border-border pt-8">
+          <h2 className="text-xl font-semibold">{tLang("title")}</h2>
+
+          {(["speaks", "learning"] as const).map((kind) => {
+            const entries = kind === "speaks" ? speaks : learning;
+            return (
+              <div key={kind} className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">{tLang(kind)}</label>
+                  {entries.length < 3 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={savingLanguages}
+                      onClick={() => addLanguage(kind)}
+                    >
+                      {tLang("addLanguage")}
+                    </Button>
+                  )}
+                  {entries.length >= 3 && (
+                    <span className="text-xs text-muted-foreground">
+                      {tLang("maxReached", { max: 3 })}
+                    </span>
+                  )}
+                </div>
+
+                {entries.map((entry, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <select
+                      className="flex-1 px-3 py-2 rounded-md border border-input bg-background text-sm"
+                      value={entry.languageCode}
+                      disabled={savingLanguages}
+                      onChange={(e) =>
+                        updateLanguage(
+                          kind,
+                          idx,
+                          "languageCode",
+                          e.target.value,
+                        )
+                      }
+                    >
+                      {LANGUAGE_CODES.map((code) => (
+                        <option key={code} value={code}>
+                          {tLanguages(code)}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      className="w-36 px-3 py-2 rounded-md border border-input bg-background text-sm"
+                      value={entry.level}
+                      disabled={savingLanguages}
+                      onChange={(e) =>
+                        updateLanguage(kind, idx, "level", e.target.value)
+                      }
+                    >
+                      {PROFICIENCY_LEVELS.map((level) => (
+                        <option key={level} value={level}>
+                          {tPeople(level)}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={savingLanguages}
+                      onClick={() => removeLanguage(kind, idx)}
+                    >
+                      {tLang("removeLanguage")}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </main>
   );

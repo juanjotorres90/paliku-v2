@@ -151,7 +151,19 @@
     "failedToSaveProfile": "Échec de l'enregistrement du profil",
     "failedToUploadAvatar": "Échec du téléchargement de l'avatar",
     "failedToDeleteAvatar": "Échec de la suppression de l'avatar",
-    "loadingProfile": "Chargement du profil..."
+    "loadingProfile": "Chargement du profil...",
+    "languages": {
+      "title": "Langues",
+      "speaks": "Je parle",
+      "learning": "J'apprends",
+      "addLanguage": "Ajouter une langue",
+      "removeLanguage": "Supprimer",
+      "selectLanguage": "Choisir une langue",
+      "selectLevel": "Choisir un niveau",
+      "maxReached": "Maximum {max} langues",
+      "failedToFetchLanguages": "Échec du chargement des langues",
+      "failedToSaveLanguages": "Échec de l'enregistrement des langues"
+    }
   },
   "api": {
     "errors": {
@@ -191,6 +203,12 @@
       },
       "validation": {
         "invalid_input": "Données d'entrée invalides"
+      },
+      "people": {
+        "self_connect": "Vous ne pouvez pas vous connecter avec vous-même",
+        "already_exists": "La connexion existe déjà",
+        "request_not_found": "Demande de connexion introuvable",
+        "not_authorized": "Non autorisé pour cette action"
       }
     }
   },
@@ -257,7 +275,22 @@
       "viewProfile": "Voir le profil",
       "previous": "Précédent",
       "next": "Suivant",
-      "pageOf": "Page {current} sur {total}"
+      "pageOf": "Page {current} sur {total}",
+      "loadMore": "Charger plus",
+      "noResults": "Aucun résultat trouvé",
+      "connectionSent": "Demande de connexion envoyée",
+      "connectionAccepted": "Connexion acceptée",
+      "connectionDeclined": "Connexion refusée",
+      "connectionCancelled": "Demande de connexion annulée",
+      "pending": "En attente",
+      "accepted": "Partenaires",
+      "declined": "Refusée",
+      "incoming": "Reçues",
+      "outgoing": "Envoyées",
+      "cancel": "Annuler",
+      "accept": "Accepter",
+      "decline": "Refuser",
+      "backToResults": "Retour aux résultats"
     },
     "chats": {
       "messages": "Messages",

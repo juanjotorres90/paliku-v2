@@ -52,6 +52,7 @@ let currentUserContext = createMockUserContext();
 vi.mock("../../../lib/api", () => ({
   apiFetchWithRefresh: () => mockApiFetchWithRefresh(),
   apiFetch: () => mockApiFetch(),
+  apiFetcher: vi.fn(),
 }));
 
 vi.mock("../../../user-context", () => ({

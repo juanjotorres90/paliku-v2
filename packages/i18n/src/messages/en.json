@@ -151,7 +151,19 @@
     "failedToSaveProfile": "Failed to save profile",
     "failedToUploadAvatar": "Failed to upload avatar",
     "failedToDeleteAvatar": "Failed to delete avatar",
-    "loadingProfile": "Loading profile..."
+    "loadingProfile": "Loading profile...",
+    "languages": {
+      "title": "Languages",
+      "speaks": "I speak",
+      "learning": "I'm learning",
+      "addLanguage": "Add language",
+      "removeLanguage": "Remove",
+      "selectLanguage": "Select language",
+      "selectLevel": "Select level",
+      "maxReached": "Maximum {max} languages",
+      "failedToFetchLanguages": "Failed to load languages",
+      "failedToSaveLanguages": "Failed to save languages"
+    }
   },
   "api": {
     "errors": {
@@ -191,6 +203,12 @@
       },
       "validation": {
         "invalid_input": "Invalid input data"
+      },
+      "people": {
+        "self_connect": "You cannot connect with yourself",
+        "already_exists": "Connection already exists",
+        "request_not_found": "Connection request not found",
+        "not_authorized": "Not authorized for this action"
       }
     }
   },
@@ -257,7 +275,22 @@
       "viewProfile": "View Profile",
       "previous": "Previous",
       "next": "Next",
-      "pageOf": "Page {current} of {total}"
+      "pageOf": "Page {current} of {total}",
+      "loadMore": "Load more",
+      "noResults": "No results found",
+      "connectionSent": "Connection request sent",
+      "connectionAccepted": "Connection accepted",
+      "connectionDeclined": "Connection declined",
+      "connectionCancelled": "Connection request cancelled",
+      "pending": "Pending",
+      "accepted": "Partners",
+      "declined": "Declined",
+      "incoming": "Incoming",
+      "outgoing": "Outgoing",
+      "cancel": "Cancel",
+      "accept": "Accept",
+      "decline": "Decline",
+      "backToResults": "Back to results"
     },
     "chats": {
       "messages": "Messages",

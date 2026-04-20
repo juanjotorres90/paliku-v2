@@ -151,7 +151,19 @@
     "failedToSaveProfile": "Error al guardar el perfil",
     "failedToUploadAvatar": "Error al subir el avatar",
     "failedToDeleteAvatar": "Error al eliminar el avatar",
-    "loadingProfile": "Cargando perfil..."
+    "loadingProfile": "Cargando perfil...",
+    "languages": {
+      "title": "Idiomas",
+      "speaks": "Hablo",
+      "learning": "Estoy aprendiendo",
+      "addLanguage": "Añadir idioma",
+      "removeLanguage": "Eliminar",
+      "selectLanguage": "Seleccionar idioma",
+      "selectLevel": "Seleccionar nivel",
+      "maxReached": "Máximo {max} idiomas",
+      "failedToFetchLanguages": "Error al cargar idiomas",
+      "failedToSaveLanguages": "Error al guardar idiomas"
+    }
   },
   "api": {
     "errors": {
@@ -191,6 +203,12 @@
       },
       "validation": {
         "invalid_input": "Datos de entrada inválidos"
+      },
+      "people": {
+        "self_connect": "No puedes conectar contigo mismo",
+        "already_exists": "La conexión ya existe",
+        "request_not_found": "Solicitud de conexión no encontrada",
+        "not_authorized": "No autorizado para esta acción"
       }
     }
   },
@@ -257,7 +275,22 @@
       "viewProfile": "Ver Perfil",
       "previous": "Anterior",
       "next": "Siguiente",
-      "pageOf": "Página {current} de {total}"
+      "pageOf": "Página {current} de {total}",
+      "loadMore": "Cargar más",
+      "noResults": "No se encontraron resultados",
+      "connectionSent": "Solicitud de conexión enviada",
+      "connectionAccepted": "Conexión aceptada",
+      "connectionDeclined": "Conexión rechazada",
+      "connectionCancelled": "Solicitud de conexión cancelada",
+      "pending": "Pendiente",
+      "accepted": "Compañeros",
+      "declined": "Rechazada",
+      "incoming": "Recibidas",
+      "outgoing": "Enviadas",
+      "cancel": "Cancelar",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "backToResults": "Volver a resultados"
     },
     "chats": {
       "messages": "Mensajes",

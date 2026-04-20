@@ -1,17 +1,21 @@
-import { describe, it, expect, vi } from "vitest";
-import { createHttpApp } from "./app";
+import { describe, expect, it, vi } from "vitest";
 import type {
-  JWTVerifierPort,
   AuthProviderPort,
+  JWTVerifierPort,
 } from "../modules/auth/application/ports";
 import type { PKCEHelpers } from "../modules/auth/domain/pkce";
-import type { AppConfig } from "../server/config";
+import type {
+  PeopleRepositoryPort,
+  UserLanguagesRepositoryPort,
+} from "../modules/people/application/ports";
 import type {
   AvatarStoragePort,
   ProfileRepositoryPort,
   UserEmailPort,
 } from "../modules/profile/application/ports";
 import type { SettingsRepositoryPort } from "../modules/settings/application/ports";
+import type { AppConfig } from "../server/config";
+import { createHttpApp } from "./app";
 
 describe("createHttpApp", () => {
   const mockContext: {
@@ -23,6 +27,8 @@ describe("createHttpApp", () => {
     avatarStorage: AvatarStoragePort;
     userEmail: UserEmailPort;
     settingsRepo: SettingsRepositoryPort;
+    peopleRepo: PeopleRepositoryPort;
+    languagesRepo: UserLanguagesRepositoryPort;
   } = {
     config: {
       supabase: {
@@ -69,6 +75,20 @@ describe("createHttpApp", () => {
       getById: vi.fn(),
       updateById: vi.fn(),
     } as unknown as SettingsRepositoryPort,
+    peopleRepo: {
+      discover: vi.fn(),
+      getRequests: vi.fn(),
+      getPartners: vi.fn(),
+      getPersonById: vi.fn(),
+      createRequest: vi.fn(),
+      respondToRequest: vi.fn(),
+      cancelRequest: vi.fn(),
+    } as unknown as PeopleRepositoryPort,
+    languagesRepo: {
+      getForUser: vi.fn(),
+      getForUsers: vi.fn(),
+      replaceForUser: vi.fn(),
+    } as unknown as UserLanguagesRepositoryPort,
   };
 
   it("should create app with root endpoint", async () => {

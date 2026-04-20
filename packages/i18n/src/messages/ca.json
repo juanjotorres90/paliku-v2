@@ -151,7 +151,19 @@
     "failedToSaveProfile": "Error en desar el perfil",
     "failedToUploadAvatar": "Error en pujar l'avatar",
     "failedToDeleteAvatar": "Error en eliminar l'avatar",
-    "loadingProfile": "Carregant perfil..."
+    "loadingProfile": "Carregant perfil...",
+    "languages": {
+      "title": "Idiomes",
+      "speaks": "Parlo",
+      "learning": "Estic aprenent",
+      "addLanguage": "Afegir idioma",
+      "removeLanguage": "Eliminar",
+      "selectLanguage": "Seleccionar idioma",
+      "selectLevel": "Seleccionar nivell",
+      "maxReached": "Màxim {max} idiomes",
+      "failedToFetchLanguages": "Error en carregar idiomes",
+      "failedToSaveLanguages": "Error en desar idiomes"
+    }
   },
   "api": {
     "errors": {
@@ -191,6 +203,12 @@
       },
       "validation": {
         "invalid_input": "Dades d'entrada invàlides"
+      },
+      "people": {
+        "self_connect": "No pots connectar amb tu mateix",
+        "already_exists": "La connexió ja existeix",
+        "request_not_found": "Sol·licitud de connexió no trobada",
+        "not_authorized": "No autoritzat per a aquesta acció"
       }
     }
   },
@@ -257,7 +275,22 @@
       "viewProfile": "Veure perfil",
       "previous": "Anterior",
       "next": "Següent",
-      "pageOf": "Pàgina {current} de {total}"
+      "pageOf": "Pàgina {current} de {total}",
+      "loadMore": "Carregar més",
+      "noResults": "No s'han trobat resultats",
+      "connectionSent": "Sol·licitud de connexió enviada",
+      "connectionAccepted": "Connexió acceptada",
+      "connectionDeclined": "Connexió rebutjada",
+      "connectionCancelled": "Sol·licitud de connexió cancel·lada",
+      "pending": "Pendent",
+      "accepted": "Companys",
+      "declined": "Rebutjada",
+      "incoming": "Rebudes",
+      "outgoing": "Enviades",
+      "cancel": "Cancel·lar",
+      "accept": "Acceptar",
+      "decline": "Rebutjar",
+      "backToResults": "Tornar als resultats"
     },
     "chats": {
       "messages": "Missatges",

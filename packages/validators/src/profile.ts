@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const IntentSchema = z.enum(["practice", "friends", "date"]);
+export type Intent = z.infer<typeof IntentSchema>;
 
 export const ProfileUpsertSchema = z
   .object({

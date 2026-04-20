@@ -44,6 +44,12 @@ export const ErrorCode = {
   UPSTREAM_DATABASE_ERROR: 5002,
   UPSTREAM_STORAGE_ERROR: 5003,
   UPSTREAM_UNKNOWN_ERROR: 5004,
+
+  // People errors (6xxx)
+  PEOPLE_SELF_CONNECT: 6001,
+  PEOPLE_ALREADY_EXISTS: 6002,
+  PEOPLE_REQUEST_NOT_FOUND: 6003,
+  PEOPLE_NOT_AUTHORIZED: 6004,
 } as const;
 
 export type ErrorCodeValue = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -84,6 +90,11 @@ export const ErrorCodeToKey: Record<ErrorCodeValue, string> = {
   [ErrorCode.UPSTREAM_DATABASE_ERROR]: "api.errors.upstream.database_error",
   [ErrorCode.UPSTREAM_STORAGE_ERROR]: "api.errors.upstream.storage_error",
   [ErrorCode.UPSTREAM_UNKNOWN_ERROR]: "api.errors.upstream.unknown_error",
+
+  [ErrorCode.PEOPLE_SELF_CONNECT]: "api.errors.people.self_connect",
+  [ErrorCode.PEOPLE_ALREADY_EXISTS]: "api.errors.people.already_exists",
+  [ErrorCode.PEOPLE_REQUEST_NOT_FOUND]: "api.errors.people.request_not_found",
+  [ErrorCode.PEOPLE_NOT_AUTHORIZED]: "api.errors.people.not_authorized",
 };
 
 /**
@@ -120,6 +131,11 @@ export const ErrorCodeFallbacks: Record<ErrorCodeValue, string> = {
   [ErrorCode.UPSTREAM_DATABASE_ERROR]: "Database error",
   [ErrorCode.UPSTREAM_STORAGE_ERROR]: "Storage error",
   [ErrorCode.UPSTREAM_UNKNOWN_ERROR]: "An unexpected error occurred",
+
+  [ErrorCode.PEOPLE_SELF_CONNECT]: "You cannot connect with yourself",
+  [ErrorCode.PEOPLE_ALREADY_EXISTS]: "Connection already exists",
+  [ErrorCode.PEOPLE_REQUEST_NOT_FOUND]: "Connection request not found",
+  [ErrorCode.PEOPLE_NOT_AUTHORIZED]: "Not authorized for this action",
 };
 
 /**

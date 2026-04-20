@@ -151,7 +151,19 @@
     "failedToSaveProfile": "Не удалось сохранить профиль",
     "failedToUploadAvatar": "Не удалось загрузить аватар",
     "failedToDeleteAvatar": "Не удалось удалить аватар",
-    "loadingProfile": "Загрузка профиля..."
+    "loadingProfile": "Загрузка профиля...",
+    "languages": {
+      "title": "Языки",
+      "speaks": "Говорю",
+      "learning": "Изучаю",
+      "addLanguage": "Добавить язык",
+      "removeLanguage": "Удалить",
+      "selectLanguage": "Выбрать язык",
+      "selectLevel": "Выбрать уровень",
+      "maxReached": "Максимум {max} языков",
+      "failedToFetchLanguages": "Не удалось загрузить языки",
+      "failedToSaveLanguages": "Не удалось сохранить языки"
+    }
   },
   "api": {
     "errors": {
@@ -191,6 +203,12 @@
       },
       "validation": {
         "invalid_input": "Недействительные входные данные"
+      },
+      "people": {
+        "self_connect": "Вы не можете подключиться к себе",
+        "already_exists": "Соединение уже существует",
+        "request_not_found": "Запрос на подключение не найден",
+        "not_authorized": "Не авторизовано для этого действия"
       }
     }
   },
@@ -257,7 +275,22 @@
       "viewProfile": "Посмотреть профиль",
       "previous": "Предыдущий",
       "next": "Следующий",
-      "pageOf": "Страница {current} из {total}"
+      "pageOf": "Страница {current} из {total}",
+      "loadMore": "Загрузить ещё",
+      "noResults": "Результаты не найдены",
+      "connectionSent": "Запрос на подключение отправлен",
+      "connectionAccepted": "Подключение принято",
+      "connectionDeclined": "Подключение отклонено",
+      "connectionCancelled": "Запрос на подключение отменён",
+      "pending": "Ожидание",
+      "accepted": "Партнёр",
+      "declined": "Отклонено",
+      "incoming": "Входящие",
+      "outgoing": "Исходящие",
+      "cancel": "Отменить",
+      "accept": "Принять",
+      "decline": "Отклонить",
+      "backToResults": "Назад к результатам"
     },
     "chats": {
       "messages": "Сообщения",

@@ -40,6 +40,7 @@ describe("createSupabaseProfileRepo", () => {
         }),
         post: vi.fn(),
         patch: vi.fn(),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -79,6 +80,7 @@ describe("createSupabaseProfileRepo", () => {
         }),
         post: vi.fn(),
         patch: vi.fn(),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -101,6 +103,7 @@ describe("createSupabaseProfileRepo", () => {
         }),
         post: vi.fn(),
         patch: vi.fn(),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -122,6 +125,7 @@ describe("createSupabaseProfileRepo", () => {
         }),
         post: vi.fn(),
         patch: vi.fn(),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -143,6 +147,7 @@ describe("createSupabaseProfileRepo", () => {
         }),
         post: vi.fn(),
         patch: vi.fn(),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -164,6 +169,7 @@ describe("createSupabaseProfileRepo", () => {
         }),
         post: vi.fn(),
         patch: vi.fn(),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -185,6 +191,7 @@ describe("createSupabaseProfileRepo", () => {
         }),
         post: vi.fn(),
         patch: vi.fn(),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -219,6 +226,7 @@ describe("createSupabaseProfileRepo", () => {
         }),
         post: vi.fn(),
         patch: vi.fn(),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -263,6 +271,7 @@ describe("createSupabaseProfileRepo", () => {
             ]),
           ),
         }),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -306,6 +315,7 @@ describe("createSupabaseProfileRepo", () => {
             ]),
           ),
         }),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -345,6 +355,7 @@ describe("createSupabaseProfileRepo", () => {
           status: 401,
           text: vi.fn().mockResolvedValue("Unauthorized"),
         }),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -373,6 +384,7 @@ describe("createSupabaseProfileRepo", () => {
           status: 200,
           text: vi.fn().mockResolvedValue("[]"),
         }),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -416,6 +428,7 @@ describe("createSupabaseProfileRepo", () => {
             ]),
           ),
         }),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -458,6 +471,7 @@ describe("createSupabaseProfileRepo", () => {
             ]),
           ),
         }),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);
@@ -487,6 +501,7 @@ describe("createSupabaseProfileRepo", () => {
           status: 403,
           text: vi.fn().mockResolvedValue("Forbidden"),
         }),
+        delete: vi.fn(),
       };
 
       const repo = createSupabaseProfileRepo(supabase, httpClient);

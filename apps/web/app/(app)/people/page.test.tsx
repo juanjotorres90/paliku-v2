@@ -1,12 +1,77 @@
+import type { PeopleDiscoverResponse } from "@repo/validators/people";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Mock apiFetchWithRefresh
+vi.mock("../../lib/api", () => ({
+  apiFetchWithRefresh: vi.fn(),
+  apiFetcher: vi.fn(),
+  ErrorCode: {},
+}));
+
+// Mock next/navigation
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  usePathname: () => "/people",
+}));
+
+// Mock next/image
+vi.mock("next/image", () => ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  default: ({ fill, priority, ...rest }: Record<string, unknown>) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img {...rest} />
+  ),
+}));
+
+const mockDiscoverResponse: PeopleDiscoverResponse = {
+  items: [
+    {
+      id: "user-1",
+      displayName: "Test User 1",
+      location: "Tokyo, Japan",
+      bio: "Hello world",
+      avatarUrl: null,
+      updatedAt: "2024-01-01T00:00:00Z",
+      intents: ["practice"],
+      speaks: [{ languageCode: "japanese", level: "native" }],
+      learning: [{ languageCode: "english", level: "beginner" }],
+      relationshipStatus: null,
+      relationshipId: null,
+      isRequester: null,
+    },
+  ],
+  nextCursor: null,
+};
+
+// Mock SWR
+vi.mock("swr", () => ({
+  default: (key: string | null) => {
+    if (key?.startsWith("/people?")) {
+      return {
+        data: mockDiscoverResponse,
+        isLoading: false,
+        mutate: vi.fn(),
+      };
+    }
+    return { data: undefined, isLoading: false, mutate: vi.fn() };
+  },
+}));
 
 describe("PeoplePage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("renders the main heading", async () => {
     const { default: PeoplePage } = await import("./page");
-
-    const ui = await PeoplePage();
-    render(ui);
+    render(<PeoplePage />);
 
     expect(
       screen.getByRole("heading", { name: "Find Language Partners" }),
@@ -15,119 +80,46 @@ describe("PeoplePage", () => {
 
   it("renders search input", async () => {
     const { default: PeoplePage } = await import("./page");
+    render(<PeoplePage />);
 
-    const ui = await PeoplePage();
-    render(ui);
-
-    const searchInputs = screen.getAllByPlaceholderText(
+    const inputs = screen.getAllByPlaceholderText(
       "Search by name, language, or location...",
     );
-    expect(searchInputs.length).toBeGreaterThan(0);
-  });
-
-  it("renders all filter dropdowns", async () => {
-    const { default: PeoplePage } = await import("./page");
-
-    const ui = await PeoplePage();
-    render(ui);
-
-    const selects = screen.getAllByRole("combobox");
-    expect(selects.length).toBeGreaterThanOrEqual(4); // Native Language, Learning Language, Proficiency Level, Availability
+    expect(inputs.length).toBeGreaterThan(0);
   });
 
   it("renders tab navigation", async () => {
     const { default: PeoplePage } = await import("./page");
+    render(<PeoplePage />);
 
-    const ui = await PeoplePage();
-    render(ui);
-
-    const discoverButtons = screen.getAllByRole("button", { name: "Discover" });
-    const myPartnersButtons = screen.getAllByRole("button", {
-      name: /My Partners/,
-    });
-    expect(discoverButtons.length).toBeGreaterThan(0);
-    expect(myPartnersButtons.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Discover").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("My Partners").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Requests").length).toBeGreaterThan(0);
   });
 
-  it("shows notification badge on Requests tab", async () => {
+  it("shows person card with name and languages", async () => {
     const { default: PeoplePage } = await import("./page");
+    render(<PeoplePage />);
 
-    const ui = await PeoplePage();
-    render(ui);
-
-    const requestsTabs = screen.getAllByRole("button", { name: /Requests/ });
-    expect(requestsTabs.length).toBeGreaterThan(0);
-    // Badge shows count of 3
-    expect(requestsTabs[0]?.textContent).toContain("3");
+    expect(screen.getAllByText("Test User 1").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Tokyo, Japan").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Japanese/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/English/).length).toBeGreaterThan(0);
   });
 
-  it("renders multiple people cards", async () => {
+  it("shows connect button for users without relationship", async () => {
     const { default: PeoplePage } = await import("./page");
-
-    const ui = await PeoplePage();
-    render(ui);
+    render(<PeoplePage />);
 
     const connectButtons = screen.getAllByRole("button", { name: "Connect" });
-    expect(connectButtons.length).toBeGreaterThanOrEqual(6); // 6 people cards
+    expect(connectButtons.length).toBeGreaterThan(0);
   });
 
-  it("shows online status indicators", async () => {
+  it("shows filter dropdowns", async () => {
     const { default: PeoplePage } = await import("./page");
+    render(<PeoplePage />);
 
-    const ui = await PeoplePage();
-    render(ui);
-
-    const onlineStatuses = screen.getAllByText("Online now");
-    expect(onlineStatuses.length).toBeGreaterThan(0);
-  });
-
-  it("displays language information on cards", async () => {
-    const { default: PeoplePage } = await import("./page");
-
-    const ui = await PeoplePage();
-    render(ui);
-
-    expect(screen.getAllByText("Speaks").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Learning").length).toBeGreaterThan(0);
-  });
-
-  it("renders Connect and View Profile buttons for each card", async () => {
-    const { default: PeoplePage } = await import("./page");
-
-    const ui = await PeoplePage();
-    render(ui);
-
-    const connectButtons = screen.getAllByRole("button", { name: "Connect" });
-    const viewProfileButtons = screen.getAllByRole("button", {
-      name: "View Profile",
-    });
-
-    expect(connectButtons.length).toBeGreaterThanOrEqual(6);
-    expect(viewProfileButtons.length).toBeGreaterThanOrEqual(6);
-  });
-
-  it("renders pagination controls", async () => {
-    const { default: PeoplePage } = await import("./page");
-
-    const ui = await PeoplePage();
-    render(ui);
-
-    const previousButtons = screen.getAllByRole("button", { name: "Previous" });
-    const nextButtons = screen.getAllByRole("button", { name: "Next" });
-    expect(previousButtons.length).toBeGreaterThan(0);
-    expect(nextButtons.length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Page 1 of 10").length).toBeGreaterThan(0);
-  });
-
-  it("displays bio preview on cards", async () => {
-    const { default: PeoplePage } = await import("./page");
-
-    const ui = await PeoplePage();
-    render(ui);
-
-    expect(
-      screen.getAllByText(/Hi! I'm looking for language exchange partners/)
-        .length,
-    ).toBeGreaterThan(0);
+    const selects = screen.getAllByRole("combobox");
+    expect(selects.length).toBeGreaterThanOrEqual(3);
   });
 });

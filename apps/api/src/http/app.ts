@@ -1,27 +1,32 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import type { RouteEnv } from "./context";
-import type { AppConfig } from "../server/config";
-import { createAuthRoutes } from "../modules/auth/http/routes";
-import { createMeRoutes } from "../modules/auth/http/me.routes";
-import { createProfileRoutes } from "../modules/profile/http/routes";
-import { createJwtAuth } from "../modules/auth/http/middleware/jwt-auth";
-import { createSettingsRoutes } from "../modules/settings/http/routes";
-import { createI18nRoutes } from "../modules/i18n/http/routes";
-import { createI18nMiddleware } from "./middleware/i18n";
-import { mapErrorToStatus, formatErrorI18n } from "./utils/error-mapper";
-import { getLocale, getT } from "./utils/i18n";
 import type {
   AuthProviderPort,
   JWTVerifierPort,
 } from "../modules/auth/application/ports";
 import type { PKCEHelpers } from "../modules/auth/domain/pkce";
+import { createMeRoutes } from "../modules/auth/http/me.routes";
+import { createJwtAuth } from "../modules/auth/http/middleware/jwt-auth";
+import { createAuthRoutes } from "../modules/auth/http/routes";
+import { createI18nRoutes } from "../modules/i18n/http/routes";
+import type {
+  PeopleRepositoryPort,
+  UserLanguagesRepositoryPort,
+} from "../modules/people/application/ports";
+import { createPeopleRoutes } from "../modules/people/http/routes";
 import type {
   AvatarStoragePort,
   ProfileRepositoryPort,
   UserEmailPort,
 } from "../modules/profile/application/ports";
+import { createProfileRoutes } from "../modules/profile/http/routes";
 import type { SettingsRepositoryPort } from "../modules/settings/application/ports";
+import { createSettingsRoutes } from "../modules/settings/http/routes";
+import type { AppConfig } from "../server/config";
+import type { RouteEnv } from "./context";
+import { createI18nMiddleware } from "./middleware/i18n";
+import { formatErrorI18n, mapErrorToStatus } from "./utils/error-mapper";
+import { getLocale, getT } from "./utils/i18n";
 
 interface HttpAppContext {
   config: AppConfig;
@@ -32,6 +37,8 @@ interface HttpAppContext {
   avatarStorage: AvatarStoragePort;
   userEmail: UserEmailPort;
   settingsRepo: SettingsRepositoryPort;
+  peopleRepo: PeopleRepositoryPort;
+  languagesRepo: UserLanguagesRepositoryPort;
 }
 
 export function createHttpApp(ctx: HttpAppContext) {
@@ -97,7 +104,7 @@ export function createHttpApp(ctx: HttpAppContext) {
         return undefined;
       },
       allowHeaders: ["Authorization", "Content-Type"],
-      allowMethods: ["GET", "POST", "PATCH", "OPTIONS"],
+      allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
     }),
   );
@@ -147,6 +154,17 @@ export function createHttpApp(ctx: HttpAppContext) {
       {
         config: ctx.config,
         settingsRepo: ctx.settingsRepo,
+      },
+      jwtAuth,
+    ),
+  );
+
+  app.route(
+    "/people",
+    createPeopleRoutes(
+      {
+        peopleRepo: ctx.peopleRepo,
+        languagesRepo: ctx.languagesRepo,
       },
       jwtAuth,
     ),

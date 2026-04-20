@@ -1,14 +1,16 @@
-import type { AppConfig } from "./config";
-import { buildConfig } from "./config";
 import { createHttpApp } from "../http/app";
-import { createFetchHttpClient } from "../shared/infrastructure/http-client";
-import { createSupabaseAuthAdapter } from "../modules/auth/infrastructure/supabase-auth.adapter";
 import { createJWTVerifier } from "../modules/auth/infrastructure/jwt-verifier.adapter";
 import { createPKCEHelpers } from "../modules/auth/infrastructure/pkce-crypto.adapter";
-import { createSupabaseProfileRepo } from "../modules/profile/infrastructure/supabase-profile.repo";
+import { createSupabaseAuthAdapter } from "../modules/auth/infrastructure/supabase-auth.adapter";
+import { createSupabaseLanguagesRepo } from "../modules/people/infrastructure/supabase-languages.repo";
+import { createSupabasePeopleRepo } from "../modules/people/infrastructure/supabase-people.repo";
 import { createSupabaseAvatarStorage } from "../modules/profile/infrastructure/supabase-avatar-storage.adapter";
+import { createSupabaseProfileRepo } from "../modules/profile/infrastructure/supabase-profile.repo";
 import { createAuthUserEmailPort } from "../modules/profile/infrastructure/user-email.adapter";
 import { createSupabaseSettingsRepo } from "../modules/settings";
+import { createFetchHttpClient } from "../shared/infrastructure/http-client";
+import type { AppConfig } from "./config";
+import { buildConfig } from "./config";
 
 export interface CreateAppOptions {
   config?: AppConfig;
@@ -25,6 +27,15 @@ export function createApp(options: CreateAppOptions = {}) {
   const avatarStorage = createSupabaseAvatarStorage(config.supabase);
   const userEmail = createAuthUserEmailPort(authProvider);
   const settingsRepo = createSupabaseSettingsRepo(config.supabase, httpClient);
+  const languagesRepo = createSupabaseLanguagesRepo(
+    config.supabase,
+    httpClient,
+  );
+  const peopleRepo = createSupabasePeopleRepo(
+    config.supabase,
+    httpClient,
+    languagesRepo,
+  );
 
   return createHttpApp({
     config,
@@ -35,5 +46,7 @@ export function createApp(options: CreateAppOptions = {}) {
     avatarStorage,
     userEmail,
     settingsRepo,
+    peopleRepo,
+    languagesRepo,
   });
 }
